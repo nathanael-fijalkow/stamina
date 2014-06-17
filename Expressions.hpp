@@ -38,8 +38,6 @@ const LetterExpr * isLetterExpr(const ExtendedExpression * expr);
 class ExtendedExpression
 {
 public:
-	// The hash
-	HashExpr _hash;
 
 	// Function returning the hash
 	HashExpr Hash() const { return _hash ; };
@@ -51,8 +49,10 @@ public:
 	bool operator == (const ExtendedExpression & exp) const;
 
 protected:
-	// The constructor. It should update the hash value 
-	// What is this for??????
+	// The hash
+	HashExpr _hash;
+
+	// The constructor is protected to avoid direct instantiation
 	ExtendedExpression(){};
 };
 
@@ -106,11 +106,14 @@ public:
 	// the leftmost at address sons + sonsNb - 1
 	const ExtendedExpression ** sons;
 
-	// First constructor: ?????
+	// First constructor:
 	ConcatExpr(const LetterExpr * expr, uint maxSonsNb);
 
-	// Second constructor: ?????
+	// This is a copy constructor which performs a memcopy of the field sons
 	ConcatExpr(const ConcatExpr & other);
+
+	// This is an assignment operator which performs a memcopy  of the field sons
+	ConcatExpr & operator=(const ConcatExpr &);
 
 	// Free the memory for a useless expression
 	~ConcatExpr();
@@ -130,6 +133,7 @@ public:
 		}
 		return true;
 	};
+
 
 	// Print
 	virtual void print() const;

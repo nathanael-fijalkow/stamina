@@ -26,6 +26,18 @@ ConcatExpr::ConcatExpr(const LetterExpr * expr, uint maxSonsNb)
 	update_hash();
 };
 
+ConcatExpr & ConcatExpr::operator=(const ConcatExpr & other)
+{
+	if (this != &other)
+	{
+		sonsNb = other.sonsNb;
+		_hash = other._hash;
+		sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
+		memcpy(sons, other.sons, sonsNb * sizeof(void *));
+	}	
+	return *this;
+}
+
 ConcatExpr::ConcatExpr(const ConcatExpr & other) : sonsNb(other.sonsNb)
 {
 	_hash = other._hash;
