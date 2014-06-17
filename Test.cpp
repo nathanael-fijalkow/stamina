@@ -1,11 +1,16 @@
 #include <iostream>
 
-#include "Expressions.cpp"
-#include "Matrix.cpp"
-#include "MarkovMonoid.cpp"
+#include "Expressions.hpp"
+#include "Matrix.hpp"
+#include "MarkovMonoid.hpp"
 
 #include <fstream>
 #include <sstream>
+
+#ifdef MSVC
+#include <windows.h>
+#include <time.h>
+#endif
 
 using namespace std;
 

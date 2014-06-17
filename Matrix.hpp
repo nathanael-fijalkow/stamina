@@ -1,7 +1,10 @@
+#ifndef MATRIX_HPP
+#define MATRIX_HPP
+
 #include <unordered_set>
 #include <vector>
 
-//#include "Expressions.hpp"
+#include "Expressions.hpp"
 
 typedef size_t HashMat;
 typedef size_t HashRowCol;
@@ -177,3 +180,6 @@ namespace std
 		}
 	};
 }
+
+
+#endif

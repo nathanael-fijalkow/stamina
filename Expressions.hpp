@@ -1,3 +1,6 @@
+#ifndef EXPRESSIONS_HPP
+#define EXPRESSIONS_HPP
+
 #include <string>
 
 typedef unsigned int uint;
@@ -5,12 +8,17 @@ typedef unsigned int uint;
 // Defines a hash function
 #define _HASH_SEED      (size_t)0xdeadbeef
 
+#ifndef MSVC
 size_t hash_value(const size_t & _Keyval)
 {
         return ((size_t)_Keyval ^ _HASH_SEED);
 }
+#else
+#include <functional>
+#include <xhash>
+using namespace std;
 
-
+#endif
 
 // The expressions are accessible by their hashes
 typedef size_t HashExpr;
@@ -175,3 +183,5 @@ namespace std
 		}
 	};
 }
+
+#endif

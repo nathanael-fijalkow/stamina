@@ -1,6 +1,10 @@
+#ifndef MARKOV_MONOID_HPP
+#define MARKOV_MONOID_HPP
+
 #include <map>
 
-//#include "Matrix.hpp"
+#include "Matrix.hpp"
+#include <Expressions.hpp>
 
 using namespace std;
 
@@ -71,3 +75,6 @@ protected:
 	// Number of states of the automaton
 	uint dim;
 };
+
+
+#endif
