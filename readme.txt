@@ -11,7 +11,6 @@ des règles de réécritures d'expressions qui réduisent la taille de l'express
 Le système de réécriture est complet au sens où il permet de réécrire toute
 #-expression en la #-expression canonique de la matrice sous-jacente.
 
-
 ****************************************
 ********* ALGORITHME **************
 ****************************************

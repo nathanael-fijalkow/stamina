@@ -1,9 +1,8 @@
 #include <string.h>
 #include <iostream>
-
 #include "Matrix.hpp"
 
-
+// Class ExplicitMatrix
 ExplicitMatrix::ExplicitMatrix(uint stateNb) : stateNb(stateNb)
 {
 	coefficients = (char *)malloc(stateNb * stateNb * sizeof(char));
@@ -15,12 +14,21 @@ ExplicitMatrix::~ExplicitMatrix()
 	coefficients = NULL;
 };
 
+// Class Vector
+// First constructor
 Vector::Vector(uint size) : entriesNb(size)
 {
-	entries = (size_t *)malloc(entriesNb
-		* sizeof(size_t));
+	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
 }
 
+// Second constructor
+Vector::Vector(const Vector & other) : entriesNb(other.entriesNb), _hash(other.Hash())
+{
+	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
+	memcpy(entries, other.entries, entriesNb * sizeof(size_t));
+}
+
+// Third constructor
 Vector::Vector(vector<size_t> data) : entriesNb(data.size())
 {
 	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
@@ -30,18 +38,13 @@ Vector::Vector(vector<size_t> data) : entriesNb(data.size())
 	update_hash();
 }
 
+// Fourth constructor
 Vector::Vector(size_t * data, size_t data_size) : entriesNb(data_size)
 {
 	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
 	memcpy(entries, data, entriesNb * sizeof(size_t));
 	update_hash();
 };
-
-Vector::Vector(const Vector & other) : entriesNb(other.entriesNb), _hash(other.Hash())
-{
-	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
-	memcpy(entries, other.entries, entriesNb * sizeof(size_t));
-}
 
 void Vector::print() const
 {
@@ -51,7 +54,6 @@ void Vector::print() const
 	}
 	cout << endl;
 }
-
 
 Vector::~Vector()
 {
@@ -74,12 +76,7 @@ bool Vector::operator==(const Vector & vec) const
 	return true;
 }
 
-// The set of known vectors
-unordered_set<Vector> Matrix::vectors;
-
-// The zero vector
-const Vector * Matrix::zero_vector = NULL;
-
+// Class Matrix
 void Matrix::allocate()
 {
 	row_pluses = (const Vector **)malloc(stateNb * sizeof(void *));
@@ -100,7 +97,6 @@ Matrix::Matrix(const ExplicitMatrix & explMatrix) : stateNb(explMatrix.stateNb)
 	allocate();
 	for (uint i = 0; i < stateNb; i++)
 	{
-
 		vector<size_t> r_pluses;
 		vector<size_t> r_ones;
 		vector<size_t> c_pluses;
@@ -165,13 +161,36 @@ void Matrix::print() const
 	}
 }
 
-// Construct a vector obtained by multiplying the line vec by all columns of mat
-const Vector * Matrix::sub_prod(
-	const Vector * vec,
-	const Vector ** mat,
-	size_t stateNb
-	)
+bool Matrix::operator==(const Matrix & mat) const
 {
+	if (mat.stateNb != stateNb) return false;
+	if (mat._hash != _hash) return false;
+
+	const Vector ** row = row_ones;
+	const Vector ** row1 = mat.row_ones;
+	for (; row != row_ones + stateNb; row++, row1++)
+	{
+		if (*row != *row1) return false;
+	}
+
+	row = row_pluses;
+	row1 = mat.row_pluses;
+	for (; row != row_pluses + stateNb; row++, row1++)
+	{
+		if (*row != *row1) return false;
+	}
+
+	return true;
+};
+
+// The set of known vectors
+unordered_set<Vector> Matrix::vectors;
+
+// The zero vector
+const Vector * Matrix::zero_vector = NULL;
+
+// Construct a vector obtained by multiplying the line vec by all columns of mat
+const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat, size_t stateNb){
 	if (vec == Matrix::zero_vector)	return Matrix::zero_vector;
 
 	size_t * new_vec = (size_t *)malloc(stateNb * sizeof(size_t));
@@ -245,13 +264,12 @@ bool Matrix::recurrent (int j) const{
 
 // Create a new vector, keep only coordinates of v that are true in tab
 Vector purge(const Vector *varg,bool * tab){
-//size of purged vector to precompute
+// size of purged vector to precompute
     int nbtab = 0;
-        for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++)
-	{
-        if(tab[*ent]) nbtab++;
-    }
-//end of precomputation
+        for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++){
+			if(tab[*ent]) nbtab++;
+		}
+
     size_t * data = (size_t*) malloc (nbtab*(sizeof(size_t)));
     size_t * datastart = data;
     for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++)
@@ -287,28 +305,6 @@ Matrix Matrix::stab(const Matrix & mat)
     result.update_hash();
     return result;
 }
-
-bool Matrix::operator==(const Matrix & mat) const
-{
-	if (mat.stateNb != stateNb) return false;
-	if (mat._hash != _hash) return false;
-
-	const Vector ** row = row_ones;
-	const Vector ** row1 = mat.row_ones;
-	for (; row != row_ones + stateNb; row++, row1++)
-	{
-		if (*row != *row1) return false;
-	}
-
-	row = row_pluses;
-	row1 = mat.row_pluses;
-	for (; row != row_pluses + stateNb; row++, row1++)
-	{
-		if (*row != *row1) return false;
-	}
-
-	return true;
-};
 
 bool Matrix::isIdempotent() const
 {

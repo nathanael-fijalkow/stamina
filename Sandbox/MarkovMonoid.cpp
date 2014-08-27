@@ -1,233 +1,5 @@
 #include <iostream>
-
 #include "MarkovMonoid.hpp"
-
-// Constructor
-UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : dim(dim)
-{
-	Matrix::vectors.clear();
-	Matrix::zero_vector = &*Matrix::vectors.emplace(0).first;
-};
-
-// Cleans up knowns vectors
-UnstableMarkovMonoid::~UnstableMarkovMonoid()
-{
-	Matrix::vectors.clear();
-	Matrix::zero_vector = NULL;;
-};
-
-// Adds a pair (expression, matrix) in the monoid
-void UnstableMarkovMonoid::addElement(const ExtendedExpression * new_expr, const Matrix * new_mat)
-{
-	expr_to_mat[new_expr] = new_mat;
-	mat_to_expr[new_mat] = new_expr;
-
-	elements.push_back(new_expr);
-	
-	if (expr_to_mat.size() % 10000 == 0)
-		cout << expr_to_mat.size() << " elements, " << rewriteRules.size() << " rewrite rules and " << Matrix::vectors.size() << " vectors." << endl;
-}
-
-// Adds a rewrite rule
-void UnstableMarkovMonoid::addRewriteRule(const ExtendedExpression * pattern, const ExtendedExpression * rewritten)
-{
-	rewriteRules[pattern] = rewritten;
-}
-
-void UnstableMarkovMonoid::addLetter(char a, ExplicitMatrix & mat)
-{
-	unordered_set<LetterExpr>::const_iterator it = letterExpressions.emplace(a).first;
-	unordered_set<Matrix>::const_iterator it2 = matrices.emplace(mat).first;
-
-	const ExtendedExpression * new_expr = &(*it);
-	const Matrix * new_mat = &(*it2);
-	addElement(new_expr, new_mat);
-}
-
-void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_left,const ExtendedExpression * elt_right)
-{
-
-	// First case: elt_left is a concatenation of expressions
-	const ConcatExpr * concatExprLeft = isConcatExpr(elt_left);
-	const LetterExpr * LetterExprLeft = isLetterExpr(elt_left);
-	const SharpedExpr * SharpedExprLeft = isSharpedExpr(elt_left);
-	if (concatExprLeft != NULL)
-	{
-
-		bool rewrite_rule_found = false;
-
-		// First subcase: elt_right is a concatenation of expressions
-		const ConcatExpr * concatExprRight = isConcatExpr(elt_right);
-		const LetterExpr * LetterExprRight = isLetterExpr(elt_right);
-		const SharpedExpr * SharpedExprRight = isSharpedExpr(elt_right);
-		if (concatExprRight != NULL)
-		{
-			// TO DO: si left = u_1 ... u_k et right = v_1 ... v_n, il faut vérifier si u_i ... u_k v_1 ... v_j se réduit pour tout i, j.
-		}
-
-		// Second and third subcase: elt_right is a letter or a sharped expression
-		else 
-		{
-			ConcatExpr new_concat_expr(elt_right, concatExprLeft->sonsNb + 1);
-						
-			// For each strict suffix, we test if the expression (which is necessarilly known) is reducible
-			for (uint i = 0; i < concatExprLeft->sonsNb - 1; i++)
-			{
-				const ExtendedExpression * new_e = concatExprLeft->sons[i];
-				new_concat_expr.addLeftSon(new_e);
-					unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
-				if (ok != concatExpressions.end())
-				{
-					const ConcatExpr * uuid = &(*ok);
-					map<const ExtendedExpression *, const ExtendedExpression *>::iterator rewrite_rule = rewriteRules.find(uuid);
-					// skip if a rewrite rule exists
-					if (rewrite_rule != rewriteRules.end())
-					{
-						rewrite_rule_found = true;
-						break;
-					}
-				}
-			}	
-
-			if (!rewrite_rule_found)
-			{
-				// We compute the matrix
-				const Matrix * mat_left = expr_to_mat[elt_left];
-				const Matrix * mat_right = expr_to_mat[elt_right];
-				Matrix mat = Matrix::prod(* mat_left,* mat_right);
-		
-				pair <unordered_set<Matrix>::iterator, bool> result = matrices.emplace(mat);
-
-				new_concat_expr.addLeftSon(concatExprLeft->sons[concatExprLeft->sonsNb - 1]);
-
-				unordered_set<ConcatExpr>::iterator it = concatExpressions.emplace(new_concat_expr).first;
-				const ConcatExpr * new_expr = &*it;
-				if (result.second)
-				{
-					addElement(new_expr, &(*result.first));
-				}
-				else
-				{
-					const ExtendedExpression * rewriten = mat_to_expr[&(*result.first)];
-					addRewriteRule(new_expr, rewriten);
-				}
-			}
-		}
-	}
-
-	// Second case: elt_left is a letter
-	else if (LetterExprLeft != NULL)
-	{				
-		// First subcase: elt_right is a concatenation of expressions
-		const ConcatExpr * concatExprRight = isConcatExpr(elt_right);
-		const LetterExpr * LetterExprRight = isLetterExpr(elt_right);
-		const SharpedExpr * SharpedExprRight = isSharpedExpr(elt_right);
-		if (concatExprRight != NULL)
-		{
-			// TO DO: si left = a et right = v_1 ... v_n, il faut vérifier si a v_1 ... v_j se réduit pour tout j.			
-		}
-		// Second subcase: elt_right is a letter
-		else if (LetterExprRight != NULL)
-		{
-			// TO DO: si left = a et right = b, traiter ab
-		}
-
-		// Third subcase: elt_right is a sharped expression
-		else
-		{
-			// TO DO: si left = a et right = b^sharp, traiter a b^sharp			
-		}
-	}
-	
-	// Third case: elt_left is a sharped expression
-	else
-	{
-		// First subcase: elt_right is a concatenation of expressions
-		const ConcatExpr * concatExprRight = isConcatExpr(elt_right);
-		const LetterExpr * LetterExprRight = isLetterExpr(elt_right);
-		const SharpedExpr * SharpedExprRight = isSharpedExpr(elt_right);
-		if (concatExprRight != NULL)
-		{
-			// TO DO: si left = u^\sharp et right = v_1...v_n, il faut vérifier si u^sharp v_1...v_j se réduit pour tout j			
-		}
-		// Second subcase: elt_right is a letter
-		else if (LetterExprRight != NULL)
-		{
-			// TO DO: si left = u^\sharp et right = a, traiter u^sharp a						
-		}
-
-		// Third subcase: elt_right is a sharped expression
-		else
-		{
-			// TO DO: si left = u^\sharp et right = v^sharp, traiter u^sharp v^sharp									
-		}
-	}
-}
-
-bool UnstableMarkovMonoid::CloseByProduct()
-{
-	/*  iterer sur tous les elements
-		pour chaque element u,
-		pour chaque element v,
-			on teste si uv est reductible
-			si oui -> on fait rien
-			si non -> on calcule la matrice, on teste si elle existe deja
-				si oui -> on ajoute la nouvelle regle de reecriture
-				si non -> on ajoute le nouvel element
-	*/
-
-	new_elements.clear();
-
-	size_t i = 0;
-
-	while (i < elements.size())
-	{
-		const ExtendedExpression *expr_left = elements[i];
-		size_t j = 0;
-		while (j < elements.size())
-		{
-			const ExtendedExpression *expr_right = elements[j];
-			process_expression(expr_left,expr_right);
-			j++;
-		}
-		i++;
-	}
-
-	return (new_elements.size() != 0);
-}
-
-void UnstableMarkovMonoid::sharpify_expression(const ExtendedExpression * elt){
-
-	const Matrix * mat_e = expr_to_mat[elt];
-
-	if ((*mat_e).isIdempotent()){
-		Matrix mat = Matrix::stab(* mat_e);
-
-		pair <unordered_set <Matrix>::iterator, bool> result = matrices.emplace(mat);
-		unordered_set<SharpedExpr>::iterator it = sharpExpressions.emplace(elt).first;
-
-		const SharpedExpr * new_expr = &*it;
-		if (result.second){
-			addElement(new_expr, &(*result.first));
-		}
-		else {
-			const ExtendedExpression * rewriten = mat_to_expr[&(*result.first)];
-			addRewriteRule(new_expr, rewriten);
-		}
-	}
-}
-
-void UnstableMarkovMonoid::CloseByStabilization()
-{
-	size_t cur_index = 0;
-
-	while (cur_index < new_elements.size())
-	{
-		const ExtendedExpression *expr = new_elements[cur_index];
-		sharpify_expression(expr);
-		cur_index++;
-	}
-}
 
 // Print
 void MarkovMonoid::print()
@@ -255,3 +27,315 @@ void MarkovMonoid::print()
 	}
 }
 
+// Constructor
+UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : dim(dim)
+{
+	Matrix::vectors.clear();
+	Matrix::zero_vector = &*Matrix::vectors.emplace(0).first;
+};
+
+// Free known vectors
+UnstableMarkovMonoid::~UnstableMarkovMonoid()
+{
+	Matrix::vectors.clear();
+	Matrix::zero_vector = NULL;;
+};
+
+// Adds a letter
+void UnstableMarkovMonoid::addLetter(char a, ExplicitMatrix & mat)
+{
+	unordered_set<LetterExpr>::const_iterator it = letterExpressions.emplace(a).first;
+	unordered_set<Matrix>::const_iterator it2 = matrices.emplace(mat).first;
+
+	const ExtendedExpression * new_expr = &(*it);
+	const Matrix * new_mat = &(*it2);
+
+	expr_to_mat[new_expr] = new_mat;
+	mat_to_expr[new_mat] = new_expr;
+
+	new_elements.push_back(new_expr);
+	to_be_sharpified.push_back(new_expr);
+}
+
+// Adds a rewrite rule
+void UnstableMarkovMonoid::addRewriteRule(const ExtendedExpression * pattern, const ExtendedExpression * rewritten)
+{
+	rewriteRules[pattern] = rewritten;
+}
+
+// The main subfunction for ClosureProduct: process an expression
+/* if uv is not reducible
+	then compute the matrix M,
+		if M exists already, 
+		then add a rewriting rule,
+		else add a new element */
+void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_left,const ExtendedExpression * elt_right)
+{
+		cout << "Processing: " ;
+		(*elt_left).print();
+		cout << " and " ;
+		(*elt_right).print();
+		cout << "." << endl;
+
+	cout << "concat expressions known: " ;
+	for (const auto& expr: concatExpressions) 
+	{
+		expr.print();
+		cout << " " ;
+	}
+	cout << endl ;
+	
+	// Casts
+	const ConcatExpr * ConcatExprLeft = isConcatExpr(elt_left);
+	const ConcatExpr * ConcatExprRight = isConcatExpr(elt_right);
+
+	bool rewrite_rule_found = false;
+
+	// First case: elt_left and elt_right are concatenations of expressions
+	if ((ConcatExprLeft != NULL) && (ConcatExprRight != NULL))
+	{
+		/* For each prefix v_1 ... v_i of elt_right
+		 * 		For each suffix u_j ... u_k of elt_left
+		 * 			Test if u_j ... u_k v_1 ... v_i is reducible
+		 */
+		ConcatExpr new_concat_expr(ConcatExprLeft->sons[0], ConcatExprRight->sonsNb + ConcatExprLeft->sonsNb);
+
+		for (uint i = 1; i <= ConcatExprRight->sonsNb; i++)
+		{
+			// Compute the prefix v_1 ... v_i 
+			ConcatExpr prefix_right_upto_i(i, ConcatExprRight);
+
+			ConcatExpr new_concat_expr(&prefix_right_upto_i, ConcatExprRight->sonsNb + ConcatExprLeft->sonsNb);
+			for (uint j = 0; j < ConcatExprLeft->sonsNb; j++)
+			{
+				const ExtendedExpression * new_e = ConcatExprLeft->sons[j]; 
+				new_concat_expr.addLeftSon(new_e);
+				unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
+				if (ok != concatExpressions.end())
+				{
+					const ConcatExpr * uuid = &(*ok);
+					map<const ExtendedExpression *, const ExtendedExpression *>::iterator rewrite_rule = rewriteRules.find(uuid);
+					// skip if a rewrite rule exists
+					if (rewrite_rule != rewriteRules.end())
+					{
+						rewrite_rule_found = true;
+						break;
+					}
+				}
+			}
+			if (rewrite_rule_found == true) break; 
+		}
+	}
+
+	// Second case: elt_right is a concatenation of expressions
+	else if (ConcatExprRight != NULL)
+	{
+		// For each strict prefix of elt_right, we test if the expression (which is necessarily known) is reducible
+		for (uint i = 1; i < ConcatExprRight->sonsNb; i++)
+		{
+			// Compute the prefix v_1 ... v_i 
+			ConcatExpr prefix_right_upto_i(i, ConcatExprRight);
+			ConcatExpr new_concat_expr(&prefix_right_upto_i, ConcatExprRight->sonsNb + 1);
+			new_concat_expr.addLeftSon(elt_left);
+			
+			cout << "check if this rewrites: " ;
+			new_concat_expr.print() ;
+			cout << endl ;
+			
+			unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
+			if (ok != concatExpressions.end())
+			{
+				cout << "here1 " ;
+				const ConcatExpr * uuid = &(*ok);
+				map<const ExtendedExpression *, const ExtendedExpression *>::iterator rewrite_rule = rewriteRules.find(uuid);
+				// skip if a rewrite rule exists
+				if (rewrite_rule != rewriteRules.end())
+				{
+				cout << "here2 " ;
+					rewrite_rule_found = true;
+					break;
+				}
+			}
+		}	
+	}
+
+	// Third case: elt_left is a concatenation expression
+	else if (ConcatExprLeft != NULL)
+	{
+		ConcatExpr new_concat_expr(elt_right, ConcatExprLeft->sonsNb + 1);
+						
+		// For each strict suffix of elt_left, we test if the expression (which is necessarily known) is reducible
+		for (uint i = 0; i < ConcatExprLeft->sonsNb - 1; i++)
+		{
+			const ExtendedExpression * new_e = ConcatExprLeft->sons[i];
+			new_concat_expr.addLeftSon(new_e);
+			unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
+			if (ok != concatExpressions.end())
+			{
+				const ConcatExpr * uuid = &(*ok);
+				map<const ExtendedExpression *, const ExtendedExpression *>::iterator rewrite_rule = rewriteRules.find(uuid);
+				// skip if a rewrite rule exists
+				if (rewrite_rule != rewriteRules.end())
+				{
+					rewrite_rule_found = true;
+					break;
+				}
+			}
+		}	
+	}
+
+// Now, treat if no rewrite rules have been found
+	if (!rewrite_rule_found)
+	{
+		// We compute the matrix
+		const Matrix * mat_left = expr_to_mat[elt_left];
+		const Matrix * mat_right = expr_to_mat[elt_right];
+		Matrix mat = Matrix::prod(* mat_left,* mat_right);
+	
+		pair <unordered_set<Matrix>::iterator, bool> result = matrices.emplace(mat);
+		ConcatExpr new_c_expr(elt_left,elt_right);
+		concatExpressions.emplace(new_c_expr);
+		
+		unordered_set<ConcatExpr>::iterator it = concatExpressions.emplace(new_c_expr).first;
+		const ConcatExpr * new_expr = &*it;
+	
+		if (result.second)
+		{
+			cout << "Add element: ";
+			new_c_expr.print() ;
+			cout << endl;
+
+			expr_to_mat[new_expr] = &(*result.first);
+			mat_to_expr[&(*result.first)] = new_expr;
+
+			new_elements.push_back(new_expr);
+			to_be_sharpified.push_back(new_expr);
+
+		}
+		else
+		{
+			const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
+			cout << "Add rewrite rule: ";
+			(*rewritten).print() ;
+			cout << endl;
+			addRewriteRule(new_expr, rewritten);
+		}
+	}
+}
+
+void UnstableMarkovMonoid::CloseByProduct()
+{
+	/* Iterating over all elements
+	 *  For every element u,
+	 * 		For every element v,
+	 * 			process(u,v)
+	*/
+
+	size_t i = 0;
+
+	while (i < elements.size())
+	{
+		const ExtendedExpression * expr_left = elements[i];
+
+		size_t j = 0;
+		while (j < new_elements.size())
+		{
+			const ExtendedExpression * expr_right = new_elements[j];
+			process_expression(expr_left,expr_right);
+			process_expression(expr_right,expr_left);
+			j++;
+		}
+		i++;			
+	}
+
+	i = 0;
+
+	while (i < new_elements.size())
+	{
+		const ExtendedExpression * expr_left = new_elements[i];
+
+		size_t j = 0;
+		while (j < new_elements.size())
+		{
+			const ExtendedExpression * expr_right = new_elements[j];
+			process_expression(expr_left,expr_right);
+			j++;
+		}
+		i++;			
+	}
+}
+
+// Takes an expression, computes its stabilization if it is idempotent,
+// and either add a rewrite rule if the stabilization already exists, or a new element if it does not
+void UnstableMarkovMonoid::sharpify_expression(const ExtendedExpression * elt){
+
+	const Matrix * mat_e = expr_to_mat[elt];
+
+	if ((*mat_e).isIdempotent()){
+		Matrix mat = Matrix::stab(* mat_e);
+
+		pair <unordered_set <Matrix>::iterator, bool> result = matrices.emplace(mat);
+		unordered_set<SharpedExpr>::iterator it = sharpExpressions.emplace(elt).first;
+		// DO WE ACTUALLY NEED SHARPEXPRESSIONS (UNORDERED SET)????
+		const SharpedExpr * new_expr = &*it;
+		if (result.second){
+			expr_to_mat[new_expr] = &(*result.first);
+			mat_to_expr[&(*result.first)] = new_expr;
+			new_elements.push_back(new_expr);
+		}
+		else {
+			const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
+			addRewriteRule(new_expr, rewritten);
+		}
+	}
+}
+
+// Goes through all the new elements and sharpify them
+void UnstableMarkovMonoid::CloseByStabilization()
+{
+	size_t cur_index = 0;
+
+	while (cur_index < to_be_sharpified.size())
+	{
+		const ExtendedExpression *expr = to_be_sharpified[cur_index];
+		sharpify_expression(expr);
+		cur_index++;
+	}
+}
+
+void UnstableMarkovMonoid::ComputeMarkovMonoid(UnstableMarkovMonoid * monoid)
+{
+	size_t cur_index = 0;
+	while (cur_index < monoid->elements.size())
+	{
+		new_elements.push_back(monoid->elements[cur_index]);
+		to_be_sharpified.push_back(monoid->elements[cur_index]);
+		cur_index++;
+	}
+
+	int i = 1 ;
+	do
+	{
+		cout << endl << "The current monoid is: " << endl << endl ;
+
+		print() ;
+		cout << endl << "Starting iteration " << i << endl << endl ;
+		cout << endl << "------> Closure by product" << endl ;
+		CloseByProduct();
+
+		cur_index = 0;
+		while (cur_index < to_be_sharpified.size())
+		{
+			elements.push_back(new_elements[cur_index]);
+			cur_index++;
+		}
+
+		new_elements.clear();	
+
+		cout << "------> Closure by stabilization" << endl << endl ;
+		CloseByStabilization() ;
+		to_be_sharpified.clear();
+		i++;
+	} while (to_be_sharpified.size() != 0);
+
+}

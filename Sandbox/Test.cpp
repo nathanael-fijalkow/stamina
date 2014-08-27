@@ -18,96 +18,59 @@ int main(int argc, char **argv)
 {
 	cout << "Acme++ rules" << endl;
 
-	unsigned int seed = time(NULL);
+	ExplicitMatrix mata(3);
+	mata.coefficients[0] = 2;
+	mata.coefficients[1] = 0;
+	mata.coefficients[2] = 0;
+	mata.coefficients[3] = 2;
+	mata.coefficients[4] = 2;
+	mata.coefficients[5] = 0;
+	mata.coefficients[6] = 0;
+	mata.coefficients[7] = 0;
+	mata.coefficients[8] = 2;
 
-	unsigned int nb_samples = 1;
+	ExplicitMatrix matb(3);
+	matb.coefficients[0] = 0;
+	matb.coefficients[1] = 2;
+	matb.coefficients[2] = 0;
+	matb.coefficients[3] = 0;
+	matb.coefficients[4] = 0;
+	matb.coefficients[5] = 2;
+	matb.coefficients[6] = 0;
+	matb.coefficients[7] = 0;
+	matb.coefficients[8] = 2;
 
-	float pzeros = 0.6f;
-	float ppluses = 0.025f;
+	Matrix a(mata);
+    Matrix b(matb);
 
-	int int0 = (int)(pzeros * RAND_MAX);
-	int int1 = (int)((pzeros + ppluses) * RAND_MAX);
+	UnstableMarkovMonoid monoid(3);
 
-	int max_state_nb = 10;
+/*
+ 	ExplicitMatrix mata(2);
+	mata.coefficients[0] = 2;
+	mata.coefficients[1] = 2;
+	mata.coefficients[2] = 0;
+	mata.coefficients[3] = 2;
 
-	stringstream filename;
-	filename << "Experiment seed " << seed << " samples " << nb_samples;
-	filename << " densities 0 plus 1 " << (int)(1000 * pzeros) << "  " << (int)(1000 * ppluses) << " " << (int)(1000 * (1.0 - ppluses - pzeros));
-	filename << ".csv";
+	ExplicitMatrix matb(2);
+	matb.coefficients[0] = 2;
+	matb.coefficients[1] = 0;
+	matb.coefficients[2] = 0;
+	matb.coefficients[3] = 2;
 
-	ofstream file(filename.str());
+	Matrix a(mata);
+    Matrix b(matb);
 
-	file << "Size;Seed;ElementsNb;RewriteRulesNb;VectorNb" << endl;
+	UnstableMarkovMonoid monoid(2);
+*/
 
-	uint nb = 0;
-	while (nb++ < nb_samples)
-	{
+	monoid.addLetter('a', mata);
+	monoid.addLetter('b', matb);
 
-		seed = hash_value( seed << 6 | seed >> 3);
-		srand(seed);
+	monoid.ComputeMarkovMonoid(& monoid);
+	
+	cout << monoid.expr_to_mat.size() << " elements." << endl;
+	cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
 
-		int n = 10 + (rand() % max_state_nb);
-
-		cout << endl;
-		cout << "************ " << nb << "/" << nb_samples << " SIZE " << n << " SEED " << seed << "  **********" << endl;
-
-		srand(seed);
-
-		UnstableMarkovMonoid monoid(n);
-
-
-		ExplicitMatrix m1(n), m2(n);
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < n; j++)
-			{
-				int r = rand();
-				if (r < int0)
-					m1.coefficients[n*i + j] = 0;
-				else if (r > int1)
-					m1.coefficients[n*i + j] = 2;
-				else
-					m1.coefficients[n*i + j] = 1;
-				r = rand();
-				if (r < int0)
-					m2.coefficients[n*i + j] = 0;
-				else if (r > int1)
-					m2.coefficients[n*i + j] = 2;
-				else
-					m2.coefficients[n*i + j] = 1;
-			}
-		}
-
-		cout << "Computing matrix " << endl;
-		monoid.addLetter('a', m1);
-		monoid.addLetter('b', m2);
-
-		int sz = monoid.elements.size();
-		cout << sz << " elements in the tab elements." << endl;
-		cout << "Closing by product " << endl;
-
-		monoid.CloseByProduct();
-
-		int s = monoid.expr_to_mat.size();
-		cout << s << " elements." << endl;
-		cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
-
-		monoid.print();
-
-		cout << "Closing by stabilization " << endl;
-
-		monoid.CloseByStabilization();
-
-		s = monoid.expr_to_mat.size();
-		cout << s << " elements." << endl;
-		cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
-
-		monoid.print();
-
-	}
-
-	file.close();
-
-	cout << "Experiment over " << endl;
-
+	monoid.print() ;
 }

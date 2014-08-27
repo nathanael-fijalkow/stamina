@@ -1,3 +1,4 @@
+/* INCLUDES */
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
@@ -11,6 +12,7 @@ typedef size_t HashRowCol;
 
 using namespace std;
 
+/* CLASS DEFINITIONS */
 // Class of explicit matrices, represented as arrays
 class ExplicitMatrix
 {
@@ -19,7 +21,7 @@ public:
 	const uint stateNb;
 
 	// coefficients is a C-style array
-	//  the coefficient i,j is stored at position  i * n + j
+	// the coefficient i,j is stored at position  i * n + j
 	// 0 means 0, 1 means +, 2 means 1
 	char * coefficients;
 
@@ -40,16 +42,19 @@ public:
 	// Number of non-zero entries
 	const uint entriesNb;
 
-	// Constructor
+	// end() points right after the last entry
+	const size_t * end() const { return entries + entriesNb; };
+
+	// First constructor
 	Vector(uint size);
 
-	// Constructor
+	// Second constructor
 	Vector(const Vector & other);
 
-	// ????
+	// Third constructor
 	Vector(vector <size_t> data);
 
-	// ?????
+	// Fourth constructor
 	Vector(size_t * data, size_t data_size);
 
 	// Function returning the hash
@@ -60,9 +65,6 @@ public:
 
 	// Free a useless vector
 	~Vector();
-
-	//
-	const size_t * end() const { return entries + entriesNb; };
 
 	// Print
 	void print() const;
@@ -126,17 +128,18 @@ public:
 	// Function returning the hash
 	HashMat hash() const { return _hash; };
 
+	// Function checking whether a matrix is idempotent
+	bool isIdempotent() const;
+
+	// Two STATIC elements
 	// This is the set of known vectors
-	// Note that it is static
 	static unordered_set <Vector> vectors;
 
 	// This is the constant vector with only zero entries
 	static const Vector * zero_vector;
 
-	// Function checking whether a matrix is idempotent
-	bool isIdempotent() const;
-
 protected:
+
 	// The hash expression
 	HashMat _hash;
 
@@ -180,6 +183,5 @@ namespace std
 		}
 	};
 }
-
 
 #endif

@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "Expressions.hpp"
-#include "Matrix.hpp"
-#include "MarkovMonoid.hpp"
+#include "Expressions.cpp"
+#include "Matrix.cpp"
+#include "MarkovMonoid.cpp"
 
 #include <fstream>
 #include <sstream>
@@ -23,8 +23,7 @@ int main(int argc, char **argv)
 	unsigned int nb_samples = 1;
 
 	float pzeros = 0.6f;
-	float ppluses = 0.000f;
-//	float ppluses = 0.025f;
+	float ppluses = 0.025f;
 
 	int int0 = (int)(pzeros * RAND_MAX);
 	int int1 = (int)((pzeros + ppluses) * RAND_MAX);
@@ -83,6 +82,8 @@ int main(int argc, char **argv)
 		monoid.addLetter('a', m1);
 		monoid.addLetter('b', m2);
 
+		int sz = monoid.elements.size();
+		cout << sz << " elements in the tab elements." << endl;
 		cout << "Closing by product " << endl;
 
 		monoid.CloseByProduct();

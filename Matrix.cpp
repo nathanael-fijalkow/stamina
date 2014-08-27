@@ -245,11 +245,13 @@ bool Matrix::recurrent (int j) const{
 
 // Create a new vector, keep only coordinates of v that are true in tab
 Vector purge(const Vector *varg,bool * tab){
-    int nbtab=0;//size of purged vector to precompute
+//size of purged vector to precompute
+    int nbtab = 0;
         for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++)
 	{
         if(tab[*ent]) nbtab++;
-    }//end of precomputation
+    }
+//end of precomputation
     size_t * data = (size_t*) malloc (nbtab*(sizeof(size_t)));
     size_t * datastart = data;
     for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++)
@@ -286,11 +288,6 @@ Matrix Matrix::stab(const Matrix & mat)
     return result;
 }
 
-bool Matrix::isIdempotent() const
-{
-	return false;
-}
-
 bool Matrix::operator==(const Matrix & mat) const
 {
 	if (mat.stateNb != stateNb) return false;
@@ -312,3 +309,8 @@ bool Matrix::operator==(const Matrix & mat) const
 
 	return true;
 };
+
+bool Matrix::isIdempotent() const
+{
+	return (* this == Matrix::prod(* this,* this));
+}

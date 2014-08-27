@@ -1,3 +1,4 @@
+/* INCLUDES */
 #ifndef MARKOV_MONOID_HPP
 #define MARKOV_MONOID_HPP
 
@@ -8,10 +9,12 @@
 
 using namespace std;
 
+/* CLASS DEFINITIONS */
 // This class describes a Markov Monoid
 class MarkovMonoid
 {
 public:
+
 	// the two maps are inverses of one another
 	map <const ExtendedExpression *, const Matrix *> expr_to_mat;
 	map <const Matrix *, const ExtendedExpression *> mat_to_expr;
@@ -23,6 +26,7 @@ public:
 	void print();
 
 protected:
+
 	// Constructor
 	MarkovMonoid(){};
 };
@@ -32,17 +36,14 @@ class UnstableMarkovMonoid : public MarkovMonoid
 {
 public:
 
-	// creates zero vector
+	// Creates zero vector
 	UnstableMarkovMonoid(uint dim);
 
-	// Cleans up knowns vectors
+	// Free knowns vectors
 	~UnstableMarkovMonoid();
 
 	// Adds a new letter
 	void addLetter(char a, ExplicitMatrix & mat);
-
-	// Adds a pair (expression, matrix) in the monoid
-	void addElement(const ExtendedExpression *, const Matrix * mat);
 
 	// Adds a rewrite rule
 	void addRewriteRule(const ExtendedExpression *, const ExtendedExpression *);
@@ -58,14 +59,20 @@ public:
 	// The vector of known elements
 	vector<const ExtendedExpression *> elements;
 
-	// The vector of elements added at last closure by product step
+	// The vector of elements added at the previous closure by product step
 	vector<const ExtendedExpression *> new_elements;
 
+	// The vector of elements added at this closure by product step (which are to be sharpified)
+	vector<const ExtendedExpression *> to_be_sharpified;
+
 	// Function closing the current monoid by concatenating all elements
-	bool CloseByProduct();
+	void CloseByProduct();
 
 	// Function closing the current monoid by stabilizing all idempotents elements
 	void CloseByStabilization();
+
+	// Function computing the smallest Markov Monoid containing a given unstable Markov Monoid
+	void ComputeMarkovMonoid(UnstableMarkovMonoid * monoid);
 
 protected:
 

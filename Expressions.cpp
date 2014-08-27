@@ -15,8 +15,7 @@ SharpedExpr::SharpedExpr(const ExtendedExpression * son) : son(son)
 	_hash = hash_value(son->Hash());
 }
 
-// What are those two constructors for????
-ConcatExpr::ConcatExpr(const LetterExpr * expr, uint maxSonsNb)
+ConcatExpr::ConcatExpr(const ExtendedExpression * expr, uint maxSonsNb)
 {
 	sons = (const ExtendedExpression **)malloc(maxSonsNb * sizeof(void *));
 

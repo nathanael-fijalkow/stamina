@@ -133,6 +133,9 @@ public:
 	// This is the constant vector with only zero entries
 	static const Vector * zero_vector;
 
+	// Function checking whether a matrix is idempotent
+	bool isIdempotent() const;
+
 protected:
 	// The hash expression
 	HashMat _hash;
@@ -164,9 +167,6 @@ protected:
 
 	// Function checking whether a state is idempotent
     bool recurrent(int) const;
-
-	// Function checking whether a matrix is idempotent
-	bool isIdempotent() const;
 };
 
 // Defines default hash for the matrix class

@@ -4,7 +4,7 @@
 #include <map>
 
 #include "Matrix.hpp"
-#include <Expressions.hpp>
+#include "Expressions.hpp"
 
 using namespace std;
 
@@ -13,11 +13,11 @@ class MarkovMonoid
 {
 public:
 	// the two maps are inverses of one another
-	map<const ExtendedExpression *, const Matrix *> expr_to_mat;
-	map<const Matrix *, const ExtendedExpression *> mat_to_expr;
+	map <const ExtendedExpression *, const Matrix *> expr_to_mat;
+	map <const Matrix *, const ExtendedExpression *> mat_to_expr;
 
 	// the map of rewrite rules
-	map<const ExtendedExpression *, const ExtendedExpression *> rewriteRules;
+	map <const ExtendedExpression *, const ExtendedExpression *> rewriteRules;
 
 	// Print
 	void print();
@@ -55,7 +55,10 @@ public:
 	// The set containing the known matrices
 	unordered_set <Matrix> matrices;
 
-	// The vector of elements added at last closure step
+	// The vector of known elements
+	vector<const ExtendedExpression *> elements;
+
+	// The vector of elements added at last closure by product step
 	vector<const ExtendedExpression *> new_elements;
 
 	// Function closing the current monoid by concatenating all elements
@@ -67,10 +70,10 @@ public:
 protected:
 
 	// Function processing an expression, computing products
-	void process_expression(const ExtendedExpression *, vector<const ExtendedExpression *> & added_elts);
+	void process_expression(const ExtendedExpression * elt_left,const ExtendedExpression * elt_right);
 
 	// Function processing an expression, computing stabilization
-	void sharpify_expression(const ExtendedExpression *, vector<const ExtendedExpression *> & added_elts);
+	void sharpify_expression(const ExtendedExpression *);
 
 	// Number of states of the automaton
 	uint dim;

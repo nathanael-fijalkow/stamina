@@ -107,7 +107,7 @@ public:
 	const ExtendedExpression ** sons;
 
 	// First constructor:
-	ConcatExpr(const LetterExpr * expr, uint maxSonsNb);
+	ConcatExpr(const ExtendedExpression * expr, uint maxSonsNb);
 
 	// This is a copy constructor which performs a memcopy of the field sons
 	ConcatExpr(const ConcatExpr & other);

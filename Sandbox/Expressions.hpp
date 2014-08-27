@@ -1,7 +1,8 @@
+/* INCLUDES */
+#include <string>
+
 #ifndef EXPRESSIONS_HPP
 #define EXPRESSIONS_HPP
-
-#include <string>
 
 typedef unsigned int uint;
 
@@ -20,19 +21,20 @@ using namespace std;
 
 #endif
 
+/* CLASS DEFINITIONS */
+
 // The expressions are accessible by their hashes
 typedef size_t HashExpr;
 
-class SharpedExpr;
-class ConcatExpr;
-class LetterExpr;
 class ExtendedExpression;
+class LetterExpr;
+class ConcatExpr;
+class SharpedExpr;
 
 // Dynamic casts to test the type of an extended expression
-const SharpedExpr * isSharpedExpr(const ExtendedExpression * expr);
-const ConcatExpr * isConcatExpr(const ExtendedExpression * expr);
 const LetterExpr * isLetterExpr(const ExtendedExpression * expr);
-
+const ConcatExpr * isConcatExpr(const ExtendedExpression * expr);
+const SharpedExpr * isSharpedExpr(const ExtendedExpression * expr);
 
 // The class of all expressions
 class ExtendedExpression
@@ -49,6 +51,7 @@ public:
 	bool operator == (const ExtendedExpression & exp) const;
 
 protected:
+
 	// The hash
 	HashExpr _hash;
 
@@ -56,34 +59,15 @@ protected:
 	ExtendedExpression(){};
 };
 
-// The class of expressions starting with a hash, extending the general class
-class SharpedExpr : public ExtendedExpression
-{
-public:
-	// The hash of the sub-expression
-	const ExtendedExpression * son;
-
-	// The constructor
-	SharpedExpr(const ExtendedExpression * son);
-
-	// Equality operator
-	bool operator == (const SharpedExpr & exp) const
-	{
-			return exp.son == this -> son;
-	}
-
-	// Print
-	void print() const;
-};
-
 // The class of expressions consisting only of one letter, extending the general class
 class LetterExpr : public ExtendedExpression
 {
 public:
+
 	// A char is used to represent the letter
 	const char letter;
 
-	// The constructor
+	// Letter constructor
 	LetterExpr(char letter);
 
 	// Equality operator
@@ -97,6 +81,7 @@ public:
 class ConcatExpr : public ExtendedExpression
 {
 public:
+
 	// The number of sons
 	uint sonsNb;
 
@@ -106,14 +91,27 @@ public:
 	// the leftmost at address sons + sonsNb - 1
 	const ExtendedExpression ** sons;
 
-	// First constructor:
+	// First constructor: takes an expression and a number of sons (to allocate the array of sons)
+	// and constructs a ConcatExpr with only one son
 	ConcatExpr(const ExtendedExpression * expr, uint maxSonsNb);
 
-	// This is a copy constructor which performs a memcopy of the field sons
+	ConcatExpr(ExtendedExpression * expr, uint maxSonsNb);
+
+	// Second constructor: a copy constructor which performs a memcopy of the field sons
 	ConcatExpr(const ConcatExpr & other);
 
-	// This is an assignment operator which performs a memcopy  of the field sons
+	// Third constructor: concatenation of two expressions
+	ConcatExpr(const ExtendedExpression * expr_left, const ExtendedExpression * expr_right);
+
+	// Fourth constructor: prefix
+	ConcatExpr(uint k, const ConcatExpr * expr);
+	
+	// This is an assignment operator which performs a memcopy of the field sons
 	ConcatExpr & operator=(const ConcatExpr &);
+
+	// Adds a son to the left
+	// Assumes that enough memory was allocated when creating the son's pointer
+	void addLeftSon(const ExtendedExpression *);
 
 	// Free the memory for a useless expression
 	~ConcatExpr();
@@ -134,15 +132,8 @@ public:
 		return true;
 	};
 
-
 	// Print
 	virtual void print() const;
-
-	/* Adds a son to the left
-	* Assumes that enough memory
-	* was allocated when creating the son's pointer
-	*/
-	void addLeftSon(const ExtendedExpression *);
 
 protected:
 	// Function that computes the hash, using the formula used in the Boost library
@@ -152,6 +143,27 @@ protected:
 		for (const ExtendedExpression ** son = this->sons; son != sons + sonsNb; son++)
 			_hash ^= hash_value((*son)->Hash()) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 	}
+};
+
+// The class of expressions starting with a sharp, extending the general class
+class SharpedExpr : public ExtendedExpression
+{
+public:
+
+	// The hash of the sub-expression
+	const ExtendedExpression * son;
+
+	// The constructor
+	SharpedExpr(const ExtendedExpression * son);
+
+	// Equality operator
+	bool operator == (const SharpedExpr & exp) const
+	{
+			return exp.son == this -> son;
+	}
+
+	// Print
+	void print() const;
 };
 
 // Defines default hash for the class of extendedExpression
