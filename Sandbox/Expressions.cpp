@@ -133,7 +133,8 @@ void ConcatExpr::addLeftSon(const ExtendedExpression * new_son)
 {
 	*(sons + sonsNb) = new_son;
 	sonsNb++;
-	_hash ^= hash_value(new_son->Hash()) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+	//_hash ^= hash_value(new_son->Hash()) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+	update_hash();
 }
 
 SharpedExpr::SharpedExpr(const ExtendedExpression * son) : son(son)
