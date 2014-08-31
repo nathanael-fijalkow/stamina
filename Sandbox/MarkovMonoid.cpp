@@ -71,19 +71,19 @@ void UnstableMarkovMonoid::addRewriteRule(const ExtendedExpression * pattern, co
 		else add a new element */
 void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_left,const ExtendedExpression * elt_right)
 {
-		cout << "Processing: " ;
+/*		cout << "Processing: " ;
 		(*elt_left).print();
 		cout << " and " ;
 		(*elt_right).print();
-		cout << "." << endl;
+		cout << "." << endl; */
 
-	cout << "concat expressions known: " ;
+/*	cout << "concat expressions known: " ;
 	for (const auto& expr: concatExpressions) 
 	{
 		expr.print();
 		cout << " " ;
 	}
-	cout << endl ;
+	cout << endl ; */
 	
 	// Casts
 	const ConcatExpr * ConcatExprLeft = isConcatExpr(elt_left);
@@ -134,24 +134,22 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 		for (uint i = 1; i < ConcatExprRight->sonsNb; i++)
 		{
 			// Compute the prefix v_1 ... v_i 
-			ConcatExpr prefix_right_upto_i(i, ConcatExprRight);
+			ConcatExpr prefix_right_upto_i(i, ConcatExprRight); //a optimiser, on recalcule le prefixe a chaque fois depuis le debut
 			ConcatExpr new_concat_expr(&prefix_right_upto_i, ConcatExprRight->sonsNb + 1);
 			new_concat_expr.addLeftSon(elt_left);
 			
-			cout << "check if this rewrites: " ;
+/*			cout << "check if this rewrites: " ;
 			new_concat_expr.print() ;
-			cout << endl ;
+			cout << endl ; */
 			
 			unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
 			if (ok != concatExpressions.end())
 			{
-				cout << "here1 " ;
 				const ConcatExpr * uuid = &(*ok);
 				map<const ExtendedExpression *, const ExtendedExpression *>::iterator rewrite_rule = rewriteRules.find(uuid);
 				// skip if a rewrite rule exists
 				if (rewrite_rule != rewriteRules.end())
 				{
-				cout << "here2 " ;
 					rewrite_rule_found = true;
 					break;
 				}
@@ -169,6 +167,7 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 		{
 			const ExtendedExpression * new_e = ConcatExprLeft->sons[i];
 			new_concat_expr.addLeftSon(new_e);
+			
 			unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
 			if (ok != concatExpressions.end())
 			{
@@ -201,13 +200,12 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 	
 		if (result.second)
 		{
-			cout << "Add element: ";
+/*			cout << "Add element: ";
 			new_c_expr.print() ;
-			cout << endl;
+			cout << endl; */
 
 			expr_to_mat[new_expr] = &(*result.first);
 			mat_to_expr[&(*result.first)] = new_expr;
-
 			new_elements.push_back(new_expr);
 			to_be_sharpified.push_back(new_expr);
 
@@ -215,9 +213,9 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 		else
 		{
 			const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
-			cout << "Add rewrite rule: ";
+/*			cout << "Add rewrite rule: ";
 			(*rewritten).print() ;
-			cout << endl;
+			cout << endl; */
 			addRewriteRule(new_expr, rewritten);
 		}
 	}
@@ -282,6 +280,11 @@ void UnstableMarkovMonoid::sharpify_expression(const ExtendedExpression * elt){
 			expr_to_mat[new_expr] = &(*result.first);
 			mat_to_expr[&(*result.first)] = new_expr;
 			new_elements.push_back(new_expr);
+
+/*			cout << "added: " ;
+			(*new_expr).print() ;
+			cout << endl ; */
+
 		}
 		else {
 			const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
@@ -336,6 +339,6 @@ void UnstableMarkovMonoid::ComputeMarkovMonoid(UnstableMarkovMonoid * monoid)
 		CloseByStabilization() ;
 		to_be_sharpified.clear();
 		i++;
-	} while (to_be_sharpified.size() != 0);
+	} while (new_elements.size() != 0);
 
 }
