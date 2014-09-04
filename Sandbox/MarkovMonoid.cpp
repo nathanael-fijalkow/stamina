@@ -71,7 +71,7 @@ void UnstableMarkovMonoid::addRewriteRule(const ExtendedExpression * pattern, co
 		else add a new element */
 void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_left,const ExtendedExpression * elt_right)
 {
-		cout << "Processing: " ;
+		cout << endl << "Processing: " ;
 		(*elt_left).print();
 		cout << " and " ;
 		(*elt_right).print();

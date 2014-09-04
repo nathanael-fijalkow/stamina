@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "Expressions.cpp"
-#include "Matrix.cpp"
-#include "MarkovMonoid.cpp"
+#include "Expressions.hpp"
+#include "Matrix.hpp"
+#include "MarkovMonoid.hpp"
 
 #include <fstream>
 #include <sstream>

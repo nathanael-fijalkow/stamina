@@ -52,7 +52,7 @@ void ConcatExpr::addLeftSon(const ExtendedExpression * new_son)
 }
 
 
-// Equality operator
+// Equality operator, never used because we only compare expressions of the same type
 bool ExtendedExpression::operator == (const ExtendedExpression & exp) const
 {
 	const ExtendedExpression * pexp = &exp;
@@ -70,6 +70,7 @@ bool ExtendedExpression::operator == (const ExtendedExpression & exp) const
 			return *(LetterExpr *)cexpr == *(LetterExpr *)pexp;
 	}
 }
+
 
 // Dynamic casts
 const SharpedExpr * isSharpedExpr(const ExtendedExpression * expr) { return dynamic_cast<const SharpedExpr *>(expr); }
