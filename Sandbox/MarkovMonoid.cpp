@@ -60,6 +60,11 @@ void UnstableMarkovMonoid::addLetter(char a, ExplicitMatrix & mat)
 // Adds a rewrite rule
 void UnstableMarkovMonoid::addRewriteRule(const ExtendedExpression * pattern, const ExtendedExpression * rewritten)
 {
+	cout << "Adding rewrite rule ";
+	pattern->print();
+	cout << " -> ";
+	rewritten->print();
+	cout << endl;
 	rewriteRules[pattern] = rewritten;
 }
 
@@ -69,22 +74,32 @@ void UnstableMarkovMonoid::addRewriteRule(const ExtendedExpression * pattern, co
 		if M exists already, 
 		then add a rewriting rule,
 		else add a new element */
-void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_left,const ExtendedExpression * elt_right)
+void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_left, const ExtendedExpression * elt_right)
 {
-		cout << endl << "Processing: " ;
-		(*elt_left).print();
-		cout << " and " ;
-		(*elt_right).print();
-		cout << "." << endl; */
+	/*		cout << endl << "Processing: " ;
+			(*elt_left).print();
+			cout << " and " ;
+			(*elt_right).print();
+			cout << "." << endl; */
 
-/*	cout << "concat expressions known: " ;
-	for (const auto& expr: concatExpressions) 
-	{
+	/*	cout << "concat expressions known: " ;
+		for (const auto& expr: concatExpressions)
+		{
 		expr.print();
 		cout << " " ;
+		}
+		cout << endl ; */
+
+	//the potentially new concat expression
+	ConcatExpr new_expr(elt_left, elt_right);
+
+	//if the expression is already known, we are done
+	if (concatExpressions.find(new_expr) != concatExpressions.end())
+	{
+		std::cout << "Expression "; new_expr.print(); std::cout << " is already known, nothing to do" << endl;
+		return;
 	}
-	cout << endl ; */
-	
+
 	// Casts
 	const ConcatExpr * ConcatExprLeft = isConcatExpr(elt_left);
 	const ConcatExpr * ConcatExprRight = isConcatExpr(elt_right);
@@ -100,6 +115,12 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 		 */
 		ConcatExpr new_concat_expr(ConcatExprLeft->sons[0], ConcatExprRight->sonsNb + ConcatExprLeft->sonsNb);
 
+		if (concatExpressions.find(new_concat_expr) != concatExpressions.end())
+		{
+			std::cout << "Expression "; new_concat_expr.print(); std::cout << " is already known, nothing to do" << endl;
+			return;
+		}
+
 		for (uint i = 1; i <= ConcatExprRight->sonsNb; i++)
 		{
 			// Compute the prefix v_1 ... v_i 
@@ -108,7 +129,7 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 			ConcatExpr new_concat_expr(&prefix_right_upto_i, ConcatExprRight->sonsNb + ConcatExprLeft->sonsNb);
 			for (uint j = 0; j < ConcatExprLeft->sonsNb; j++)
 			{
-				const ExtendedExpression * new_e = ConcatExprLeft->sons[j]; 
+				const ExtendedExpression * new_e = ConcatExprLeft->sons[j];
 				new_concat_expr.addLeftSon(new_e);
 				unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
 				if (ok != concatExpressions.end())
@@ -123,7 +144,7 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 					}
 				}
 			}
-			if (rewrite_rule_found == true) break; 
+			if (rewrite_rule_found == true) break;
 		}
 	}
 
@@ -137,37 +158,34 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 			ConcatExpr prefix_right_upto_i(i, ConcatExprRight); //a optimiser, on recalcule le prefixe a chaque fois depuis le debut
 			ConcatExpr new_concat_expr(&prefix_right_upto_i, ConcatExprRight->sonsNb + 1);
 			new_concat_expr.addLeftSon(elt_left);
-			
-/*			cout << "check if this rewrites: " ;
-			new_concat_expr.print() ;
-			cout << endl ; */
-			
+
+			/*			cout << "check if this rewrites: " ;
+						new_concat_expr.print() ;
+						cout << endl ; */
+
 			unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
 			if (ok != concatExpressions.end())
 			{
 				const ConcatExpr * uuid = &(*ok);
-				map<const ExtendedExpression *, const ExtendedExpression *>::iterator rewrite_rule = rewriteRules.find(uuid);
-				// skip if a rewrite rule exists
-				if (rewrite_rule != rewriteRules.end())
-				{
-					rewrite_rule_found = true;
+				rewrite_rule_found = (rewriteRules.find(uuid) != rewriteRules.end());
+				if (rewrite_rule_found)
 					break;
-				}
 			}
-		}	
+		}
+
 	}
 
 	// Third case: elt_left is a concatenation expression
 	else if (ConcatExprLeft != NULL)
 	{
 		ConcatExpr new_concat_expr(elt_right, ConcatExprLeft->sonsNb + 1);
-						
+
 		// For each strict suffix of elt_left, we test if the expression (which is necessarily known) is reducible
 		for (uint i = 0; i < ConcatExprLeft->sonsNb - 1; i++)
 		{
 			const ExtendedExpression * new_e = ConcatExprLeft->sons[i];
 			new_concat_expr.addLeftSon(new_e);
-			
+
 			unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
 			if (ok != concatExpressions.end())
 			{
@@ -180,47 +198,42 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 					break;
 				}
 			}
-		}	
+		}
 	}
 
-// Now, treat if no rewrite rules have been found
+	// Now, treat if no rewrite rules have been found
 	if (!rewrite_rule_found)
 	{
-		// We compute the matrix
+		/* we add the new exprssions to the list of all expressions */
+		const ConcatExpr * new_expr = &*concatExpressions.emplace(elt_left, elt_right).first;
+
+		/* We compute the matrix */
 		const Matrix * mat_left = expr_to_mat[elt_left];
 		const Matrix * mat_right = expr_to_mat[elt_right];
-		Matrix mat = Matrix::prod(* mat_left,* mat_right);
-	
+		Matrix mat = Matrix::prod(*mat_left, *mat_right);
+
+		/* we check if the matrix is already known */
 		pair <unordered_set<Matrix>::iterator, bool> result = matrices.emplace(mat);
-		ConcatExpr new_c_expr(elt_left,elt_right);
-		concatExpressions.emplace(new_c_expr);
-		
-		unordered_set<ConcatExpr>::iterator it = concatExpressions.emplace(new_c_expr).first;
-		const ConcatExpr * new_expr = &*it;
-	
-		if (result.second)
-		{
-/*			cout << "Add element: ";
-			new_c_expr.print() ;
-			cout << endl; */
 
-			expr_to_mat[new_expr] = &(*result.first);
-			mat_to_expr[&(*result.first)] = new_expr;
-			new_elements.push_back(new_expr);
-			to_be_sharpified.push_back(new_expr);
+			if (result.second)
+			{
+				/* if the matrix was not known before, we create a new association between expression and its matrix */
+				/* cout << "Add element: "; new_expr.print() ;	cout << endl; */
+				expr_to_mat[new_expr] = &(*result.first);
+				mat_to_expr[&(*result.first)] = new_expr;
 
-		}
-		else
-		{
-			const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
-/*			cout << "Add rewrite rule: ";
-			(*rewritten).print() ;
-			cout << endl; */
-			addRewriteRule(new_expr, rewritten);
-		}
+				new_elements.push_back(new_expr);
+				to_be_sharpified.push_back(new_expr);
+			}
+			else
+			{
+				/* if the matrix was known before, we create the new rewrite rule */
+				const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
+				/*	cout << "Add rewrite rule: ";		(*rewritten).print() ;		cout << endl; */
+				addRewriteRule(new_expr, rewritten);
+			}
 	}
 }
-
 void UnstableMarkovMonoid::CloseByProduct()
 {
 	/* Iterating over all elements
