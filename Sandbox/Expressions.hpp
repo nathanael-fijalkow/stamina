@@ -119,17 +119,26 @@ public:
 	// Equality operator
 	bool operator==(const ConcatExpr & exp) const
 	{
-		if ((exp.sonsNb != this->sonsNb) || (exp.Hash() != this->Hash() ) )
-			return false;
-		else
-		{
-			for (uint i = 0; i < sonsNb; i++)
-			{
-				if (exp.sons[i] != sons[i])
-					return false;
-			}
+	  if ((exp.sonsNb != this->sonsNb) || (exp.Hash() != this->Hash() ) )
+	    return false;
+	  else {
+	      for (uint i = 0; i < sonsNb; i++) {
+		  const ExtendedExpression * t1 = exp.sons[i];
+		  const ExtendedExpression * t2 = sons[i];
+		  
+		  const ConcatExpr * c1 = isConcatExpr(exp.sons[i]);
+		  const ConcatExpr * c2 = isConcatExpr(sons[i]);
+
+		  if (c1 && (c1->sonsNb == 1))
+		    t1 = c1->sons[0];
+		  if (c2 && (c2->sonsNb == 1))
+		    t2 = c2->sons[0];
+
+		  if (t1 != t2)
+		    return false;
 		}
-		return true;
+	    }
+	  return true;
 	};
 
 	// Print
@@ -139,9 +148,13 @@ protected:
 	// Function that computes the hash, using the formula used in the Boost library
 	void update_hash()
 	{
-		_hash = 0x777;
-		for (const ExtendedExpression ** son = this->sons; son != sons + sonsNb; son++)
-			_hash ^= hash_value((*son)->Hash()) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+	  if(sonsNb == 1) 
+	    _hash = sons[0]->Hash();
+	  else {
+	    _hash = 0x777;
+	    for (const ExtendedExpression ** son = this->sons; son != sons + sonsNb; son++)
+	      _hash ^= hash_value((*son)->Hash()) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+	  }
 	}
 };
 
