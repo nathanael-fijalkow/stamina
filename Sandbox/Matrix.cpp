@@ -19,6 +19,7 @@ ExplicitMatrix::~ExplicitMatrix()
 Vector::Vector(uint size) : entriesNb(size)
 {
 	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
+	update_hash();
 }
 
 // Second constructor
@@ -39,10 +40,17 @@ Vector::Vector(vector<size_t> data) : entriesNb(data.size())
 }
 
 // Fourth constructor
-Vector::Vector(size_t * data, size_t data_size) : entriesNb(data_size)
+Vector::Vector(size_t * data, size_t data_size, bool copy) : entriesNb(data_size)
 {
-	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
-	memcpy(entries, data, entriesNb * sizeof(size_t));
+	if (copy)
+	{
+		entries = (size_t *)malloc(entriesNb * sizeof(size_t));
+		memcpy(entries, data, entriesNb * sizeof(size_t));
+	}
+	else
+	{
+		entries = data;
+	}
 	update_hash();
 };
 
@@ -134,6 +142,7 @@ Matrix::Matrix(const ExplicitMatrix & explMatrix) : stateNb(explMatrix.stateNb)
 // Print
 void Matrix::print() const
 {
+	cout << "Row description " << endl;
 	for (uint i = 0; i < stateNb; i++)
 	{
 		cout << i << ":" << " ";
@@ -145,7 +154,7 @@ void Matrix::print() const
 		{
 			if (ones.entriesNb > jones && ones.entries[jones] == j)
 			{
-				cout << "1 ";
+				cout << ((pluses.entriesNb > jpluses && pluses.entries[jpluses] == j) ? "2 " : "1 ");
 				jones++;
 				jpluses++;
 			}
@@ -159,6 +168,47 @@ void Matrix::print() const
 		}
 		cout << endl;
 	}
+	/*
+	Uncomment to get deep description of the matrix, including columns and hashes and adresses
+	cout << "Col description " << endl;
+	for (uint i = 0; i < stateNb; i++)
+	{
+		cout << i << ":" << " ";
+		const Vector & ones = *col_ones[i];
+		const Vector & pluses = *col_pluses[i];
+
+		uint jones = 0, jpluses = 0;
+		for (uint j = 0; j < stateNb; j++)
+		{
+			if (ones.entriesNb > jones && ones.entries[jones] == j)
+			{
+				cout << ((pluses.entriesNb > jpluses && pluses.entries[jpluses] == j) ? "2 " : "1 ");
+				jones++;
+				jpluses++;
+			}
+			else if (pluses.entriesNb > jpluses && pluses.entries[jpluses] == j)
+			{
+				cout << "+ ";
+				jpluses++;
+			}
+			else
+				cout << "_ ";
+		}
+		cout << endl;
+	}
+	for (uint i = 0; i < stateNb; i++)
+	{
+		cout << "row " << i << ":" << " ";
+		cout << "h" << row_ones[i]->Hash() << " #" << row_ones[i] << " h" << row_pluses[i]->Hash() << " #" << row_pluses[i] << " ";
+		cout << endl;
+	}
+	for (uint i = 0; i < stateNb; i++)
+	{
+		cout << "col " << i << ":" << " ";
+		cout << "h" << col_ones[i]->Hash() << " #" << col_ones[i] << " h" << col_pluses[i]->Hash() << " #" << col_pluses[i] << " ";
+		cout << endl;
+	}
+	*/
 }
 
 bool Matrix::operator==(const Matrix & mat) const
@@ -222,9 +272,24 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat, size_t 
             } ;
 		} ;
 	}
+	unordered_set<Vector>::iterator it = vectors.emplace(new_vec_start, new_vec - new_vec_start, false).first;
+	return &(*it);
+}
 
-	unordered_set<Vector>::iterator it = vectors.emplace(new_vec_start, new_vec - new_vec_start).first;
-	free(new_vec_start);
+// Create a new vector, keep only coordinates of v that are true in tab
+const Vector * Matrix::purge(const Vector *varg, bool * tab){
+	// size of purged vector to precompute
+	int nbtab = 0;
+	for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++){
+		if (tab[*ent]) nbtab++;
+	}
+
+	size_t * data = (size_t*)malloc(nbtab*(sizeof(size_t)));
+	size_t * datastart = data;
+	for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++)
+		if (tab[*ent]) *data++ = *ent;
+
+	unordered_set<Vector>::iterator it = vectors.emplace(datastart, nbtab, false).first;
 	return &(*it);
 }
 
@@ -262,23 +327,6 @@ bool Matrix::recurrent (int j) const{
 	return true;
 }
 
-// Create a new vector, keep only coordinates of v that are true in tab
-Vector purge(const Vector *varg,bool * tab){
-// size of purged vector to precompute
-    int nbtab = 0;
-        for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++){
-			if(tab[*ent]) nbtab++;
-		}
-
-    size_t * data = (size_t*) malloc (nbtab*(sizeof(size_t)));
-    size_t * datastart = data;
-    for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++)
-	{
-        if(tab[*ent]) *data++=*ent;
-    }
-    Vector result(datastart,nbtab);
-	return result;
-}
 
 // Function computing the stabilization. Only works on idempotent
 Matrix Matrix::stab(const Matrix & mat) 
@@ -297,9 +345,7 @@ Matrix Matrix::stab(const Matrix & mat)
     }
     for(uint i = 0; i < n ; i++){
         result.row_pluses[i] = mat.row_pluses[i];
-        Vector v = purge(mat.row_ones[i],tabrec);
-        unordered_set<Vector>::iterator it = Matrix::vectors.emplace(v).first;
-        result.row_ones[i] = &(*it);
+		result.row_ones[i] = purge(mat.row_ones[i], tabrec);
     }
 
     result.update_hash();

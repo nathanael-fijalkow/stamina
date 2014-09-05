@@ -214,24 +214,27 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 
 		/* we check if the matrix is already known */
 		pair <unordered_set<Matrix>::iterator, bool> result = matrices.emplace(mat);
+		const Matrix *  new_mat = &(*result.first);
+		if (result.second)
+		{
+			/* if the matrix was not known before, we create a new association between expression and its matrix */
+			cout << "Add element: "; new_expr->print();	 cout << endl;
+			cout << "with matrix adress #" << new_mat << " hash h" << new_mat->hash() << endl;
+			new_mat->print();
+			cout << endl;
+			expr_to_mat[new_expr] = new_mat;
+			mat_to_expr[new_mat] = new_expr;
 
-			if (result.second)
-			{
-				/* if the matrix was not known before, we create a new association between expression and its matrix */
-				/* cout << "Add element: "; new_expr.print() ;	cout << endl; */
-				expr_to_mat[new_expr] = &(*result.first);
-				mat_to_expr[&(*result.first)] = new_expr;
-
-				new_elements.push_back(new_expr);
-				to_be_sharpified.push_back(new_expr);
-			}
-			else
-			{
-				/* if the matrix was known before, we create the new rewrite rule */
-				const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
-				/*	cout << "Add rewrite rule: ";		(*rewritten).print() ;		cout << endl; */
-				addRewriteRule(new_expr, rewritten);
-			}
+			new_elements.push_back(new_expr);
+			to_be_sharpified.push_back(new_expr);
+		}
+		else
+		{
+			/* if the matrix was known before, we create the new rewrite rule */
+			const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
+			/*	cout << "Add rewrite rule: ";		(*rewritten).print() ;		cout << endl; */
+			addRewriteRule(new_expr, rewritten);
+		}
 	}
 }
 void UnstableMarkovMonoid::CloseByProduct()

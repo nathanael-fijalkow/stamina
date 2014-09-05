@@ -54,8 +54,8 @@ public:
 	// Third constructor
 	Vector(vector <size_t> data);
 
-	// Fourth constructor
-	Vector(size_t * data, size_t data_size);
+	// Fourth constructor, data is copied by default
+	Vector(size_t * data, size_t data_size, bool copy = true);
 
 	// Function returning the hash
 	size_t Hash() const { return _hash; };
@@ -167,6 +167,9 @@ protected:
 
 	// Function used in the product
 	static const Vector * sub_prod(const Vector *, const Vector **, size_t stateNb);
+
+	// Create a new vector, keep only coordinates of v that are true in tab
+	static const Vector * purge(const Vector *varg, bool * tab);
 
 	// Function checking whether a state is idempotent
     bool recurrent(int) const;
