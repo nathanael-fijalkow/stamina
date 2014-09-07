@@ -7,7 +7,7 @@
 void MarkovMonoid::print()
 {
 	cout << "***************************************" << endl;
-	cout << "Elements " << endl;
+	cout << "Elements (" << expr_to_mat.size() << ")" << endl;
 	cout << "***************************************" << endl;
 	for (map<const ExtendedExpression *, const Matrix *>::iterator it = expr_to_mat.begin(); it != expr_to_mat.end(); it++)
 	{
@@ -18,7 +18,7 @@ void MarkovMonoid::print()
 	}
 
 	cout << "***************************************" << endl;
-	cout << "Rewrite rules " << endl;
+	cout << "Non-canonical rewrite rules (" <<  rewriteRules.size() - canonicalRewriteRules.size() << ")" << endl;
 	cout << "***************************************" << endl;
 	for (map<const ExtendedExpression *, const ExtendedExpression *>::iterator it = rewriteRules.begin(); it != rewriteRules.end(); it++)
 	{
@@ -32,7 +32,7 @@ void MarkovMonoid::print()
 	}
 
 	cout << "***************************************" << endl;
-	cout << "Canonical Rewrite rules " << endl;
+	cout << "Canonical rewrite rules (" << canonicalRewriteRules.size() << ")" << endl;
 	cout << "***************************************" << endl;
 	for (map<const ExtendedExpression *, const ExtendedExpression *>::iterator it = rewriteRules.begin(); it != rewriteRules.end(); it++)
 	{
