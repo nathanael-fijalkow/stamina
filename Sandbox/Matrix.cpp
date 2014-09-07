@@ -142,7 +142,7 @@ Matrix::Matrix(const ExplicitMatrix & explMatrix) : stateNb(explMatrix.stateNb)
 // Print
 void Matrix::print() const
 {
-	cout << "Row description " << endl;
+	//cout << "Row description " << endl;
 	for (uint i = 0; i < stateNb; i++)
 	{
 		cout << i << ":" << " ";

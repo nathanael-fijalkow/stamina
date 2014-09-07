@@ -3,6 +3,7 @@
 #define MARKOV_MONOID_HPP
 
 #include <map>
+#include <set>
 
 #include "Matrix.hpp"
 #include "Expressions.hpp"
@@ -21,7 +22,7 @@ public:
 
 	// the map of rewrite rules
 	map <const ExtendedExpression *, const ExtendedExpression *> rewriteRules;
-
+	
 	// Print
 	void print();
 
@@ -29,6 +30,11 @@ protected:
 
 	// Constructor
 	MarkovMonoid(){};
+
+	//the set of canonical rewrite rules
+	set<const ExtendedExpression *> canonicalRewriteRules;
+
+
 };
 
 // This class describes Markov Monoid under construction, it extends the class MarkovMonoid

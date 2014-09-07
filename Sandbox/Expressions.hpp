@@ -48,11 +48,11 @@ public:
 	virtual void print() const = 0;
 
 	// Equality operator
-	bool operator == (const ExtendedExpression & exp) const;
+	virtual bool operator == (const ExtendedExpression & exp) const;
 
 protected:
 
-	// The hash
+	// The hash. It is used in the == operator to quickly detect if two expressions are different.
 	HashExpr _hash;
 
 	// The constructor is protected to avoid direct instantiation
@@ -75,6 +75,7 @@ public:
 
 	// Print
 	virtual void print() const;
+
 };
 
 // The class of expressions consisting of concatenation of expressions, extending the general class
@@ -85,13 +86,16 @@ public:
 	// The number of sons
 	uint sonsNb;
 
-	// The hashes of the subtrees
+	// The subtrees
 	// It is a C-style array of size sonsNb
 	// The rightmost son is stored at the beginning of the array,
 	// the leftmost at address sons + sonsNb - 1
 	const ExtendedExpression ** sons;
 
+	ConcatExpr() : sons(NULL), sonsNb(0) {};
+
 	// First constructor: takes an expression and a number of sons (to allocate the array of sons)
+	// Hugo: there is a contradiction with the descriptions before the field sons above: it is supposed to be an array of size sonsNb 
 	// and constructs a ConcatExpr with only one son
 	ConcatExpr(const ExtendedExpression * expr, uint maxSonsNb);
 
@@ -105,7 +109,7 @@ public:
 
 	// Fourth constructor: prefix
 	ConcatExpr(uint k, const ConcatExpr * expr);
-	
+
 	// This is an assignment operator which performs a memcopy of the field sons
 	ConcatExpr & operator=(const ConcatExpr &);
 
@@ -144,17 +148,18 @@ public:
 	// Print
 	virtual void print() const;
 
-protected:
 	// Function that computes the hash, using the formula used in the Boost library
 	void update_hash()
 	{
+		/* Hugo: we do not want that, a concat expresssion with only one son is different from its son 
 	  if(sonsNb == 1) 
 	    _hash = sons[0]->Hash();
 	  else {
+	  */
 	    _hash = 0x777;
 	    for (const ExtendedExpression ** son = this->sons; son != sons + sonsNb; son++)
 	      _hash ^= hash_value((*son)->Hash()) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	  }
+	  /* } */
 	}
 };
 

@@ -1,6 +1,8 @@
 #include <iostream>
 #include "MarkovMonoid.hpp"
 
+#define VERBOSE_MONOID_COMPUTATION 0
+
 // Print
 void MarkovMonoid::print()
 {
@@ -20,11 +22,29 @@ void MarkovMonoid::print()
 	cout << "***************************************" << endl;
 	for (map<const ExtendedExpression *, const ExtendedExpression *>::iterator it = rewriteRules.begin(); it != rewriteRules.end(); it++)
 	{
-		it->first->print();
-		cout << "  ->  ";
-		it->second->print();
-		cout << endl;
+		if (canonicalRewriteRules.find(it->first) == canonicalRewriteRules.end())
+		{
+			it->first->print();
+			cout << "  ->  ";
+			it->second->print();
+			cout << endl;
+		}
 	}
+
+	cout << "***************************************" << endl;
+	cout << "Canonical Rewrite rules " << endl;
+	cout << "***************************************" << endl;
+	for (map<const ExtendedExpression *, const ExtendedExpression *>::iterator it = rewriteRules.begin(); it != rewriteRules.end(); it++)
+	{
+		if (canonicalRewriteRules.find(it->first) != canonicalRewriteRules.end())
+		{
+			it->first->print();
+			cout << "  ->  ";
+			it->second->print();
+			cout << endl;
+		}
+	}
+
 }
 
 // Constructor
@@ -60,11 +80,13 @@ void UnstableMarkovMonoid::addLetter(char a, ExplicitMatrix & mat)
 // Adds a rewrite rule
 void UnstableMarkovMonoid::addRewriteRule(const ExtendedExpression * pattern, const ExtendedExpression * rewritten)
 {
+#if VERBOSE_MONOID_COMPUTATION
 	cout << "Adding rewrite rule ";
 	pattern->print();
 	cout << " -> ";
 	rewritten->print();
 	cout << endl;
+#endif
 	rewriteRules[pattern] = rewritten;
 }
 
@@ -76,130 +98,128 @@ void UnstableMarkovMonoid::addRewriteRule(const ExtendedExpression * pattern, co
 		else add a new element */
 void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_left, const ExtendedExpression * elt_right)
 {
-	/*		cout << endl << "Processing: " ;
+#if VERBOSE_MONOID_COMPUTATION
+			cout << endl << endl << "***************************************" << endl << "Processing: " ;
 			(*elt_left).print();
 			cout << " and " ;
 			(*elt_right).print();
-			cout << "." << endl; */
+			cout << "." << endl; 
+#endif
 
-	/*	cout << "concat expressions known: " ;
-		for (const auto& expr: concatExpressions)
-		{
-		expr.print();
-		cout << " " ;
-		}
-		cout << endl ; */
+			// the potentially new concat expression
+			// notice that concat expressions are automatically flattened by the constructor,
+			// thus the sons os new_expr are necessarilly letter or sharp expressions
+			ConcatExpr new_expr(elt_left, elt_right);
 
-	//the potentially new concat expression
-	ConcatExpr new_expr(elt_left, elt_right);
+			/* this stores whether the expression is reducible or not */
+			bool rewrite_rule_found = false;
 
-	//if the expression is already known, we are done
-	if (concatExpressions.find(new_expr) != concatExpressions.end())
-	{
-		std::cout << "Expression "; new_expr.print(); std::cout << " is already known, nothing to do" << endl;
-		return;
-	}
-
-	// Casts
-	const ConcatExpr * ConcatExprLeft = isConcatExpr(elt_left);
-	const ConcatExpr * ConcatExprRight = isConcatExpr(elt_right);
-
-	bool rewrite_rule_found = false;
-
-	// First case: elt_left and elt_right are concatenations of expressions
-	if ((ConcatExprLeft != NULL) && (ConcatExprRight != NULL))
-	{
-		/* For each prefix v_1 ... v_i of elt_right
-		 * 		For each suffix u_j ... u_k of elt_left
-		 * 			Test if u_j ... u_k v_1 ... v_i is reducible
-		 */
-		ConcatExpr new_concat_expr(ConcatExprLeft->sons[0], ConcatExprRight->sonsNb + ConcatExprLeft->sonsNb);
-
-		if (concatExpressions.find(new_concat_expr) != concatExpressions.end())
-		{
-			std::cout << "Expression "; new_concat_expr.print(); std::cout << " is already known, nothing to do" << endl;
-			return;
-		}
-
-		for (uint i = 1; i <= ConcatExprRight->sonsNb; i++)
-		{
-			// Compute the prefix v_1 ... v_i 
-			ConcatExpr prefix_right_upto_i(i, ConcatExprRight);
-
-			ConcatExpr new_concat_expr(&prefix_right_upto_i, ConcatExprRight->sonsNb + ConcatExprLeft->sonsNb);
-			for (uint j = 0; j < ConcatExprLeft->sonsNb; j++)
+			//if the expression is already known, we are done
+			if (concatExpressions.find(new_expr) != concatExpressions.end())
 			{
-				const ExtendedExpression * new_e = ConcatExprLeft->sons[j];
-				new_concat_expr.addLeftSon(new_e);
-				unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
-				if (ok != concatExpressions.end())
-				{
-					const ConcatExpr * uuid = &(*ok);
-					map<const ExtendedExpression *, const ExtendedExpression *>::iterator rewrite_rule = rewriteRules.find(uuid);
-					// skip if a rewrite rule exists
-					if (rewrite_rule != rewriteRules.end())
-					{
-						rewrite_rule_found = true;
-						break;
-					}
-				}
+#if VERBOSE_MONOID_COMPUTATION
+				cout << "Expression "; new_expr.print(); cout << " is already known, nothing to do" << endl;
+#endif
+				return;
 			}
-			if (rewrite_rule_found == true) break;
-		}
-	}
 
-	// Second case: elt_right is a concatenation of expressions
-	else if (ConcatExprRight != NULL)
-	{
-		// For each strict prefix of elt_right, we test if the expression (which is necessarily known) is reducible
-		for (uint i = 1; i < ConcatExprRight->sonsNb; i++)
-		{
-			// Compute the prefix v_1 ... v_i 
-			ConcatExpr prefix_right_upto_i(i, ConcatExprRight); //a optimiser, on recalcule le prefixe a chaque fois depuis le debut
-			ConcatExpr new_concat_expr(&prefix_right_upto_i, ConcatExprRight->sonsNb + 1);
-			new_concat_expr.addLeftSon(elt_left);
+			/* We check canonical rewrite rules */
+			const ExtendedExpression * canonical_rewrites = NULL;
 
-			/*			cout << "check if this rewrites: " ;
-						new_concat_expr.print() ;
-						cout << endl ; */
-
-			unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
-			if (ok != concatExpressions.end())
+			/* We check for rule uu# = u#*/
+			const SharpedExpr * sh_right = isSharpedExpr(elt_right);
+			if (sh_right != NULL && sh_right->son == elt_left)
 			{
-				const ConcatExpr * uuid = &(*ok);
-				rewrite_rule_found = (rewriteRules.find(uuid) != rewriteRules.end());
-				if (rewrite_rule_found)
-					break;
+#if VERBOSE_MONOID_COMPUTATION
+				cout << "Adding canonical rewrite rule uu# -> u# for u="; new_expr.print(); cout << endl;
+#endif
+				canonical_rewrites = sh_right;
 			}
-		}
 
-	}
-
-	// Third case: elt_left is a concatenation expression
-	else if (ConcatExprLeft != NULL)
-	{
-		ConcatExpr new_concat_expr(elt_right, ConcatExprLeft->sonsNb + 1);
-
-		// For each strict suffix of elt_left, we test if the expression (which is necessarily known) is reducible
-		for (uint i = 0; i < ConcatExprLeft->sonsNb - 1; i++)
-		{
-			const ExtendedExpression * new_e = ConcatExprLeft->sons[i];
-			new_concat_expr.addLeftSon(new_e);
-
-			unordered_set<ConcatExpr>::iterator ok = concatExpressions.find(new_concat_expr);
-			if (ok != concatExpressions.end())
+			/* We check for rule u#u = u#*/
+			const SharpedExpr * sh_left = isSharpedExpr(elt_left);
+			if (sh_left != NULL && sh_left->son == elt_right)
 			{
-				const ConcatExpr * uuid = &(*ok);
-				map<const ExtendedExpression *, const ExtendedExpression *>::iterator rewrite_rule = rewriteRules.find(uuid);
-				// skip if a rewrite rule exists
-				if (rewrite_rule != rewriteRules.end())
+#if VERBOSE_MONOID_COMPUTATION
+				cout << "Adding canonical rewrite rule u#u -> u# for u="; new_expr.print(); cout << endl;
+#endif
+				canonical_rewrites = sh_left;
+			}
+
+			if (sh_left != NULL && sh_left == sh_right)
+			{
+#if VERBOSE_MONOID_COMPUTATION
+				cout << "Adding canonical rewrite rule u#u# -> u# for u="; new_expr.print(); cout << endl;
+#endif
+				canonical_rewrites = sh_left;
+			}
+			if (canonical_rewrites != NULL)
+			{
+				/* we add the new exprssions to the list of all expressions */
+				const ConcatExpr * new_expr = &*concatExpressions.emplace(elt_left, elt_right).first;
+				addRewriteRule(new_expr, canonical_rewrites);
+				canonicalRewriteRules.insert(new_expr);
+				return;
+			}
+
+
+	/* We constitute all possible infixes (for the . operator) of the concatenation of the expressions,
+	to check for reducibility according to the current rewrite rules*/
+			// we compute the index that separates right sons (at the beginning of new_expr.sons)
+			//from left sons (at the end of new_expr.sons)
+			const ConcatExpr * ConcatExprRight = isConcatExpr(elt_right);
+			int subtrees_nb_right = (ConcatExprRight != NULL) ? ConcatExprRight->sonsNb : 1;
+
+
+
+	/* We scan all possible infixes (including the whole concatenation itself) and check whether the infix can be rewritten 
+	If the left (resp right) expression is a concatexpression, we scan all sons products starting from right (resp left).
+	Otherwise, in case the left (resp right) expression is a letter or a sharp, there is only one son to iterate on.
+	*/
+
+	/* we copy data of new_expr */
+	const ExtendedExpression ** subtrees = new_expr.sons;
+	const uint subtrees_nb = new_expr.sonsNb;
+
+
+	for (int right_idx = subtrees_nb_right - 1; right_idx >= 0; right_idx--)
+	{
+		for (int left_idx = subtrees_nb_right; left_idx < subtrees_nb; left_idx++)
+		{
+			new_expr.sons = subtrees + right_idx;
+			new_expr.sonsNb = left_idx - right_idx + 1;
+			new_expr.update_hash();
+			
+
+			/* if the expression is already known and rewrites, we set rewrite_rule to true*/
+			auto expr = concatExpressions.find(new_expr);
+#if VERBOSE_MONOID_COMPUTATION
+			cout << "Checking for rewrite rule for infix [ " << (subtrees_nb - left_idx) << " : " << (subtrees_nb - right_idx) << " ]"; infix.print();
+			cout << " of "; new_expr.print(); cout << endl;
+#endif
+			if (expr != concatExpressions.end())
+			{
+				if (rewriteRules.find(&*expr) != rewriteRules.end())
 				{
+#if VERBOSE_MONOID_COMPUTATION
+					cout << ": found rewrite rule "; rewriteRules.find(&*expr)->first->print(); cout << endl;
+#endif
 					rewrite_rule_found = true;
 					break;
 				}
+#if VERBOSE_MONOID_COMPUTATION
+				else
+				{
+					cout << ": none" << endl;
+				}
+#endif
 			}
 		}
+		if (rewrite_rule_found) break;
 	}
+	/* we put new_expr back to normal, memory desallocation will be done by the destructor*/
+	new_expr.sons = subtrees;
+	new_expr.sonsNb = subtrees_nb;
 
 	// Now, treat if no rewrite rules have been found
 	if (!rewrite_rule_found)
@@ -208,20 +228,20 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 		const ConcatExpr * new_expr = &*concatExpressions.emplace(elt_left, elt_right).first;
 
 		/* We compute the matrix */
-		const Matrix * mat_left = expr_to_mat[elt_left];
-		const Matrix * mat_right = expr_to_mat[elt_right];
-		Matrix mat = Matrix::prod(*mat_left, *mat_right);
+		Matrix mat = Matrix::prod(*expr_to_mat[elt_left], *expr_to_mat[elt_right]);
 
 		/* we check if the matrix is already known */
 		pair <unordered_set<Matrix>::iterator, bool> result = matrices.emplace(mat);
 		const Matrix *  new_mat = &(*result.first);
 		if (result.second)
 		{
+#if VERBOSE_MONOID_COMPUTATION
 			/* if the matrix was not known before, we create a new association between expression and its matrix */
 			cout << "Add element: "; new_expr->print();	 cout << endl;
 			cout << "with matrix adress #" << new_mat << " hash h" << new_mat->hash() << endl;
 			new_mat->print();
 			cout << endl;
+#endif
 			expr_to_mat[new_expr] = new_mat;
 			mat_to_expr[new_mat] = new_expr;
 
@@ -232,7 +252,6 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 		{
 			/* if the matrix was known before, we create the new rewrite rule */
 			const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
-			/*	cout << "Add rewrite rule: ";		(*rewritten).print() ;		cout << endl; */
 			addRewriteRule(new_expr, rewritten);
 		}
 	}

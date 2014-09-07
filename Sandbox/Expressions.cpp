@@ -47,57 +47,22 @@ ConcatExpr::ConcatExpr(const ExtendedExpression * expr_left, const ExtendedExpre
 	const ConcatExpr * ConcatExprLeft = isConcatExpr(expr_left);
 	const ConcatExpr * ConcatExprRight = isConcatExpr(expr_right);
 
-	// First case: elt_left and elt_right are concatenations of expressions
-	if ((ConcatExprLeft != NULL) && (ConcatExprRight != NULL))
-	{
-		sonsNb = ConcatExprRight->sonsNb + ConcatExprLeft->sonsNb;
-		sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
+	int subtrees_nb_right = (ConcatExprRight != NULL) ? ConcatExprRight->sonsNb : 1;
+	sonsNb = subtrees_nb_right + ((ConcatExprLeft != NULL) ? ConcatExprLeft->sonsNb : 1);
 
-		for (uint i = 0; i < ConcatExprRight->sonsNb; i++)
-		{
-			sons[i] = ConcatExprRight->sons[i]; 
-		}
-		for (uint i = 0; i < ConcatExprLeft->sonsNb; i++)
-		{
-			sons[i + ConcatExprRight->sonsNb] = ConcatExprLeft->sons[i]; 
-		}
-	}
+	/* temporary array used to create all infixes */
+	sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
 
-	// Second case: elt_right is a concatenation of expressions
-	else if (ConcatExprRight != NULL)
-	{
-		sonsNb = ConcatExprRight->sonsNb + 1;
-		sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
-
-		for (uint i = 0; i < ConcatExprRight->sonsNb; i++)
-		{
-			sons[i] = ConcatExprRight->sons[i]; 
-		}
-		sons[ConcatExprRight->sonsNb] = expr_left; 
-	}
-
-	// Third case: elt_left is a concatenation expression
-	else if (ConcatExprLeft != NULL)
-	{
-		sonsNb = 1 + ConcatExprLeft->sonsNb;
-		sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
-
-		sons[0] = expr_right; 
-		for (uint i = 0; i < ConcatExprLeft->sonsNb; i++)
-		{
-			sons[i + 1] = ConcatExprLeft->sons[i]; 
-		}
-	}
-	
-	// Last case: both letters or sharped expressions
+	/* copy the expressions in the array*/
+	if (ConcatExprRight != NULL)
+		memcpy(sons, ConcatExprRight->sons, ConcatExprRight->sonsNb * sizeof(void*));
 	else
-	{
-		sonsNb = 2;
-		sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
-
 		sons[0] = expr_right;
-		sons[1] = expr_left;
-	}
+
+	if (ConcatExprLeft != NULL)
+		memcpy(sons + subtrees_nb_right, ConcatExprLeft->sons, ConcatExprLeft->sonsNb * sizeof(void*));
+	else
+		sons[subtrees_nb_right] = expr_left;
 
 	update_hash();
 }
@@ -142,7 +107,9 @@ SharpedExpr::SharpedExpr(const ExtendedExpression * son) : son(son)
 	_hash = hash_value(son->Hash());
 }
 
+
 // Equality operator
+
 bool ExtendedExpression::operator == (const ExtendedExpression & exp) const
 {
 	const ExtendedExpression * pexp = &exp;
@@ -160,6 +127,7 @@ bool ExtendedExpression::operator == (const ExtendedExpression & exp) const
 			return *(LetterExpr *)cexpr == *(LetterExpr *)pexp;
 	}
 }
+
 
 // Dynamic casts
 const SharpedExpr * isSharpedExpr(const ExtendedExpression * expr) { return dynamic_cast<const SharpedExpr *>(expr); }
