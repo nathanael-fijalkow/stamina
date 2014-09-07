@@ -94,21 +94,11 @@ public:
 
 	ConcatExpr() : sons(NULL), sonsNb(0) {};
 
-	// First constructor: takes an expression and a number of sons (to allocate the array of sons)
-	// Hugo: there is a contradiction with the descriptions before the field sons above: it is supposed to be an array of size sonsNb 
-	// and constructs a ConcatExpr with only one son
-	ConcatExpr(const ExtendedExpression * expr, uint maxSonsNb);
-
-	ConcatExpr(ExtendedExpression * expr, uint maxSonsNb);
-
 	// Second constructor: a copy constructor which performs a memcopy of the field sons
 	ConcatExpr(const ConcatExpr & other);
 
 	// Third constructor: concatenation of two expressions
 	ConcatExpr(const ExtendedExpression * expr_left, const ExtendedExpression * expr_right);
-
-	// Fourth constructor: prefix
-	ConcatExpr(uint k, const ConcatExpr * expr);
 
 	// This is an assignment operator which performs a memcopy of the field sons
 	ConcatExpr & operator=(const ConcatExpr &);

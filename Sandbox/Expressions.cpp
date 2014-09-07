@@ -10,28 +10,6 @@ LetterExpr::LetterExpr(char letter) : letter(letter)
 	_hash = hash_value(letter);
 };
 
-// First constructor: takes an expression and a number of sons (to allocate the array of sons)
-// and constructs a ConcatExpr with only one son
-ConcatExpr::ConcatExpr(const ExtendedExpression * expr, uint maxSonsNb)
-{
-	sons = (const ExtendedExpression **)malloc(maxSonsNb * sizeof(void *));
-
-	sons[0] = expr;
-	sonsNb = 1;
-
-	update_hash();
-};
-
-ConcatExpr::ConcatExpr(ExtendedExpression * expr, uint maxSonsNb)
-{
-	sons = (const ExtendedExpression **)malloc(maxSonsNb * sizeof(void *));
-
-	sons[0] = expr;
-	sonsNb = 1;
-
-	update_hash();
-};
-
 // Second constructor: a copy constructor which performs a memcopy of the field sons
 ConcatExpr::ConcatExpr(const ConcatExpr & other) : sonsNb(other.sonsNb)
 {
@@ -63,18 +41,6 @@ ConcatExpr::ConcatExpr(const ExtendedExpression * expr_left, const ExtendedExpre
 		memcpy(sons + subtrees_nb_right, ConcatExprLeft->sons, ConcatExprLeft->sonsNb * sizeof(void*));
 	else
 		sons[subtrees_nb_right] = expr_left;
-
-	update_hash();
-}
-
-ConcatExpr::ConcatExpr(uint k, const ConcatExpr * expr)
-{
-	sonsNb = k;
-	sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
-	for (uint i = 0; i < k; i++)
-	{
-		sons[i] = expr->sons[i + expr->sonsNb - k]; 
-	}
 
 	update_hash();
 }
