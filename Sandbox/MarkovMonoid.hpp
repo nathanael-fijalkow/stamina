@@ -10,6 +10,7 @@
 
 using namespace std;
 
+
 /* CLASS DEFINITIONS */
 // This class describes a Markov Monoid
 class MarkovMonoid
@@ -80,6 +81,9 @@ public:
 	// Function computing the smallest Markov Monoid containing a given unstable Markov Monoid
 	void ComputeMarkovMonoid(UnstableMarkovMonoid * monoid);
 
+	//Computes the maximum number of leaks 
+	int maxLeakNb();
+
 protected:
 
 	// Function processing an expression, computing products
@@ -90,6 +94,27 @@ protected:
 
 	// Number of states of the automaton
 	uint dim;
+
+	//check idempotence
+	bool is_idempotent(const Matrix * mat);
+
+	//get recurrent states
+	const Vector * recurrent_states(const Matrix * mat);
+
+	//get recurrence classes
+	const Vector * recurrence_classes(const Matrix * mat);
+
+#if CACHE_RECURRENT_STATES
+	// maps from matrice to states which are recurrent
+	map <const Matrix *, const Vector *> mat_to_recurrent_states;
+	// maps from matrice to one recurrent state per class
+	map <const Matrix *, const Vector *> mat_to_recurrence_classes;
+
+	// (not)idempotent matrices
+	unordered_set<const Matrix *> idempotent;
+	unordered_set<const Matrix *> notidempotent;
+#endif
+
 };
 
 

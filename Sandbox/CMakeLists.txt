@@ -78,3 +78,6 @@ endforeach (SOURCE)
 add_executable (AcmeTest ${ALL_SOURCES} ${ALL_HEADERS} Test.cpp)
 target_link_libraries (AcmeTest ${EXTRA_LIBS})
 
+add_executable (OneLeakTest ${ALL_SOURCES} ${ALL_HEADERS} OneLeak.cpp)
+target_link_libraries (OneLeakTest ${EXTRA_LIBS})
+

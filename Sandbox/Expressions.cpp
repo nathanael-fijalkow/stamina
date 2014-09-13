@@ -74,6 +74,8 @@ SharpedExpr::SharpedExpr(const ExtendedExpression * son) : son(son)
 }
 
 
+
+
 // Equality operator
 
 bool ExtendedExpression::operator == (const ExtendedExpression & exp) const

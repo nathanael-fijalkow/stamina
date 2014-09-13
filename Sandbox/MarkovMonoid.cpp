@@ -47,11 +47,38 @@ void MarkovMonoid::print()
 
 }
 
+//Computes the maximum number of leaks of all sharped expression
+int UnstableMarkovMonoid::maxLeakNb()
+{
+	int result = 0;
+	for (auto & expr_mat : expr_to_mat)
+	{
+		if ( is_idempotent(expr_mat.second))
+		{
+			cout << "Checking whether "; expr_mat.first->print(); cout << " has a leak" << endl;
+//			cout << "Recurrence states" << endl; recurrent_states(expr_mat.second)->print(); cout << endl;
+//			cout << "Recurrence classes" << endl; recurrence_classes(expr_mat.second)->print(); cout << endl;
+			int cl = expr_mat.second->countLeaks(recurrence_classes(expr_mat.second));
+			if (cl > 0)
+				cout << "Found " << cl << " leaks." << endl;
+			if (cl > result) result = cl;
+		}
+	}
+	return result;
+}
+
 // Constructor
 UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : dim(dim)
 {
 	Matrix::vectors.clear();
+#if USE_SPARSE_MATRIX
 	Matrix::zero_vector = &*Matrix::vectors.emplace(0).first;
+#else
+	vector<bool> zero(dim);
+	for (int i = 0; i < dim; i++)
+		zero[i] = false;
+	Matrix::zero_vector = &*Matrix::vectors.emplace(zero).first;
+#endif
 };
 
 // Free known vectors
@@ -194,7 +221,7 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 			/* if the expression is already known and rewrites, we set rewrite_rule to true*/
 			auto expr = concatExpressions.find(new_expr);
 #if VERBOSE_MONOID_COMPUTATION
-			cout << "Checking for rewrite rule for infix [ " << (subtrees_nb - left_idx) << " : " << (subtrees_nb - right_idx) << " ]"; infix.print();
+			cout << "Checking for rewrite rule for infix [ " << (subtrees_nb - left_idx) << " : " << (subtrees_nb - right_idx) << " ]"; new_expr.print();
 			cout << " of "; new_expr.print(); cout << endl;
 #endif
 			if (expr != concatExpressions.end())
@@ -300,13 +327,76 @@ void UnstableMarkovMonoid::CloseByProduct()
 
 // Takes an expression, computes its stabilization if it is idempotent,
 // and either add a rewrite rule if the stabilization already exists, or a new element if it does not
+
+//get recurrent states
+const Vector * UnstableMarkovMonoid::recurrent_states(const Matrix * mat)
+{
+#ifdef CACHE_RECURRENT_STATES
+	auto recs = mat_to_recurrent_states.find(mat);
+	if (recs == mat_to_recurrent_states.end())
+	{
+		auto vec = mat->recurrent_states();
+		mat_to_recurrent_states[mat] = vec;
+		return vec;
+	}
+	else
+		return recs->second;
+#else
+	return mat->recurrent_states();
+#endif
+}
+
+//get recurrence classes
+const Vector * UnstableMarkovMonoid::recurrence_classes(const Matrix * mat)
+{
+#ifdef CACHE_RECURRENT_STATES
+	auto recs = mat_to_recurrence_classes.find(mat);
+	if (recs == mat_to_recurrence_classes.end())
+	{
+		auto vec = mat->recurrence_classes( recurrent_states(mat) );
+		mat_to_recurrence_classes[mat] = vec;
+		return vec;
+	}
+	else
+		return recs->second;
+#else
+	return mat->recurrent_classes();
+#endif
+}
+
+bool UnstableMarkovMonoid::is_idempotent(const Matrix * mat)
+{
+#if CACHE_RECURRENT_STATES
+	if (idempotent.find(mat) != idempotent.end())
+		return true;
+	else if (notidempotent.find(mat) != notidempotent.end())
+		return false;
+	else
+	{
+		bool is_idempotent = (*mat).isIdempotent();
+		if(is_idempotent)
+			idempotent.insert(mat);
+		else
+			notidempotent.insert(mat);
+		return is_idempotent;
+	}
+#else
+	return (*mat).isIdempotent();
+#endif
+
+}
+
 void UnstableMarkovMonoid::sharpify_expression(const ExtendedExpression * elt){
 
 	const Matrix * mat_e = expr_to_mat[elt];
 
-	if ((*mat_e).isIdempotent()){
-		Matrix mat = Matrix::stab(* mat_e);
 
+	if (is_idempotent(mat_e)){
+#if USE_SPARSE_MATRIX
+		Matrix mat = Matrix::stab(*mat_e);
+#else
+		Matrix mat = Matrix::stab(* mat_e, recurrent_states(mat_e ) );
+#endif
 		pair <unordered_set <Matrix>::iterator, bool> result = matrices.emplace(mat);
 		unordered_set<SharpedExpr>::iterator it = sharpExpressions.emplace(elt).first;
 		// DO WE ACTUALLY NEED SHARPEXPRESSIONS (UNORDERED SET)????
@@ -354,11 +444,13 @@ void UnstableMarkovMonoid::ComputeMarkovMonoid(UnstableMarkovMonoid * monoid)
 	int i = 1 ;
 	do
 	{
+#if VERBOSE_MONOID_COMPUTATION
 		cout << endl << "The current monoid is: " << endl << endl ;
 
 		print() ;
 		cout << endl << "Starting iteration " << i << endl << endl ;
 		cout << endl << "------> Closure by product" << endl ;
+#endif
 		CloseByProduct();
 
 		cur_index = 0;
@@ -370,8 +462,10 @@ void UnstableMarkovMonoid::ComputeMarkovMonoid(UnstableMarkovMonoid * monoid)
 
 		new_elements.clear();	
 
-		cout << "------> Closure by stabilization" << endl << endl ;
-		CloseByStabilization() ;
+#if VERBOSE_MONOID_COMPUTATION
+		cout << "------> Closure by stabilization" << endl << endl;
+#endif
+		CloseByStabilization();
 		to_be_sharpified.clear();
 		i++;
 	} while (new_elements.size() != 0);
