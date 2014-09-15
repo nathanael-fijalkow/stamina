@@ -79,7 +79,7 @@ public:
 	void CloseByStabilization();
 
 	// Function computing the smallest Markov Monoid containing a given unstable Markov Monoid
-	void ComputeMarkovMonoid(UnstableMarkovMonoid * monoid);
+	void ComputeMarkovMonoid();
 
 	//Computes the maximum number of leaks 
 	int maxLeakNb();

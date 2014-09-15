@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 	monoid.addLetter('a', mata);
 	monoid.addLetter('b', matb);
 
-	monoid.ComputeMarkovMonoid(& monoid);
+	monoid.ComputeMarkovMonoid();
 	
 	cout << monoid.expr_to_mat.size() << " elements." << endl;
 	cout << monoid.rewriteRules.size() << " rewrite rules." << endl;

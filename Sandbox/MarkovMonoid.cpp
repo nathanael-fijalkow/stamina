@@ -55,13 +55,15 @@ int UnstableMarkovMonoid::maxLeakNb()
 	{
 		if ( is_idempotent(expr_mat.second))
 		{
-			cout << "Checking whether "; expr_mat.first->print(); cout << " has a leak" << endl;
-//			cout << "Recurrence states" << endl; recurrent_states(expr_mat.second)->print(); cout << endl;
-//			cout << "Recurrence classes" << endl; recurrence_classes(expr_mat.second)->print(); cout << endl;
 			int cl = expr_mat.second->countLeaks(recurrence_classes(expr_mat.second));
+			if (cl > result) result = cl;
+#if VERBOSE_MONOID_COMPUTATION
+			cout << "Checking whether "; expr_mat.first->print(); cout << " has a leak" << endl;
 			if (cl > 0)
 				cout << "Found " << cl << " leaks." << endl;
-			if (cl > result) result = cl;
+			//			cout << "Recurrence states" << endl; recurrent_states(expr_mat.second)->print(); cout << endl;
+			//			cout << "Recurrence classes" << endl; recurrence_classes(expr_mat.second)->print(); cout << endl;
+#endif
 		}
 	}
 	return result;
@@ -431,8 +433,9 @@ void UnstableMarkovMonoid::CloseByStabilization()
 	}
 }
 
-void UnstableMarkovMonoid::ComputeMarkovMonoid(UnstableMarkovMonoid * monoid)
+void UnstableMarkovMonoid::ComputeMarkovMonoid()
 {
+	auto monoid = this;
 	size_t cur_index = 0;
 	while (cur_index < monoid->elements.size())
 	{

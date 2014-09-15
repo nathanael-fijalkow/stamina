@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
 	cout << "Acme++ rules" << endl;
 
-//	while (true)
+	while (true)
 	{
 		int stateNb = 3;
 		UnstableMarkovMonoid monoid(stateNb);
@@ -29,6 +29,7 @@ int main(int argc, char **argv)
 		ExplicitMatrix * b = ExplicitMatrix::random(stateNb);
 		//ExplicitMatrix * c = ExplicitMatrix::random(stateNb);
 
+		/*
 		for (int i = 0; i < stateNb * stateNb; i++)
 			a->coefficients[i] = b->coefficients[i] = 0;
 		
@@ -40,18 +41,28 @@ int main(int argc, char **argv)
 		b->coefficients[2] = 2;
 		b->coefficients[3] = 2;
 		b->coefficients[8] = 2;
+		*/
 
 		monoid.addLetter('a', *a);
 		monoid.addLetter('b', *b);
 //		monoid.addLetter('c', *c);
 
-		monoid.ComputeMarkovMonoid(&monoid);
+		monoid.ComputeMarkovMonoid();
 
-		cout << monoid.expr_to_mat.size() << " elements and " << monoid.rewriteRules.size() << " rewrite rules and " ;
 
-		monoid.print();
+
 		int ln = monoid.maxLeakNb();
-		cout << " max leak number " << ln << endl;
+
+		if (ln > 0)
+		{
+			cout << endl << monoid.expr_to_mat.size() << " elements and " << monoid.rewriteRules.size() << " rewrite rules and ";
+//			monoid.print();
+			cout << " max leak number " << ln << endl;
+		}
+		else
+		{
+			cout << "." << flush;
+		}
 
 		delete a;
 		delete b;

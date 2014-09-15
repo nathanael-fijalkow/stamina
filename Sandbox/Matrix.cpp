@@ -513,15 +513,14 @@ uint Matrix::countLeaks(const Vector * classes) const
 				if (i != j && classes->contains(j) && row_pluses[i]->contains(j))
 				{
 					answer++;
+#if VERBOSE_MONOID_COMPUTATION
 					cout << "Found leak from class " << i << " to class " << j << endl;
+#endif
 	//				print();
 				}
 			}
 		}
 	}
-	if (answer > 0)
-		print();
-
 	return answer;
 }
 #endif
