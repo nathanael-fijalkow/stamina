@@ -92,8 +92,10 @@ public:
 	// the leftmost at address sons + sonsNb - 1
 	const ExtendedExpression ** sons;
 
+protected:
 	ConcatExpr() : sons(NULL), sonsNb(0) {};
 
+public:
 	// Second constructor: a copy constructor which performs a memcopy of the field sons
 	ConcatExpr(const ConcatExpr & other);
 
@@ -117,7 +119,11 @@ public:
 	    return false;
 	  else {
 	      for (uint i = 0; i < sonsNb; i++) {
-		  const ExtendedExpression * t1 = exp.sons[i];
+			  if (exp.sons[i] != sons[i])
+				  return false;
+
+			  /*
+			  const ExtendedExpression * t1 = exp.sons[i];
 		  const ExtendedExpression * t2 = sons[i];
 		  
 		  const ConcatExpr * c1 = isConcatExpr(exp.sons[i]);
@@ -127,9 +133,10 @@ public:
 		    t1 = c1->sons[0];
 		  if (c2 && (c2->sonsNb == 1))
 		    t2 = c2->sons[0];
-
+			
 		  if (t1 != t2)
 		    return false;
+			*/
 		}
 	    }
 	  return true;

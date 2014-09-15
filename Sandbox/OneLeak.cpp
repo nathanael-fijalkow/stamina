@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
 	while (true)
 	{
-		int stateNb = 3;
+		int stateNb = 5;
 		UnstableMarkovMonoid monoid(stateNb);
 		
 		ExplicitMatrix * a = ExplicitMatrix::random(stateNb);
@@ -53,15 +53,11 @@ int main(int argc, char **argv)
 
 		int ln = monoid.maxLeakNb();
 
+		cout << endl << stateNb << " states and " <<  monoid.expr_to_mat.size() << " elements and " << monoid.rewriteRules.size() << " rewrite rules and ";
+		cout << " max leak number " << ln << endl;
 		if (ln > 0)
 		{
-			cout << endl << monoid.expr_to_mat.size() << " elements and " << monoid.rewriteRules.size() << " rewrite rules and ";
 //			monoid.print();
-			cout << " max leak number " << ln << endl;
-		}
-		else
-		{
-			cout << "." << flush;
 		}
 
 		delete a;
