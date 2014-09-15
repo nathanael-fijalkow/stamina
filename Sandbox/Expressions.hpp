@@ -107,7 +107,7 @@ public:
 
 	// Adds a son to the left
 	// Assumes that enough memory was allocated when creating the son's pointer
-	void addLeftSon(const ExtendedExpression *);
+	//void addLeftSon(const ExtendedExpression *);
 
 	// Free the memory for a useless expression
 	~ConcatExpr();

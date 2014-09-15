@@ -60,6 +60,7 @@ ConcatExpr & ConcatExpr::operator=(const ConcatExpr & other)
 
 // Adds a son to the left
 // Assumes that enough memory was allocated when creating the son's pointer
+/*
 void ConcatExpr::addLeftSon(const ExtendedExpression * new_son)
 {
 	*(sons + sonsNb) = new_son;
@@ -67,6 +68,7 @@ void ConcatExpr::addLeftSon(const ExtendedExpression * new_son)
 	//_hash ^= hash_value(new_son->Hash()) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 	update_hash();
 }
+*/
 
 SharpedExpr::SharpedExpr(const ExtendedExpression * son) : son(son)
 {
