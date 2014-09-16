@@ -9,10 +9,7 @@ typedef unsigned int uint;
 #define _HASH_SEED      (size_t)0xdeadbeef
 
 #ifndef MSVC
-size_t hash_value(const size_t & _Keyval)
-{
-        return ((size_t)_Keyval ^ _HASH_SEED);
-}
+size_t hash_value(const size_t & _Keyval);
 #else
 #include <functional>
 #include <xhash>

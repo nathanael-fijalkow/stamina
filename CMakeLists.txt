@@ -78,3 +78,5 @@ endforeach (SOURCE)
 add_executable (AcmeTest ${ALL_SOURCES} ${ALL_HEADERS} Test.cpp)
 target_link_libraries (AcmeTest ${EXTRA_LIBS})
 
+SET(GCC_COMPILE_FLAGS "-std=c++11")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}" )

@@ -3,6 +3,12 @@
 #include <typeinfo>
 
 #include "Expressions.hpp"
+#ifndef MSVC
+size_t hash_value(const size_t & _Keyval)
+{
+        return ((size_t)_Keyval ^ _HASH_SEED);
+}
+#endif
 
 // Constructors
 LetterExpr::LetterExpr(char letter) : letter(letter)
