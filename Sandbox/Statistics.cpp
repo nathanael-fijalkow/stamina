@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
 	unsigned int seed = time(NULL);
 
-	unsigned int nb_samples = 50000;
+	unsigned int nb_samples = 100000;
 
 
 	int max_state_nb = 10;
@@ -40,13 +40,6 @@ int main(int argc, char **argv)
 	uint nb = 0;
 	while (nb++ < nb_samples)
 	{
-
-		//seed = hash_value(seed << 6 | seed >> 3);
-		//srand(seed);
-
-
-
-
 		int n = 1 + (rand() % max_state_nb);
 
 		int da = rand();
@@ -59,58 +52,59 @@ int main(int argc, char **argv)
 		cout << endl << "#" << nb  << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed <<  endl;
 		file2 << endl << "#" << nb << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed << endl;
 
-
 		UnstableMarkovMonoid monoid(n);
 
-
 		ExplicitMatrix m1(n), m2(n);
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < n; j++)
+		int max_tries = 100;
+
+			for (int i = 0; i < n; i++)
 			{
-				if (rand() < da)
-					m1.coefficients[n*i + j] = 0;
-				else
-					m1.coefficients[n*i + j] = 2;
-				if (rand() < db)
-					m2.coefficients[n*i + j] = 0;
-				else
-					m2.coefficients[n*i + j] = 2;
+				for (int j = 0; j < n; j++)
+				{
+					if (rand() < da)
+						m1.coefficients[n*i + j] = 0;
+					else
+						m1.coefficients[n*i + j] = 2;
+					if (rand() < db)
+						m2.coefficients[n*i + j] = 0;
+					else
+						m2.coefficients[n*i + j] = 2;
+				}
+				m1.coefficients[n * i + rand() % n] = 2;
+				m2.coefficients[n * i + rand() % n] = 2;
 			}
-		}
 
-		auto a = monoid.addLetter('a', m1);
-		auto b = monoid.addLetter('b', m2);
+			auto a = monoid.addLetter('a', m1);
+			auto b = monoid.addLetter('b', m2);
 
-		cout << "a" << *a << endl << "b" << endl << *b << endl;
-		file2 << "a" << *a << endl << "b" << endl << *b << endl;
+				cout << "a" << endl << *a << endl << "b" << endl << *b << endl;
+				file2 << "a" << endl << *a << endl << "b" << endl << *b << endl;
 
 		try
-
 		{
 			monoid.ComputeMarkovMonoid();
 
 			//monoid.print();
 
 			int s = monoid.expr_to_mat.size();
-			cout << s << " elements." << monoid.rewriteRules.size() << " rewrite rules " << flush;
-			file2 << s << " elements." << monoid.rewriteRules.size() << " rewrite rules " << flush;
+			cout << s << " elements." << monoid.rewriteRules.size() << " rewrite rules " << endl;
+			file2 << s << " elements." << monoid.rewriteRules.size() << " rewrite rules " << endl;
 
 			auto l = monoid.maxLeakNb();
 			if (l.first == 0)
 			{
-				cout << " leaktight " << endl;
-				file2 << " leaktight " << endl;
+				cout << "Leaktight " << endl;
+				file2 << "Leaktight " << endl;
 			}
 			else
 			{
-				cout << " maxleaknb " << l.first << " on expression " << endl << *(l.second) << endl;
-				file2 << " maxleaknb " << l.first << " on expression " << endl << *(l.second) << endl;
+				cout << "Maxleaknb " << l.first << " on expression " << endl << *(l.second) << endl << "and matrix " << endl << *(monoid.expr_to_mat[l.second]) << endl;
+				file2 << "Maxleaknb " << l.first << " on expression " << endl << *(l.second) << endl << "and matrix " << endl << *(monoid.expr_to_mat[l.second]) << endl;
 			}
 			
 			//file << "Size;Proba;Seed;ElementsNb;RewriteRulesNb;VectorNb;LeakNb" << endl;
 
-			file << n << ";" << da << ";" << db << "; " << monoid.expr_to_mat.size();
+			file << n << ";" << density_a << ";" << density_b << "; " << monoid.expr_to_mat.size();
 			file << "; " << monoid.rewriteRules.size() << "; " << Matrix::vectors.size() << "; " << l.first << endl;
 
 			//		Sleep(10000);

@@ -209,6 +209,9 @@ public:
 	uint countLeaks(const Vector * classes) const;
 #endif
 
+	//check matrix is well formed
+	bool check() const;
+
 protected:
 
 	// The hash expression

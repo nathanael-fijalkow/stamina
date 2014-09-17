@@ -527,6 +527,14 @@ uint Matrix::countLeaks(const Vector * classes) const
 }
 #endif
 
+bool Matrix::check() const
+{
+	//at least one 1 per line
+	for (int i = 0; i < stateNb; i++)
+		if (row_ones[i] == Matrix::zero_vector)
+			return false;
+}
+
 // Function computing the product of two matrices
 Matrix Matrix::prod(const Matrix & mat1, const Matrix & mat2)
 {

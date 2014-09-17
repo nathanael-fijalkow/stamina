@@ -274,6 +274,7 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 		const Matrix *  new_mat = &(*result.first);
 		if (result.second)
 		{
+			new_mat->check();
 #if VERBOSE_MONOID_COMPUTATION
 			/* if the matrix was not known before, we create a new association between expression and its matrix */
 			cout << "Add element: "; new_expr->print();	 cout << endl;
