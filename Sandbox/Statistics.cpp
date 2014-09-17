@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	ofstream file(filename.str() + ".csv");
 	ofstream file2(filename.str() + " monoids.txt");
 
-	file << "Size;Density;ElementsNb;RewriteRulesNb;VectorNb;LeakNb" << endl;
+	file << "Size;Densitya;Densityb;ElementsNb;RewriteRulesNb;VectorNb;LeakNb" << endl;
 
 	uint nb = 0;
 	while (nb++ < nb_samples)
@@ -49,10 +49,15 @@ int main(int argc, char **argv)
 
 		int n = 1 + (rand() % max_state_nb);
 
-		int int0 = rand();
-		float pones = 1.0 - (int0 * 1.0) / RAND_MAX;
+		int da = rand();
+		float density_a = 1.0 - (da * 1.0) / RAND_MAX;
+		int db = rand();
+		float density_b = 1.0 - (db * 1.0) / RAND_MAX;
 
-		cout << endl << "#" << nb  << " size " << n << " 1-density " << pones << " seed " << seed <<  endl;
+		file2 << endl << "******************************************************" << endl << endl;
+
+		cout << endl << "#" << nb  << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed <<  endl;
+		file2 << endl << "#" << nb << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed << endl;
 
 
 		UnstableMarkovMonoid monoid(n);
@@ -63,11 +68,11 @@ int main(int argc, char **argv)
 		{
 			for (int j = 0; j < n; j++)
 			{
-				if (rand() < int0)
+				if (rand() < da)
 					m1.coefficients[n*i + j] = 0;
 				else
 					m1.coefficients[n*i + j] = 2;
-				if (rand() < int0)
+				if (rand() < db)
 					m2.coefficients[n*i + j] = 0;
 				else
 					m2.coefficients[n*i + j] = 2;
@@ -91,19 +96,29 @@ int main(int argc, char **argv)
 			cout << s << " elements." << monoid.rewriteRules.size() << " rewrite rules " << flush;
 			file2 << s << " elements." << monoid.rewriteRules.size() << " rewrite rules " << flush;
 
-			int l = monoid.maxLeakNb();
-			cout << "MaxLeakNb " << l << endl;
-			file2 << "MaxLeakNb " << l << endl;
+			auto l = monoid.maxLeakNb();
+			if (l.first == 0)
+			{
+				cout << " leaktight " << endl;
+				file2 << " leaktight " << endl;
+			}
+			else
+			{
+				cout << " maxleaknb " << l.first << " on expression " << endl << *(l.second) << endl;
+				file2 << " maxleaknb " << l.first << " on expression " << endl << *(l.second) << endl;
+			}
 			
 			//file << "Size;Proba;Seed;ElementsNb;RewriteRulesNb;VectorNb;LeakNb" << endl;
 
-			file << n << ";" << pones << "; " << monoid.expr_to_mat.size() << "; " << monoid.rewriteRules.size() << "; " << Matrix::vectors.size() << "; " << l << endl;
+			file << n << ";" << da << ";" << db << "; " << monoid.expr_to_mat.size();
+			file << "; " << monoid.rewriteRules.size() << "; " << Matrix::vectors.size() << "; " << l.first << endl;
 
 			//		Sleep(10000);
 		}
 		catch (const runtime_error & err)
 		{
 			cout << "Failed to compute: " << err.what() << endl;
+			file2 << "Failed to compute: " << err.what() << endl;
 		}
 	}
 

@@ -55,15 +55,19 @@ ostream& operator<<(ostream& st, const MarkovMonoid & monoid)
 }
 
 //Computes the maximum number of leaks of all sharped expression
-int UnstableMarkovMonoid::maxLeakNb()
+pair<int, const ExtendedExpression *> UnstableMarkovMonoid::maxLeakNb()
 {
-	int result = 0;
+	pair<int, const ExtendedExpression *> result(0, NULL);
 	for (auto & expr_mat : expr_to_mat)
 	{
 		if ( is_idempotent(expr_mat.second))
 		{
 			int cl = expr_mat.second->countLeaks(recurrence_classes(expr_mat.second));
-			if (cl > result) result = cl;
+			if (cl > result.first)
+			{
+				result.first = cl;
+				result.second = expr_mat.first;
+			}
 #if VERBOSE_MONOID_COMPUTATION
 			cout << "Checking whether "; expr_mat.first->print(); cout << " has a leak" << endl;
 			if (cl > 0)

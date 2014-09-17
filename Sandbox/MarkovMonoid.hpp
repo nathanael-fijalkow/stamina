@@ -87,8 +87,8 @@ public:
 	// Function computing the smallest Markov Monoid containing a given unstable Markov Monoid
 	void ComputeMarkovMonoid();
 
-	//Computes the maximum number of leaks 
-	int maxLeakNb();
+	//Computes the maximum number of leaks and the associated expreession 
+	pair<int, const ExtendedExpression *> maxLeakNb();
 
 protected:
 
