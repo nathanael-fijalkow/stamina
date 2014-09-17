@@ -10,6 +10,7 @@
 
 using namespace std;
 
+#define MAX_MONOID_SIZE 1000000
 
 /* CLASS DEFINITIONS */
 // This class describes a Markov Monoid
@@ -25,18 +26,23 @@ public:
 	map <const ExtendedExpression *, const ExtendedExpression *> rewriteRules;
 	
 	// Print
-	void print();
+	void print() const;
+	string toString() const;
+
+	//the set of canonical rewrite rules
+	set<const ExtendedExpression *> canonicalRewriteRules;
 
 protected:
 
 	// Constructor
 	MarkovMonoid(){};
 
-	//the set of canonical rewrite rules
-	set<const ExtendedExpression *> canonicalRewriteRules;
 
 
 };
+
+/* for printing to a file */
+ostream& operator<<(ostream& os, const MarkovMonoid & monoid);
 
 // This class describes Markov Monoid under construction, it extends the class MarkovMonoid
 class UnstableMarkovMonoid : public MarkovMonoid
@@ -50,7 +56,7 @@ public:
 	~UnstableMarkovMonoid();
 
 	// Adds a new letter
-	void addLetter(char a, ExplicitMatrix & mat);
+	const Matrix * addLetter(char a, ExplicitMatrix & mat);
 
 	// Adds a rewrite rule
 	void addRewriteRule(const ExtendedExpression *, const ExtendedExpression *);

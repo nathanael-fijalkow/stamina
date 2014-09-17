@@ -90,16 +90,16 @@ Vector::Vector(uint * data, size_t data_size, bool copy) : entriesNb(data_size),
 };
 #endif
 
-void Vector::print() const
+void Vector::print(ostream & os) const
 {
 #if USE_SPARSE_MATRIX
 	for (size_t * v = entries; v != entries + entriesNb; v++)
-		cout << *v << " ";
-	cout << endl;
+		os << *v << " ";
+	os << endl;
 #else
 	for (int i = 0 ; i < entriesNb; i++)
-		cout << ( contains(i) ? "1" : "0");
-	cout << endl;
+		os << ( contains(i) ? "1" : "0");
+	os << endl;
 #endif
 }
 
@@ -226,12 +226,12 @@ Matrix::Matrix(const ExplicitMatrix & explMatrix) : stateNb(explMatrix.stateNb)
 }
 
 // Print
-void Matrix::print() const
+void Matrix::print(ostream & os) const
 {
 	//cout << "Row description " << endl;
 	for (uint i = 0; i < stateNb; i++)
 	{
-		cout << i << ":" << " ";
+		os << i << ":" << " ";
 		const Vector & ones = *row_ones[i];
 		const Vector & pluses = *row_pluses[i];
 
@@ -241,29 +241,29 @@ void Matrix::print() const
 			uint jones = 0, jpluses = 0;
 			if (ones.entriesNb > jones && ones.entries[jones] == j)
 			{
-				cout << ((pluses.entriesNb > jpluses && pluses.entries[jpluses] == j) ? "2 " : "1 ");
+				os << ((pluses.entriesNb > jpluses && pluses.entries[jpluses] == j) ? "2 " : "1 ");
 				jones++;
 				jpluses++;
 			}
 			else if (pluses.entriesNb > jpluses && pluses.entries[jpluses] == j)
 			{
-				cout << "+ ";
+				os << "+ ";
 				jpluses++;
 			}
 			else
-				cout << "_ ";
+				os << "_ ";
 #else
-			cout << (ones.contains(j) ? "1" : pluses.contains(j) ? "+" : "_");
+			os << (ones.contains(j) ? "1" : pluses.contains(j) ? "+" : "_");
 #endif
 		}
-		cout << endl;
+		os << endl;
 	}
 	/*
 	Uncomment to get deep description of the matrix, including columns and hashes and adresses
-	cout << "Col description " << endl;
+	os << "Col description " << endl;
 	for (uint i = 0; i < stateNb; i++)
 	{
-		cout << i << ":" << " ";
+		os << i << ":" << " ";
 		const Vector & ones = *col_ones[i];
 		const Vector & pluses = *col_pluses[i];
 
@@ -272,34 +272,36 @@ void Matrix::print() const
 		{
 			if (ones.entriesNb > jones && ones.entries[jones] == j)
 			{
-				cout << ((pluses.entriesNb > jpluses && pluses.entries[jpluses] == j) ? "2 " : "1 ");
+				os << ((pluses.entriesNb > jpluses && pluses.entries[jpluses] == j) ? "2 " : "1 ");
 				jones++;
 				jpluses++;
 			}
 			else if (pluses.entriesNb > jpluses && pluses.entries[jpluses] == j)
 			{
-				cout << "+ ";
+				os << "+ ";
 				jpluses++;
 			}
 			else
-				cout << "_ ";
+				os << "_ ";
 		}
-		cout << endl;
+		os << endl;
 	}
 	for (uint i = 0; i < stateNb; i++)
 	{
-		cout << "row " << i << ":" << " ";
-		cout << "h" << row_ones[i]->Hash() << " #" << row_ones[i] << " h" << row_pluses[i]->Hash() << " #" << row_pluses[i] << " ";
-		cout << endl;
+		os << "row " << i << ":" << " ";
+		os << "h" << row_ones[i]->Hash() << " #" << row_ones[i] << " h" << row_pluses[i]->Hash() << " #" << row_pluses[i] << " ";
+		os << endl;
 	}
 	for (uint i = 0; i < stateNb; i++)
 	{
-		cout << "col " << i << ":" << " ";
-		cout << "h" << col_ones[i]->Hash() << " #" << col_ones[i] << " h" << col_pluses[i]->Hash() << " #" << col_pluses[i] << " ";
-		cout << endl;
+		os << "col " << i << ":" << " ";
+		os << "h" << col_ones[i]->Hash() << " #" << col_ones[i] << " h" << col_pluses[i]->Hash() << " #" << col_pluses[i] << " ";
+		os << endl;
 	}
 	*/
 }
+
+ostream& operator<<(ostream& os, const Matrix & mat){ mat.print(os); return os; };
 
 bool Matrix::operator==(const Matrix & mat) const
 {

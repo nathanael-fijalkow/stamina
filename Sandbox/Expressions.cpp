@@ -98,6 +98,8 @@ bool ExtendedExpression::operator == (const ExtendedExpression & exp) const
 	}
 }
 
+ostream& operator<<(ostream& os, const ExtendedExpression & expr){ expr.print(os); return os; };
+
 
 // Dynamic casts
 const SharpedExpr * isSharpedExpr(const ExtendedExpression * expr) { return dynamic_cast<const SharpedExpr *>(expr); }
@@ -108,29 +110,29 @@ const LetterExpr * isLetterExpr(const ExtendedExpression * expr){ return dynamic
 // Printing functions
 using namespace std;
 
-void LetterExpr::print() const
+void LetterExpr::print(ostream& os) const
 {
-	cout << letter;
+	os << letter;
 }
 
-void ConcatExpr::print() const
+void ConcatExpr::print(ostream& os) const
 {
 	for (uint i = sonsNb ; i > 0; i--)
-		sons[i -1]->print();
+		sons[i -1]->print(os);
 }
 
-void SharpedExpr::print() const
+void SharpedExpr::print(ostream& os) const
 {
 	if (isLetterExpr(son))
 	{
-		son->print();
-		cout << "#";
+		son->print(os);
+		os << "#";
 	}
 	else
 	{
-		cout << "(";
-		son->print();
-		cout << ")^#";
+		os << "(";
+		son->print(os);
+		os << ")^#";
 	}
 }
 

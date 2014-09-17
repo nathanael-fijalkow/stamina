@@ -1,50 +1,57 @@
 #include <iostream>
 #include "MarkovMonoid.hpp"
+#include <sstream>
 
 #define VERBOSE_MONOID_COMPUTATION 0
 
 // Print
-void MarkovMonoid::print()
+void MarkovMonoid::print() const
 {
-	cout << "***************************************" << endl;
-	cout << "Elements (" << expr_to_mat.size() << ")" << endl;
-	cout << "***************************************" << endl;
-	for (map<const ExtendedExpression *, const Matrix *>::iterator it = expr_to_mat.begin(); it != expr_to_mat.end(); it++)
+	cout << *this;
+}
+
+ostream& operator<<(ostream& st, const MarkovMonoid & monoid)
+{
+
+	st << "***************************************" << endl;
+	st << "Elements (" << monoid.expr_to_mat.size() << ")" << endl;
+	st << "***************************************" << endl;
+	for (map<const ExtendedExpression *, const Matrix *>::const_iterator it = monoid.expr_to_mat.begin(); it != monoid.expr_to_mat.end(); it++)
 	{
-			it->first->print();
-			cout << endl;
-			it->second->print();
-			cout << endl;
+			it->first->print(st);
+			st << endl;
+			it->second->print(st);
+			st << endl;
 	}
 
-	cout << "***************************************" << endl;
-	cout << "Non-canonical rewrite rules (" <<  rewriteRules.size() - canonicalRewriteRules.size() << ")" << endl;
-	cout << "***************************************" << endl;
-	for (map<const ExtendedExpression *, const ExtendedExpression *>::iterator it = rewriteRules.begin(); it != rewriteRules.end(); it++)
+	st << "***************************************" << endl;
+	st << "Non-canonical rewrite rules (" << monoid.rewriteRules.size() - monoid.canonicalRewriteRules.size() << ")" << endl;
+	st << "***************************************" << endl;
+	for (map<const ExtendedExpression *, const ExtendedExpression *>::const_iterator it = monoid.rewriteRules.begin(); it != monoid.rewriteRules.end(); it++)
 	{
-		if (canonicalRewriteRules.find(it->first) == canonicalRewriteRules.end())
+		if (monoid.canonicalRewriteRules.find(it->first) == monoid.canonicalRewriteRules.end())
 		{
-			it->first->print();
-			cout << "  ->  ";
-			it->second->print();
-			cout << endl;
+			it->first->print(st);
+			st << "  ->  ";
+			it->second->print(st);
+			st << endl;
 		}
 	}
 
-	cout << "***************************************" << endl;
-	cout << "Canonical rewrite rules (" << canonicalRewriteRules.size() << ")" << endl;
-	cout << "***************************************" << endl;
-	for (map<const ExtendedExpression *, const ExtendedExpression *>::iterator it = rewriteRules.begin(); it != rewriteRules.end(); it++)
+	st << "***************************************" << endl;
+	st << "Canonical rewrite rules (" << monoid.canonicalRewriteRules.size() << ")" << endl;
+	st << "***************************************" << endl;
+	for (map<const ExtendedExpression *, const ExtendedExpression *>::const_iterator it = monoid.rewriteRules.begin(); it != monoid.rewriteRules.end(); it++)
 	{
-		if (canonicalRewriteRules.find(it->first) != canonicalRewriteRules.end())
+		if (monoid.canonicalRewriteRules.find(it->first) != monoid.canonicalRewriteRules.end())
 		{
-			it->first->print();
-			cout << "  ->  ";
-			it->second->print();
-			cout << endl;
+			it->first->print(st);
+			st << "  ->  ";
+			it->second->print(st);
+			st << endl;
 		}
 	}
-
+	return st;
 }
 
 //Computes the maximum number of leaks of all sharped expression
@@ -91,7 +98,7 @@ UnstableMarkovMonoid::~UnstableMarkovMonoid()
 };
 
 // Adds a letter
-void UnstableMarkovMonoid::addLetter(char a, ExplicitMatrix & mat)
+const Matrix * UnstableMarkovMonoid::addLetter(char a, ExplicitMatrix & mat)
 {
 	unordered_set<LetterExpr>::const_iterator it = letterExpressions.emplace(a).first;
 	unordered_set<Matrix>::const_iterator it2 = matrices.emplace(mat).first;
@@ -102,8 +109,7 @@ void UnstableMarkovMonoid::addLetter(char a, ExplicitMatrix & mat)
 	expr_to_mat[new_expr] = new_mat;
 	mat_to_expr[new_mat] = new_expr;
 
-	new_elements.push_back(new_expr);
-	to_be_sharpified.push_back(new_expr);
+	return new_mat;
 }
 
 // Adds a rewrite rule
@@ -271,6 +277,10 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 			new_mat->print();
 			cout << endl;
 #endif
+			if (expr_to_mat.size() % (MAX_MONOID_SIZE / 10) == 0)
+				cout << expr_to_mat.size() << " elements and " << rewriteRules.size() << " rewrite_rules " << endl;
+			if (expr_to_mat.size() > MAX_MONOID_SIZE)
+				throw std::runtime_error("Monoid too large");
 			expr_to_mat[new_expr] = new_mat;
 			mat_to_expr[new_mat] = new_expr;
 
@@ -282,6 +292,10 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 			/* if the matrix was known before, we create the new rewrite rule */
 			const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
 			addRewriteRule(new_expr, rewritten);
+
+			if (rewriteRules.size() % (MAX_MONOID_SIZE / 10) == 0)
+				cout << expr_to_mat.size() << " elements and " << rewriteRules.size() << " rewrite_rules " << endl;
+
 		}
 	}
 }
@@ -435,6 +449,14 @@ void UnstableMarkovMonoid::CloseByStabilization()
 
 void UnstableMarkovMonoid::ComputeMarkovMonoid()
 {
+	new_elements.clear();
+	to_be_sharpified.clear();
+	for (auto expr : expr_to_mat)
+	{
+		new_elements.push_back(expr.first);
+		to_be_sharpified.push_back(expr.first);
+	}
+
 	auto monoid = this;
 	size_t cur_index = 0;
 	while (cur_index < monoid->elements.size())

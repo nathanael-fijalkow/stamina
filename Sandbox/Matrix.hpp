@@ -106,7 +106,7 @@ public:
 	~Vector();
 
 	// Print
-	void print() const;
+	void print(ostream& os) const;
 
 
 protected:
@@ -164,7 +164,7 @@ public:
 	Matrix(uint stateNb);
 
 	// Print
-	void print() const;
+	virtual void print(ostream& os = cout) const;
 
 	// Equality operator
 	bool operator == (const Matrix & mat) const;
@@ -252,6 +252,10 @@ protected:
     bool recurrent(int) const;
 
 };
+
+/* for printing to a file */
+ostream& operator<<(ostream& os, const Matrix & mat);
+
 
 // Defines default hash for the matrix class
 namespace std

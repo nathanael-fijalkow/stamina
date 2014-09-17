@@ -44,11 +44,11 @@ public:
 	// Function returning the hash
 	HashExpr Hash() const { return _hash ; };
 
-	// Print
-	virtual void print() const = 0;
-
 	// Equality operator
 	virtual bool operator == (const ExtendedExpression & exp) const;
+
+	//print to an output stream
+	virtual void print(ostream& os = cout) const = 0;
 
 protected:
 
@@ -58,6 +58,9 @@ protected:
 	// The constructor is protected to avoid direct instantiation
 	ExtendedExpression(){};
 };
+
+/* for printing to a file */
+ostream& operator<<(ostream& os, const ExtendedExpression & expr);
 
 // The class of expressions consisting only of one letter, extending the general class
 class LetterExpr : public ExtendedExpression
@@ -74,7 +77,7 @@ public:
 	bool operator == (const LetterExpr & exp) const { return exp.letter == letter; };
 
 	// Print
-	virtual void print() const;
+	virtual void print(ostream& os) const;
 
 };
 
@@ -143,7 +146,7 @@ public:
 	};
 
 	// Print
-	virtual void print() const;
+	virtual void print(ostream& os) const;
 
 	// Function that computes the hash, using the formula used in the Boost library
 	void update_hash()
@@ -178,7 +181,7 @@ public:
 	}
 
 	// Print
-	void print() const;
+	virtual void print(ostream& os) const;
 };
 
 // Defines default hash for the class of extendedExpression
