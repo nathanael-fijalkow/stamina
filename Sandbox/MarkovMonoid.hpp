@@ -90,7 +90,13 @@ public:
 	//Computes the maximum number of leaks and the associated expreession 
 	pair<int, const ExtendedExpression *> maxLeakNb();
 
+	int sharp_height(){
+		return _sharp_height;
+	};
+
 protected:
+
+	UnstableMarkovMonoid::UnstableMarkovMonoid() : _sharp_height(0), cnt(0){};
 
 	// Function processing an expression, computing products
 	void process_expression(const ExtendedExpression * elt_left,const ExtendedExpression * elt_right);
@@ -121,6 +127,19 @@ protected:
 	unordered_set<const Matrix *> notidempotent;
 #endif
 
+	int cnt;
+	void check_size(int i)
+	{
+		cout << expr_to_mat.size() << " exprs ";
+		cout << " and " << rewriteRules.size() << " rules " << i << " prods" << endl;
+		cnt = MAX_MONOID_SIZE / 100;
+		if (new_elements.size() > MAX_MONOID_SIZE)
+				throw std::runtime_error("Monoid too large");
+			if (i > 100* MAX_MONOID_SIZE)
+				throw std::runtime_error("Too much work");
+	}
+
+	int _sharp_height;
 };
 
 

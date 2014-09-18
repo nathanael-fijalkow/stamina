@@ -80,8 +80,9 @@ pair<int, const ExtendedExpression *> UnstableMarkovMonoid::maxLeakNb()
 	return result;
 }
 
+
 // Constructor
-UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : dim(dim)
+UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : dim(dim), _sharp_height(0), cnt(0)
 {
 	Matrix::vectors.clear();
 #if USE_SPARSE_MATRIX
@@ -95,7 +96,7 @@ UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : dim(dim)
 };
 
 // Free known vectors
-UnstableMarkovMonoid::~UnstableMarkovMonoid()
+UnstableMarkovMonoid::~UnstableMarkovMonoid() 
 {
 	Matrix::vectors.clear();
 	Matrix::zero_vector = NULL;;
@@ -274,7 +275,6 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 		const Matrix *  new_mat = &(*result.first);
 		if (result.second)
 		{
-			new_mat->check();
 #if VERBOSE_MONOID_COMPUTATION
 			/* if the matrix was not known before, we create a new association between expression and its matrix */
 			cout << "Add element: "; new_expr->print();	 cout << endl;
@@ -282,10 +282,6 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 			new_mat->print();
 			cout << endl;
 #endif
-			if (expr_to_mat.size() % (MAX_MONOID_SIZE / 10) == 0)
-				cout << expr_to_mat.size() << " elements and " << rewriteRules.size() << " rewrite_rules " << endl;
-			if (expr_to_mat.size() > MAX_MONOID_SIZE)
-				throw std::runtime_error("Monoid too large");
 			expr_to_mat[new_expr] = new_mat;
 			mat_to_expr[new_mat] = new_expr;
 
@@ -314,6 +310,7 @@ void UnstableMarkovMonoid::CloseByProduct()
 
 	size_t i = 0;
 
+
 	while (i < elements.size())
 	{
 		const ExtendedExpression * expr_left = elements[i];
@@ -324,11 +321,17 @@ void UnstableMarkovMonoid::CloseByProduct()
 			const ExtendedExpression * expr_right = new_elements[j];
 			process_expression(expr_left,expr_right);
 			process_expression(expr_right,expr_left);
+			if (--cnt == 0)
+			{
+				cout << "Scanning known elts: ";
+				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i - 1) + new_elements.size()* new_elements.size());
+			}
 			j++;
 		}
-		i++;			
+		i++;		
 	}
 
+	
 	i = 0;
 
 	while (i < new_elements.size())
@@ -340,10 +343,16 @@ void UnstableMarkovMonoid::CloseByProduct()
 		{
 			const ExtendedExpression * expr_right = new_elements[j];
 			process_expression(expr_left,expr_right);
+			if (--cnt == 0)
+			{
+				cout << "Scanning new elts: ";
+				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i -1));
+			}
 			j++;
 		}
 		i++;			
 	}
+	
 }
 
 // Takes an expression, computes its stabilization if it is idempotent,
@@ -449,11 +458,21 @@ void UnstableMarkovMonoid::CloseByStabilization()
 		const ExtendedExpression *expr = to_be_sharpified[cur_index];
 		sharpify_expression(expr);
 		cur_index++;
+		if (--cnt == 0)
+		{
+			cout << expr_to_mat.size() << " elements and " << rewriteRules.size();
+			cout << " rewrite_rules and " << to_be_sharpified.size() - cur_index << " elements to sharpify" << endl;
+			if (to_be_sharpified.size() > MAX_MONOID_SIZE)
+				throw std::runtime_error("Monoid too large");
+			cnt = MAX_MONOID_SIZE / 100;
+		}
 	}
 }
 
 void UnstableMarkovMonoid::ComputeMarkovMonoid()
 {
+	cnt = MAX_MONOID_SIZE / 100;
+
 	new_elements.clear();
 	to_be_sharpified.clear();
 	for (auto expr : expr_to_mat)
@@ -461,6 +480,7 @@ void UnstableMarkovMonoid::ComputeMarkovMonoid()
 		new_elements.push_back(expr.first);
 		to_be_sharpified.push_back(expr.first);
 	}
+	_sharp_height = 0;
 
 	auto monoid = this;
 	size_t cur_index = 0;
@@ -481,6 +501,7 @@ void UnstableMarkovMonoid::ComputeMarkovMonoid()
 		cout << endl << "Starting iteration " << i << endl << endl ;
 		cout << endl << "------> Closure by product" << endl ;
 #endif
+		cout << "Concatenation" << endl;
 		CloseByProduct();
 
 		cur_index = 0;
@@ -495,7 +516,9 @@ void UnstableMarkovMonoid::ComputeMarkovMonoid()
 #if VERBOSE_MONOID_COMPUTATION
 		cout << "------> Closure by stabilization" << endl << endl;
 #endif
+		cout << "Stabilization" << endl;
 		CloseByStabilization();
+		_sharp_height++;
 		to_be_sharpified.clear();
 		i++;
 	} while (new_elements.size() != 0);

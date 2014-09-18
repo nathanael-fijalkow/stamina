@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	ofstream file(filename.str() + ".csv");
 	ofstream file2(filename.str() + " monoids.txt");
 
-	file << "Size;Densitya;Densityb;ElementsNb;RewriteRulesNb;VectorNb;LeakNb" << endl;
+	file << "#;Size;Densitya;Densityb;ElementsNb;RewriteRulesNb;VectorNb;LeakNb;SharpHeight" << endl;
 
 	uint nb = 0;
 	while (nb++ < nb_samples)
@@ -90,6 +90,9 @@ int main(int argc, char **argv)
 			cout << s << " elements." << monoid.rewriteRules.size() << " rewrite rules " << endl;
 			file2 << s << " elements." << monoid.rewriteRules.size() << " rewrite rules " << endl;
 
+			cout << "Sharpheight " << monoid.sharp_height() << endl;
+			file2 << "Sharpheight " << monoid.sharp_height() << endl;
+
 			auto l = monoid.maxLeakNb();
 			if (l.first == 0)
 			{
@@ -104,15 +107,18 @@ int main(int argc, char **argv)
 			
 			//file << "Size;Proba;Seed;ElementsNb;RewriteRulesNb;VectorNb;LeakNb" << endl;
 
-			file << n << ";" << density_a << ";" << density_b << "; " << monoid.expr_to_mat.size();
-			file << "; " << monoid.rewriteRules.size() << "; " << Matrix::vectors.size() << "; " << l.first << endl;
+			file << nb << ";" << n << ";" << density_a << ";" << density_b << "; " << monoid.expr_to_mat.size();
+			file << ";" << monoid.rewriteRules.size() << ";" << Matrix::vectors.size() << ";" << l.first << ";" << monoid.sharp_height() << endl;
 
 			//		Sleep(10000);
 		}
 		catch (const runtime_error & err)
 		{
 			cout << "Failed to compute: " << err.what() << endl;
+			file2 << " > " << monoid.expr_to_mat.size() << " elements > " << monoid.rewriteRules.size() << " rewrite rules " << endl;
 			file2 << "Failed to compute: " << err.what() << endl;
+			file << nb << ";" << n << "; " << density_a << "; " << density_b << ";>>" << monoid.expr_to_mat.size();
+			file << ";>>" << monoid.rewriteRules.size() << ";>>" << Matrix::vectors.size() << ";?;>" << monoid.sharp_height() << endl;
 		}
 	}
 
