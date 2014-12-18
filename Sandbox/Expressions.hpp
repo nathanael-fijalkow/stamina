@@ -1,5 +1,6 @@
 /* INCLUDES */
 #include <string>
+#include <iostream>
 
 #ifndef EXPRESSIONS_HPP
 #define EXPRESSIONS_HPP
@@ -17,9 +18,10 @@ size_t hash_value(const size_t & _Keyval)
 #else
 #include <functional>
 #include <xhash>
-using namespace std;
 
 #endif
+
+using namespace std;
 
 /* CLASS DEFINITIONS */
 
@@ -48,7 +50,7 @@ public:
 	virtual bool operator == (const ExtendedExpression & exp) const;
 
 	//print to an output stream
-	virtual void print(ostream& os = cout) const = 0;
+	virtual void print(ostream & os = cout) const = 0;
 
 protected:
 
@@ -181,7 +183,7 @@ public:
 	}
 
 	// Print
-	virtual void print(ostream& os) const;
+	virtual void print(ostream & os) const;
 };
 
 // Defines default hash for the class of extendedExpression
