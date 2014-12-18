@@ -30,12 +30,14 @@ Vector::Vector(uint size) : entriesNb(size), bitsNb((entriesNb + 8 * sizeof(uint
 
 void Vector::allocate(int size)
 {
+#if USE_SPARSE_MATRIX
 		entries = (size_t *)malloc(entriesNb * sizeof(size_t));
+#endif
 }
 
 
 // Second constructor
-Vector::Vector(const Vector & other) :  : entriesNb(other.size), bitsNb((other.size + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
+Vector::Vector(const Vector & other) :  entriesNb(other.entriesNb), bitsNb((entriesNb + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
 {
 	allocate(other.entriesNb);
 
@@ -51,13 +53,13 @@ Vector::Vector(const Vector & other) :  : entriesNb(other.size), bitsNb((other.s
 #if USE_SPARSE_MATRIX
 Vector::Vector(vector<size_t> data) : entriesNb(data.size()), bitsNb((entriesNb + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
 {
+	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
 	size_t * p = entries;
 	for (vector<size_t>::iterator it = data.begin(); it != data.end(); it++)
 		*p++ = *it;
 #else
 Vector::Vector(vector<bool> data):  entriesNb(data.size()), bitsNb((entriesNb + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
 {
-		entries = (size_t *)malloc(entriesNb * sizeof(size_t));
 
 	for (int i = data.size() -1; i >=0 ; i--)
 	{
