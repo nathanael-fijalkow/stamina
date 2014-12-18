@@ -7,7 +7,7 @@
 // Constructors
 LetterExpr::LetterExpr(char letter) : letter(letter)
 {
-	_hash = hash_value(letter);
+	_hash = std::hash_value(letter);
 };
 
 // Second constructor: a copy constructor which performs a memcopy of the field sons
@@ -72,7 +72,7 @@ void ConcatExpr::addLeftSon(const ExtendedExpression * new_son)
 
 SharpedExpr::SharpedExpr(const ExtendedExpression * son) : son(son)
 {
-	_hash = hash_value(son->Hash());
+	_hash = std::hash_value(son->Hash());
 }
 
 
@@ -98,7 +98,7 @@ bool ExtendedExpression::operator == (const ExtendedExpression & exp) const
 	}
 }
 
-ostream& operator<<(ostream& os, const ExtendedExpression & expr){ expr.print(os); return os; };
+std::ostream& operator<<(std::ostream& os, const ExtendedExpression & expr){ expr.print(os); return os; };
 
 
 // Dynamic casts
@@ -110,18 +110,18 @@ const LetterExpr * isLetterExpr(const ExtendedExpression * expr){ return dynamic
 // Printing functions
 using namespace std;
 
-void LetterExpr::print(ostream& os) const
+void LetterExpr::print(std::ostream& os) const
 {
 	os << letter;
 }
 
-void ConcatExpr::print(ostream& os) const
+void ConcatExpr::print(std::ostream& os) const
 {
 	for (uint i = sonsNb ; i > 0; i--)
 		sons[i -1]->print(os);
 }
 
-void SharpedExpr::print(ostream& os) const
+void SharpedExpr::print(std::ostream& os) const
 {
 	if (isLetterExpr(son))
 	{

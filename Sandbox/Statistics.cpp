@@ -2,7 +2,7 @@
 
 #include "Expressions.hpp"
 #include "Matrix.hpp"
-#include "Monoid.hpp"
+#include "MarkovMonoid.hpp"
 
 #include <fstream>
 #include <sstream>

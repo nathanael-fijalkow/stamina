@@ -18,10 +18,7 @@ size_t hash_value(const size_t & _Keyval)
 #else
 #include <functional>
 #include <xhash>
-
 #endif
-
-using namespace std;
 
 /* CLASS DEFINITIONS */
 
@@ -50,7 +47,7 @@ public:
 	virtual bool operator == (const ExtendedExpression & exp) const;
 
 	//print to an output stream
-	virtual void print(ostream & os = cout) const = 0;
+	virtual void print(std::ostream & os = std::cout) const = 0;
 
 protected:
 
@@ -62,7 +59,7 @@ protected:
 };
 
 /* for printing to a file */
-ostream& operator<<(ostream& os, const ExtendedExpression & expr);
+std::ostream& operator<<(std::ostream& os, const ExtendedExpression & expr);
 
 // The class of expressions consisting only of one letter, extending the general class
 class LetterExpr : public ExtendedExpression
@@ -79,7 +76,7 @@ public:
 	bool operator == (const LetterExpr & exp) const { return exp.letter == letter; };
 
 	// Print
-	virtual void print(ostream& os) const;
+	virtual void print(std::ostream& os) const;
 
 };
 
@@ -148,7 +145,7 @@ public:
 	};
 
 	// Print
-	virtual void print(ostream& os) const;
+	virtual void print(std::ostream& os) const;
 
 	// Function that computes the hash, using the formula used in the Boost library
 	void update_hash()
@@ -160,7 +157,7 @@ public:
 	  */
 	    _hash = 0x777;
 	    for (const ExtendedExpression ** son = this->sons; son != sons + sonsNb; son++)
-	      _hash ^= hash_value((*son)->Hash()) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+			_hash ^= std::hash_value((*son)->Hash()) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 	  /* } */
 	}
 };
@@ -183,7 +180,7 @@ public:
 	}
 
 	// Print
-	virtual void print(ostream & os) const;
+	virtual void print(std::ostream & os) const;
 };
 
 // Defines default hash for the class of extendedExpression
