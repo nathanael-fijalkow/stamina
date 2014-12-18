@@ -82,8 +82,7 @@ pair<int, const ExtendedExpression *> UnstableMarkovMonoid::maxLeakNb()
 }
 
 
-// Constructor
-UnstableMonoid::UnstableMonoid(uint dim) : dim(dim), _sharp_height(0), cnt(0)
+UnstableMonoid::UnstableMonoid(int dim) : dim(dim), _sharp_height(0), cnt(0)
 {
 	Matrix::vectors.clear();
 #if USE_SPARSE_MATRIX
@@ -96,8 +95,13 @@ UnstableMonoid::UnstableMonoid(uint dim) : dim(dim), _sharp_height(0), cnt(0)
 #endif
 };
 
+// Constructor
+UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : UnstableMonoid(dim)
+{
+};
+
 // Free known vectors
-UnstableMonoid::~UnstableMonoid() 
+UnstableMonoid::~UnstableMonoid()
 {
 	Matrix::vectors.clear();
 	Matrix::zero_vector = NULL;;

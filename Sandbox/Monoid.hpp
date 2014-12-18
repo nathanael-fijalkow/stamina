@@ -49,10 +49,7 @@ class UnstableMonoid : public Monoid
 {
 public:
 
-	// Creates zero vector
-	UnstableMonoid(uint dim);
-
-	// Free knowns vectors
+	UnstableMonoid(int dim);
 	~UnstableMonoid();
 
 	// Adds a new letter
@@ -133,6 +130,9 @@ protected:
 class UnstableMarkovMonoid : public UnstableMonoid
 {
 public:
+	// Creates zero vector
+	UnstableMarkovMonoid(uint dim);
+
 	// The set containing the known matrices
 	unordered_set<ProbMatrix> matrices;
 
