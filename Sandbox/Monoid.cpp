@@ -383,7 +383,7 @@ void UnstableMonoid::CloseByProduct()
 //get recurrent states
 const Vector * UnstableMarkovMonoid::recurrent_states(const Matrix * mmat)
 {
-	ProbMatrix * mat = (ProbMatrix *) mat;
+	ProbMatrix * mat = (ProbMatrix *) mmat;
 #ifdef CACHE_RECURRENT_STATES
 	auto recs = mat_to_recurrent_states.find(mat);
 	if (recs == mat_to_recurrent_states.end())
@@ -402,7 +402,7 @@ const Vector * UnstableMarkovMonoid::recurrent_states(const Matrix * mmat)
 //get recurrence classes
 const Vector * UnstableMarkovMonoid::recurrence_classes(const Matrix * mmat)
 {
-	ProbMatrix * mat = (ProbMatrix *)mat;
+	ProbMatrix * mat = (ProbMatrix *)mmat;
 #ifdef CACHE_RECURRENT_STATES
 	auto recs = mat_to_recurrence_classes.find(mat);
 	if (recs == mat_to_recurrence_classes.end())
