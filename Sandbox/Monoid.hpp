@@ -51,6 +51,7 @@ public:
 
 	UnstableMonoid(int dim);
 	~UnstableMonoid();
+	void init(int dim);
 
 	// Adds a new letter
 	const Matrix * addLetter(char a, ExplicitMatrix & mat);
