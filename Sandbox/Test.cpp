@@ -2,7 +2,7 @@
 
 #include "Expressions.hpp"
 #include "Matrix.hpp"
-#include "MarkovMonoid.hpp"
+#include "Monoid.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	Matrix a(mata);
     Matrix b(matb);
 
-	UnstableMarkovMonoid monoid(3);
+	UnstableMonoid monoid(3);
 
 /*
  	ExplicitMatrix mata(2);
@@ -62,13 +62,13 @@ int main(int argc, char **argv)
 	Matrix a(mata);
     Matrix b(matb);
 
-	UnstableMarkovMonoid monoid(2);
+	UnstableMonoid monoid(2);
 */
 
 	monoid.addLetter('a', mata);
 	monoid.addLetter('b', matb);
 
-	monoid.ComputeMarkovMonoid();
+	monoid.ComputeMonoid();
 	
 	cout << monoid.expr_to_mat.size() << " elements." << endl;
 	cout << monoid.rewriteRules.size() << " rewrite rules." << endl;

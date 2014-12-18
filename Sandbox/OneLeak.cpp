@@ -2,7 +2,7 @@
 
 #include "Expressions.hpp"
 #include "Matrix.hpp"
-#include "MarkovMonoid.hpp"
+#include "Monoid.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 	while (true)
 	{
 		int stateNb = 5;
-		UnstableMarkovMonoid monoid(stateNb);
+		UnstableMonoid monoid(stateNb);
 		
 		ExplicitMatrix * a = ExplicitMatrix::random(stateNb);
 		ExplicitMatrix * b = ExplicitMatrix::random(stateNb);
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 		monoid.addLetter('b', *b);
 //		monoid.addLetter('c', *c);
 
-		monoid.ComputeMarkovMonoid();
+		monoid.ComputeMonoid();
 
 
 

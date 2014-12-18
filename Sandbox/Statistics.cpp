@@ -2,7 +2,7 @@
 
 #include "Expressions.hpp"
 #include "Matrix.hpp"
-#include "MarkovMonoid.hpp"
+#include "Monoid.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 		cout << endl << "#" << nb  << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed <<  endl;
 		file2 << endl << "#" << nb << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed << endl;
 
-		UnstableMarkovMonoid monoid(n);
+		UnstableMonoid monoid(n);
 
 		ExplicitMatrix m1(n), m2(n);
 		int max_tries = 100;
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 
 		try
 		{
-			monoid.ComputeMarkovMonoid();
+			monoid.ComputeMonoid();
 
 			//monoid.print();
 
@@ -107,7 +107,7 @@ int main(int argc, char **argv)
 			
 			//file << "Size;Proba;Seed;ElementsNb;RewriteRulesNb;VectorNb;LeakNb" << endl;
 
-			file << nb << ";" << n << ";" << density_a << ";" << density_b << "; " << monoid.expr_to_mat.size();
+			file << nb << ";" << n << ";" << density_a << ";" << density_b << ";" << monoid.expr_to_mat.size();
 			file << ";" << monoid.rewriteRules.size() << ";" << Matrix::vectors.size() << ";" << l.first << ";" << monoid.sharp_height() << endl;
 
 			//		Sleep(10000);
@@ -117,7 +117,7 @@ int main(int argc, char **argv)
 			cout << "Failed to compute: " << err.what() << endl;
 			file2 << " > " << monoid.expr_to_mat.size() << " elements > " << monoid.rewriteRules.size() << " rewrite rules " << endl;
 			file2 << "Failed to compute: " << err.what() << endl;
-			file << nb << ";" << n << "; " << density_a << "; " << density_b << ";>>" << monoid.expr_to_mat.size();
+			file << nb << ";" << n << ";" << density_a << ";" << density_b << ";>>" << monoid.expr_to_mat.size();
 			file << ";>>" << monoid.rewriteRules.size() << ";>>" << Matrix::vectors.size() << ";?;>" << monoid.sharp_height() << endl;
 		}
 	}

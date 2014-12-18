@@ -134,7 +134,7 @@ bool Vector::operator==(const Vector & vec) const
 }
 
 // Class Matrix
-void Matrix::allocate()
+void ProbMatrix::allocate()
 {
 	row_pluses = (const Vector **)malloc(stateNb * sizeof(void *));
 	row_ones = (const Vector **)malloc(stateNb * sizeof(void *));
@@ -165,9 +165,8 @@ ExplicitMatrix * ExplicitMatrix::random(uint stateNb)
 }
 
 // Convert an explicit matrix into a matrix
-Matrix::Matrix(const ExplicitMatrix & explMatrix) : stateNb(explMatrix.stateNb)
+ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix) : Matrix(explMatrix.stateNb)
 {
-	allocate();
 	for (uint i = 0; i < stateNb; i++)
 	{
 #if USE_SPARSE_MATRIX
@@ -226,7 +225,7 @@ Matrix::Matrix(const ExplicitMatrix & explMatrix) : stateNb(explMatrix.stateNb)
 }
 
 // Print
-void Matrix::print(ostream & os) const
+void ProbMatrix::print(ostream & os) const
 {
 	//cout << "Row description " << endl;
 	for (uint i = 0; i < stateNb; i++)
@@ -303,7 +302,7 @@ void Matrix::print(ostream & os) const
 
 ostream& operator<<(ostream& os, const Matrix & mat){ mat.print(os); return os; };
 
-bool Matrix::operator==(const Matrix & mat) const
+bool ProbMatrix::operator==(const ProbMatrix & mat) const
 {
 	if (mat.stateNb != stateNb) return false;
 	if (mat._hash != _hash) return false;
@@ -396,7 +395,7 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat, size_t 
 }
 
 // computes the list of recurrent states.
-const Vector * Matrix::recurrent_states() const
+const Vector * ProbMatrix::recurrent_states() const
 {
 #if USE_SPARSE_MATRIX
 	size_t * new_vec = (size_t *)malloc(stateNb * sizeof(size_t));
@@ -426,7 +425,7 @@ const Vector * Matrix::recurrent_states() const
 
 /* computes the list of recurrence classesgiven the list of recurrent states.
 The matrix is assumed to be idempotent. */
-const Vector * Matrix::recurrence_classes(const Vector * recs) const
+const Vector * ProbMatrix::recurrence_classes(const Vector * recs) const
 {
 #if USE_SPARSE_MATRIX
 	size_t * new_vec = (size_t *)malloc(stateNb * sizeof(size_t));
@@ -501,7 +500,7 @@ const Vector * Matrix::purge(const Vector *varg, const Vector * tab){
 
 #if USE_SPARSE_MATRIX
 #else
-uint Matrix::countLeaks(const Vector * classes) const
+uint ProbMatrix::countLeaks(const Vector * classes) const
 {
 	uint answer = 0;
 	for (int i = 0; i < stateNb; i++)
@@ -527,7 +526,7 @@ uint Matrix::countLeaks(const Vector * classes) const
 }
 #endif
 
-bool Matrix::check() const
+bool ProbMatrix::check() const
 {
 	//at least one 1 per line
 	for (int i = 0; i < stateNb; i++)
@@ -536,25 +535,27 @@ bool Matrix::check() const
 }
 
 // Function computing the product of two matrices
-Matrix Matrix::prod(const Matrix & mat1, const Matrix & mat2)
+Matrix * ProbMatrix::prod(const Matrix * pmat1) const
 {
+	const ProbMatrix & mat1 = *(ProbMatrix *)pmat1;
+	const ProbMatrix & mat2 = *this;
 	uint n = mat1.stateNb;
-    Matrix result(n);
+	ProbMatrix * result = new ProbMatrix(n);
 
 	for (uint i = 0; i < n; i++)
 	{
-		result.row_ones[i] = sub_prod( mat1.row_ones[i], mat2.col_ones, n);
-		result.row_pluses[i] = sub_prod( mat1.row_pluses[i], mat2.col_pluses, n);
-		result.col_ones[i] = sub_prod( mat2.col_ones[i], mat1.row_ones, n);
-		result.col_pluses[i] = sub_prod( mat2.col_pluses[i], mat1.row_pluses, n);
+		result->row_ones[i] = sub_prod( mat1.row_ones[i], mat2.col_ones, n);
+		result->row_pluses[i] = sub_prod( mat1.row_pluses[i], mat2.col_pluses, n);
+		result->col_ones[i] = sub_prod( mat2.col_ones[i], mat1.row_ones, n);
+		result->col_pluses[i] = sub_prod( mat2.col_pluses[i], mat1.row_pluses, n);
 	}
 
-	result.update_hash();
+	result->update_hash();
 	return result;
 }
 
 // Function checking whether j is recurrent. Only works if this is idempotent
-bool Matrix::recurrent (int j) const{
+bool ProbMatrix::recurrent (int j) const{
 #if USE_SPARSE_MATRIX
     size_t * vpred = this->col_ones[j]->entries;
     size_t * vmax = this->col_ones[j]->entries+this->col_ones[j]->entriesNb;
@@ -598,32 +599,33 @@ Matrix Matrix::stab(const Matrix & mat)
 		result.row_ones[i] = purge(mat.row_ones[i], tabrec);
     }
 #else
-Matrix Matrix::stab(const Matrix & mat, const Vector * recs)
+Matrix * ProbMatrix::stab() const
 {
-	uint n = mat.stateNb;
-	Matrix result(n);
+	const Vector * recs = recurrent_states();
+	uint n = stateNb;
+	ProbMatrix * result = new ProbMatrix(n);
 
-	for (uint i = 0; i < mat.stateNb; i++)
+	for (uint i = 0; i < n; i++)
 	{
-		result.row_ones[i] = purge(mat.row_ones[i], recs);
-		result.row_pluses[i] = mat.row_pluses[i];
+		result->row_ones[i] = purge(row_ones[i], recs);
+		result->row_pluses[i] = row_pluses[i];
 	}
 
-	for (uint j = 0; j < mat.stateNb; j++)
+	for (uint j = 0; j < n; j++)
 	{
 		if (recs->contains(j))
-			result.col_ones[j] = mat.col_ones[j];
+			result->col_ones[j] = col_ones[j];
 		else
-			result.col_ones[j] = Matrix::zero_vector;
-		result.col_pluses[j] = mat.col_pluses[j];
+			result->col_ones[j] = Matrix::zero_vector;
+		result->col_pluses[j] = col_pluses[j];
 	}
 
 #endif
-	result.update_hash();
+	result->update_hash();
 	return result;
 }
 
-bool Matrix::isIdempotent() const
+bool ProbMatrix::isIdempotent() const
 {
-	return (* this == Matrix::prod(* this,* this));
+	return (*this == *(ProbMatrix *)(this->ProbMatrix::prod(this)));
 }

@@ -94,7 +94,7 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 				// We compute the matrix
 				const Matrix * mat_left = expr_to_mat[elt_left];
 				const Matrix * mat_right = expr_to_mat[elt_right];
-				Matrix mat = Matrix::prod(* mat_left,* mat_right);
+				Matrix mat = mat_left->prod(* mat_right);
 		
 				pair <unordered_set<Matrix>::iterator, bool> result = matrices.emplace(mat);
 
@@ -201,8 +201,8 @@ void UnstableMarkovMonoid::sharpify_expression(const ExtendedExpression * elt){
 	const Matrix * mat_e = expr_to_mat[elt];
 
 	if ((*mat_e).isIdempotent()){
-		Matrix mat = Matrix::stab(* mat_e);
-
+		Matrix mat = mat_e->stab();
+		
 		pair <unordered_set <Matrix>::iterator, bool> result = matrices.emplace(mat);
 		unordered_set<SharpedExpr>::iterator it = sharpExpressions.emplace(elt).first;
 

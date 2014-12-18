@@ -1,16 +1,16 @@
 #include <iostream>
-#include "MarkovMonoid.hpp"
+#include "Monoid.hpp"
 #include <sstream>
 
 #define VERBOSE_MONOID_COMPUTATION 0
 
 // Print
-void MarkovMonoid::print() const
+void Monoid::print() const
 {
 	cout << *this;
 }
 
-ostream& operator<<(ostream& st, const MarkovMonoid & monoid)
+ostream& operator<<(ostream& st, const Monoid & monoid)
 {
 
 	st << "***************************************" << endl;
@@ -58,15 +58,16 @@ ostream& operator<<(ostream& st, const MarkovMonoid & monoid)
 pair<int, const ExtendedExpression *> UnstableMarkovMonoid::maxLeakNb()
 {
 	pair<int, const ExtendedExpression *> result(0, NULL);
-	for (auto & expr_mat : expr_to_mat)
+	for (auto & gexpr_mat : expr_to_mat)
 	{
-		if ( is_idempotent(expr_mat.second))
+		auto expr_mat = (ProbMatrix *)gexpr_mat.second;
+		if ( is_idempotent(expr_mat))
 		{
-			int cl = expr_mat.second->countLeaks(recurrence_classes(expr_mat.second));
+			int cl = expr_mat->countLeaks(recurrence_classes(expr_mat));
 			if (cl > result.first)
 			{
 				result.first = cl;
-				result.second = expr_mat.first;
+				result.second = gexpr_mat.first;
 			}
 #if VERBOSE_MONOID_COMPUTATION
 			cout << "Checking whether "; expr_mat.first->print(); cout << " has a leak" << endl;
@@ -82,7 +83,7 @@ pair<int, const ExtendedExpression *> UnstableMarkovMonoid::maxLeakNb()
 
 
 // Constructor
-UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : dim(dim), _sharp_height(0), cnt(0)
+UnstableMonoid::UnstableMonoid(uint dim) : dim(dim), _sharp_height(0), cnt(0)
 {
 	Matrix::vectors.clear();
 #if USE_SPARSE_MATRIX
@@ -96,20 +97,36 @@ UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : dim(dim), _sharp_height(0
 };
 
 // Free known vectors
-UnstableMarkovMonoid::~UnstableMarkovMonoid() 
+UnstableMonoid::~UnstableMonoid() 
 {
 	Matrix::vectors.clear();
 	Matrix::zero_vector = NULL;;
 };
 
+Matrix * UnstableMarkovMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
+{
+	return new ProbMatrix(mat);
+}
+
+pair <Matrix *, bool> UnstableMarkovMonoid::addMatrix(Matrix * mat)
+{
+	ProbMatrix * mmat = (ProbMatrix *)mat;
+	auto it = matrices.emplace(*mmat);
+	return pair<Matrix *, bool>((Matrix *)&(*it.first), it.second);
+}
+
 // Adds a letter
-const Matrix * UnstableMarkovMonoid::addLetter(char a, ExplicitMatrix & mat)
+const Matrix * UnstableMonoid::addLetter(char a, ExplicitMatrix & mat)
 {
 	unordered_set<LetterExpr>::const_iterator it = letterExpressions.emplace(a).first;
-	unordered_set<Matrix>::const_iterator it2 = matrices.emplace(mat).first;
+	auto pmat = convertExplicitMatrix(mat);
+	auto it2 = addMatrix(pmat);
+
+	if (!it2.second)
+		delete pmat;
 
 	const ExtendedExpression * new_expr = &(*it);
-	const Matrix * new_mat = &(*it2);
+	const Matrix * new_mat = it2.first;
 
 	expr_to_mat[new_expr] = new_mat;
 	mat_to_expr[new_mat] = new_expr;
@@ -118,7 +135,7 @@ const Matrix * UnstableMarkovMonoid::addLetter(char a, ExplicitMatrix & mat)
 }
 
 // Adds a rewrite rule
-void UnstableMarkovMonoid::addRewriteRule(const ExtendedExpression * pattern, const ExtendedExpression * rewritten)
+void UnstableMonoid::addRewriteRule(const ExtendedExpression * pattern, const ExtendedExpression * rewritten)
 {
 #if VERBOSE_MONOID_COMPUTATION
 	cout << "Adding rewrite rule ";
@@ -136,7 +153,7 @@ void UnstableMarkovMonoid::addRewriteRule(const ExtendedExpression * pattern, co
 		if M exists already, 
 		then add a rewriting rule,
 		else add a new element */
-void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_left, const ExtendedExpression * elt_right)
+void UnstableMonoid::process_expression(const ExtendedExpression * elt_left, const ExtendedExpression * elt_right)
 {
 #if VERBOSE_MONOID_COMPUTATION
 			cout << endl << endl << "***************************************" << endl << "Processing: " ;
@@ -268,11 +285,12 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 		const ConcatExpr * new_expr = &*concatExpressions.emplace(elt_left, elt_right).first;
 
 		/* We compute the matrix */
-		Matrix mat = Matrix::prod(*expr_to_mat[elt_left], *expr_to_mat[elt_right]);
+		Matrix * mat = expr_to_mat[elt_left]->prod(expr_to_mat[elt_right]);
 
 		/* we check if the matrix is already known */
-		pair <unordered_set<Matrix>::iterator, bool> result = matrices.emplace(mat);
-		const Matrix *  new_mat = &(*result.first);
+		auto result = addMatrix(mat);
+
+		const Matrix *  new_mat = result.first;
 		if (result.second)
 		{
 #if VERBOSE_MONOID_COMPUTATION
@@ -300,7 +318,7 @@ void UnstableMarkovMonoid::process_expression(const ExtendedExpression * elt_lef
 		}
 	}
 }
-void UnstableMarkovMonoid::CloseByProduct()
+void UnstableMonoid::CloseByProduct()
 {
 	/* Iterating over all elements
 	 *  For every element u,
@@ -359,8 +377,9 @@ void UnstableMarkovMonoid::CloseByProduct()
 // and either add a rewrite rule if the stabilization already exists, or a new element if it does not
 
 //get recurrent states
-const Vector * UnstableMarkovMonoid::recurrent_states(const Matrix * mat)
+const Vector * UnstableMarkovMonoid::recurrent_states(const Matrix * mmat)
 {
+	ProbMatrix * mat = (ProbMatrix *) mat;
 #ifdef CACHE_RECURRENT_STATES
 	auto recs = mat_to_recurrent_states.find(mat);
 	if (recs == mat_to_recurrent_states.end())
@@ -377,8 +396,9 @@ const Vector * UnstableMarkovMonoid::recurrent_states(const Matrix * mat)
 }
 
 //get recurrence classes
-const Vector * UnstableMarkovMonoid::recurrence_classes(const Matrix * mat)
+const Vector * UnstableMarkovMonoid::recurrence_classes(const Matrix * mmat)
 {
+	ProbMatrix * mat = (ProbMatrix *)mat;
 #ifdef CACHE_RECURRENT_STATES
 	auto recs = mat_to_recurrence_classes.find(mat);
 	if (recs == mat_to_recurrence_classes.end())
@@ -394,7 +414,7 @@ const Vector * UnstableMarkovMonoid::recurrence_classes(const Matrix * mat)
 #endif
 }
 
-bool UnstableMarkovMonoid::is_idempotent(const Matrix * mat)
+bool UnstableMonoid::is_idempotent(const Matrix * mat)
 {
 #if CACHE_RECURRENT_STATES
 	if (idempotent.find(mat) != idempotent.end())
@@ -416,18 +436,17 @@ bool UnstableMarkovMonoid::is_idempotent(const Matrix * mat)
 
 }
 
-void UnstableMarkovMonoid::sharpify_expression(const ExtendedExpression * elt){
+void UnstableMonoid::sharpify_expression(const ExtendedExpression * elt){
 
 	const Matrix * mat_e = expr_to_mat[elt];
-
 
 	if (is_idempotent(mat_e)){
 #if USE_SPARSE_MATRIX
 		Matrix mat = Matrix::stab(*mat_e);
 #else
-		Matrix mat = Matrix::stab(* mat_e, recurrent_states(mat_e ) );
+		Matrix * mat = mat_e->stab();
 #endif
-		pair <unordered_set <Matrix>::iterator, bool> result = matrices.emplace(mat);
+		auto result = addMatrix(mat);
 		unordered_set<SharpedExpr>::iterator it = sharpExpressions.emplace(elt).first;
 		// DO WE ACTUALLY NEED SHARPEXPRESSIONS (UNORDERED SET)????
 		const SharpedExpr * new_expr = &*it;
@@ -449,7 +468,7 @@ void UnstableMarkovMonoid::sharpify_expression(const ExtendedExpression * elt){
 }
 
 // Goes through all the new elements and sharpify them
-void UnstableMarkovMonoid::CloseByStabilization()
+void UnstableMonoid::CloseByStabilization()
 {
 	size_t cur_index = 0;
 
@@ -469,7 +488,7 @@ void UnstableMarkovMonoid::CloseByStabilization()
 	}
 }
 
-void UnstableMarkovMonoid::ComputeMarkovMonoid()
+void UnstableMonoid::ComputeMonoid()
 {
 	cnt = MAX_MONOID_SIZE / 100;
 

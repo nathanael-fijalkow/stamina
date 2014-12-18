@@ -1,6 +1,6 @@
 set (SOURCES
 	Expressions.cpp
-	MarkovMonoid.cpp
+	Monoid.cpp
 	Matrix.cpp
     )
 

@@ -157,35 +157,26 @@ public:
 	// Number of states of the matrix
 	const uint stateNb;
 
-	// Constructor
-	Matrix(const ExplicitMatrix &);
-
-	// Constructor
+	// Constructor from state nb
 	Matrix(uint stateNb);
 
 	// Print
-	virtual void print(ostream& os = cout) const;
-
-	// Equality operator
-	bool operator == (const Matrix & mat) const;
+	virtual void print(ostream& os = cout) const = 0;
 
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns
-	static Matrix prod(const Matrix &, const Matrix &);
+	//The caller is in charge of deleting the returned object
+	virtual Matrix * prod(const Matrix  *) const = 0;
 
-#if USE_SPARSE_MATRIX
 	// compute stabilisation
-	static Matrix stab(const Matrix &);
-#else
-	// compute stabilisation, given recurrent states
-	static Matrix stab(const Matrix & mat, const Vector * recs);
-#endif
+	//The caller is in charge of deleting the returned object
+	virtual Matrix * stab() const = 0;
 
 	// Function returning the hash
 	HashMat hash() const { return _hash; };
 
 	// Function checking whether a matrix is idempotent
-	bool isIdempotent() const;
+	virtual bool isIdempotent() const = 0;
 
 	// Two STATIC elements
 	// This is the set of known vectors
@@ -194,50 +185,16 @@ public:
 	// This is the constant vector with only zero entries
 	static const Vector * zero_vector;
 
-	// computes the list of recurrent states.
-	const Vector * recurrent_states() const;
-
-	/* computes the list of recurrence classes given the list of recurrent states.
-	The matrix is assumed to be idempotent. */
-	const Vector * recurrence_classes(const Vector *) const;
-
-	// Count the number of leaks given the list of recurrence classes
-	//the matrix is assumed to be idempotent
-#if USE_SPARSE_MATRIX
-	uint countLeaks(const Vector * classes) const { return 0; };
-#else
-	uint countLeaks(const Vector * classes) const;
-#endif
-
-	//check matrix is well formed
-	bool check() const;
-
 protected:
 
 	// The hash expression
 	HashMat _hash;
 
-	// Four C-style matrices of size stateNb containing all rows, state per state
-	const Vector ** row_pluses;
-	const Vector ** row_ones;
-	const Vector ** col_pluses;
-	const Vector ** col_ones;
-
 	// Function computing the hash
-	void update_hash(){
-	_hash = 0;
-	for (const Vector ** p = col_ones; p != col_ones + stateNb; p++)
-		_hash ^= hash_value((size_t) *p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	for (const Vector ** p = col_pluses; p != col_pluses + stateNb; p++)
-		_hash ^= hash_value((size_t) *p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	for (const Vector ** p = row_ones; p != row_ones + stateNb; p++)
-		_hash ^= hash_value((size_t) *p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	for (const Vector ** p = row_pluses; p != row_pluses + stateNb; p++)
-		_hash ^= hash_value((size_t) *p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	};
-
-	// Function allocating memory for pluses and ones
-	void allocate();
+	virtual void update_hash() = 0;
+	
+	// Function allocating memory, used by the constructor
+	virtual void allocate() = 0;
 
 	// Function used in the product
 	static const Vector * sub_prod(const Vector *, const Vector **, size_t stateNb);
@@ -249,10 +206,80 @@ protected:
 	static const Vector * purge(const Vector *varg, const Vector * tab);
 #endif
 
+};
+
+class ProbMatrix : public Matrix
+{
+public:
+	// Constructor from explicit representation
+	ProbMatrix(const ExplicitMatrix &);
+
+	// Print
+	virtual void print(ostream& os = cout) const;
+
+	// Equality operator
+	virtual bool operator == (const ProbMatrix & mat) const;
+
+	// Function computing the product and stabilization
+	// They update the matrices, rows and columns
+	//The caller is in charge of deleting the returned object
+	virtual Matrix * prod(const Matrix  *) const;
+
+	// compute stabilisation
+	//The caller is in charge of deleting the returned object
+	virtual Matrix * stab() const;
+
+	// computes the list of recurrent states.
+	const Vector * recurrent_states() const;
+
+	/* computes the list of recurrence classes given the list of recurrent states.
+	The matrix is assumed to be idempotent. */
+	const Vector * recurrence_classes(const Vector *) const;
+
+	// Count the number of leaks given the list of recurrence classes
+	//the matrix is assumed to be idempotent
+	uint countLeaks(const Vector * classes) const;
+
+	//check matrix is well formed
+	bool check() const;
+
+	// Function checking whether a matrix is idempotent
+	bool isIdempotent() const;
+
+protected:
+
+	// Four C-style matrices of size stateNb containing all rows, state per state
+	const Vector ** row_pluses;
+	const Vector ** row_ones;
+	const Vector ** col_pluses;
+	const Vector ** col_ones;
+
+	void update_hash()
+	{
+		_hash = 0;
+		for (const Vector ** p = col_ones; p != col_ones + stateNb; p++)
+			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+		for (const Vector ** p = col_pluses; p != col_pluses + stateNb; p++)
+			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+		for (const Vector ** p = row_ones; p != row_ones + stateNb; p++)
+			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+		for (const Vector ** p = row_pluses; p != row_pluses + stateNb; p++)
+			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+	};
+
+	// Function allocating memory for pluses and ones
+	void allocate();
 
 	// Function checking whether a state is recurrent
 	//the matrix is assumed idempotent
-    bool recurrent(int) const;
+	bool recurrent(int) const;
+};
+
+class OneCounterMatrix : public Matrix
+{
+public:
+
+protected:
 
 };
 

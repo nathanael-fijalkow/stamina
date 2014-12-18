@@ -210,8 +210,9 @@ const Vector * Matrix::sub_prod(
 }
 
 // Function computing the product of two matrices
-Matrix Matrix::prod(const Matrix & mat1, const Matrix & mat2)
+Matrix Matrix::prod(const Matrix & mat2) const
 {
+	const Matrix & mat1 = *this;
 	uint n = mat1.stateNb;
     Matrix result(n);
 
@@ -263,8 +264,9 @@ Vector purge(const Vector *varg,bool * tab){
 }
 
 // Function computing the stabilization. Only works on idempotent
-Matrix Matrix::stab(const Matrix & mat) 
+Matrix * Matrix::stab() const
 {
+	const Matrix & mat = *this;
     uint n=mat.stateNb;
     Matrix result(n);
 
@@ -312,5 +314,5 @@ bool Matrix::operator==(const Matrix & mat) const
 
 bool Matrix::isIdempotent() const
 {
-	return (* this == Matrix::prod(* this,* this));
+	return (* this == this->prod(* this));
 }

@@ -113,15 +113,16 @@ public:
 	Matrix(uint stateNb);
 
 	// Print
-	void print() const;
+	virtual void print() const = 0;
 
 	// Equality operator
-	bool operator == (const Matrix & mat) const;
+	virtual bool operator == (const Matrix & mat) const = 0;
 
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns
-	static Matrix prod(const Matrix &, const Matrix &);
-	static Matrix stab(const Matrix &);
+	//the caller is in charge of deleting the return object
+	virtual Matrix * prod(const Matrix *) const = 0;
+	virtual Matrix * stab() const = 0;
 
 	// Function returning the hash
 	HashMat hash() const { return _hash; };
@@ -140,25 +141,9 @@ protected:
 	// The hash expression
 	HashMat _hash;
 
-	// Four C-style matrices of size stateNb containing all rows, state per state
-	const Vector ** row_pluses;
-	const Vector ** row_ones;
-	const Vector ** col_pluses;
-	const Vector ** col_ones;
-
 	// Function computing the hash
-	void update_hash(){
-	_hash = 0;
-	for (const Vector ** p = col_ones; p != col_ones + stateNb; p++)
-		_hash ^= hash_value((size_t) *p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	for (const Vector ** p = col_pluses; p != col_pluses + stateNb; p++)
-		_hash ^= hash_value((size_t) *p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	for (const Vector ** p = row_ones; p != row_ones + stateNb; p++)
-		_hash ^= hash_value((size_t) *p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	for (const Vector ** p = row_pluses; p != row_pluses + stateNb; p++)
-		_hash ^= hash_value((size_t) *p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	};
-
+	virtual void update_hash() = 0;
+	
 	// Function allocating memory for pluses and ones
 	void allocate();
 
@@ -167,6 +152,55 @@ protected:
 
 	// Function checking whether a state is idempotent
     bool recurrent(int) const;
+};
+
+
+class ProbMatrix : public Matrix
+{
+public:
+	// Function computing the product and stabilization
+	// They update the matrices, rows and columns
+	//the caller is in charge of deleting the return object
+	Matrix * prod(const Matrix *) const;
+	Matrix * stab() const;
+
+	// Print
+	void print() const;
+
+	// Equality operator
+	bool operator == (const Matrix & mat) const;
+
+protected:
+	// Four C-style matrices of size stateNb containing all rows, state per state
+	const Vector ** row_pluses;
+	const Vector ** row_ones;
+	const Vector ** col_pluses;
+	const Vector ** col_ones;
+
+	void update_hash(){
+		_hash = 0;
+		for (const Vector ** p = col_ones; p != col_ones + stateNb; p++)
+			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+		for (const Vector ** p = col_pluses; p != col_pluses + stateNb; p++)
+			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+		for (const Vector ** p = row_ones; p != row_ones + stateNb; p++)
+			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+		for (const Vector ** p = row_pluses; p != row_pluses + stateNb; p++)
+			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+	};
+
+
+};
+
+class OneCounterMatrix : public Matrix
+{
+public:
+	// Function computing the product and stabilization
+	// They update the matrices, rows and columns
+	//the caller is in charge of deleting the return object
+	Matrix * prod(const Matrix *) const;
+	Matrix * stab() const;
+
 };
 
 // Defines default hash for the matrix class
