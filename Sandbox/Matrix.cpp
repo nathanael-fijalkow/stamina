@@ -145,7 +145,6 @@ void ProbMatrix::allocate()
 // Constructor
 Matrix::Matrix(uint stateNb) : _hash(0), stateNb(stateNb)
 {
-	allocate();
 };
 
 //Random matrix
@@ -167,6 +166,8 @@ ExplicitMatrix * ExplicitMatrix::random(uint stateNb)
 // Convert an explicit matrix into a matrix
 ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix) : Matrix(explMatrix.stateNb)
 {
+	allocate();
+
 	for (uint i = 0; i < stateNb; i++)
 	{
 #if USE_SPARSE_MATRIX
@@ -532,6 +533,7 @@ bool ProbMatrix::check() const
 	for (int i = 0; i < stateNb; i++)
 		if (row_ones[i] == Matrix::zero_vector)
 			return false;
+	return true;
 }
 
 // Function computing the product of two matrices

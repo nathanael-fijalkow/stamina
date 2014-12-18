@@ -297,6 +297,22 @@ namespace std
 			return mat.hash();
 		}
 	};
+
+		template <> struct hash<ProbMatrix>
+		{
+			size_t operator()(const ProbMatrix & mat) const
+			{
+				return mat.hash();
+			}
+		};
+
+			template <> struct hash<OneCounterMatrix>
+			{
+				size_t operator()(const OneCounterMatrix & mat) const
+				{
+					return mat.hash();
+				}
+			};
 }
 
 #endif
