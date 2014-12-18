@@ -32,6 +32,9 @@ void Vector::allocate(int size)
 {
 #if USE_SPARSE_MATRIX
 		entries = (size_t *)malloc(entriesNb * sizeof(size_t));
+#else
+	bits = (uint *)malloc(bitsNb * sizeof(uint));
+	memset(bits, (char)0, bitsNb * sizeof(uint));
 #endif
 }
 
@@ -60,7 +63,7 @@ Vector::Vector(vector<size_t> data) : entriesNb(data.size()), bitsNb((entriesNb 
 #else
 Vector::Vector(vector<bool> data):  entriesNb(data.size()), bitsNb((entriesNb + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
 {
-
+	allocate(entriesNb);
 	for (int i = data.size() -1; i >=0 ; i--)
 	{
 		bits[i / (8 * sizeof(uint))] = (bits[i / (8 * sizeof(uint))] << 1) | (data[i] ? 1 : 0);
