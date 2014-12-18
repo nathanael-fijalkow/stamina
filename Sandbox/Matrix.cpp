@@ -24,14 +24,21 @@ Vector::Vector(uint size) : entriesNb(size)
 #else
 Vector::Vector(uint size) : entriesNb(size), bitsNb((entriesNb + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
 {
-	bits = (uint *)malloc(bitsNb * sizeof(uint));
-	memset(bits, (char) 0, bitsNb * sizeof(uint));
+	allocate(size);
 }
 #endif
 
-// Second constructor
-Vector::Vector(const Vector & other) : Vector(other.entriesNb)
+void Vector::allocate(int size)
 {
+		entries = (size_t *)malloc(entriesNb * sizeof(size_t));
+}
+
+
+// Second constructor
+Vector::Vector(const Vector & other) :  : entriesNb(other.size), bitsNb((other.size + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
+{
+	allocate(other.entriesNb);
+
 	_hash = other.Hash();
 #if USE_SPARSE_MATRIX
 	memcpy(entries, other.entries, entriesNb * sizeof(size_t));
@@ -42,14 +49,16 @@ Vector::Vector(const Vector & other) : Vector(other.entriesNb)
 
 // Third constructor
 #if USE_SPARSE_MATRIX
-Vector::Vector(vector<size_t> data) : Vector(data.size())
+Vector::Vector(vector<size_t> data) : entriesNb(data.size()), bitsNb((entriesNb + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
 {
 	size_t * p = entries;
 	for (vector<size_t>::iterator it = data.begin(); it != data.end(); it++)
 		*p++ = *it;
 #else
-Vector::Vector(vector<bool> data) : Vector(data.size())
+Vector::Vector(vector<bool> data):  entriesNb(data.size()), bitsNb((entriesNb + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
 {
+		entries = (size_t *)malloc(entriesNb * sizeof(size_t));
+
 	for (int i = data.size() -1; i >=0 ; i--)
 	{
 		bits[i / (8 * sizeof(uint))] = (bits[i / (8 * sizeof(uint))] << 1) | (data[i] ? 1 : 0);
@@ -61,7 +70,7 @@ Vector::Vector(vector<bool> data) : Vector(data.size())
 
 // Fourth constructor
 #if USE_SPARSE_MATRIX
-Vector::Vector(size_t * data, size_t data_size, bool copy) : entriesNb(data_size)
+Vector::Vector(size_t * data, size_t data_size, bool copy) :  entriesNb(data_size), bitsNb((entriesNb + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
 {
 	if (copy)
 	{
@@ -75,7 +84,7 @@ Vector::Vector(size_t * data, size_t data_size, bool copy) : entriesNb(data_size
 	update_hash();
 };
 #else
-Vector::Vector(uint * data, size_t data_size, bool copy) : entriesNb(data_size), bitsNb((entriesNb + 8 * sizeof(uint) - 1 )/ (8 * sizeof(uint)))
+Vector::Vector(uint * data, size_t data_size, bool copy) : entriesNb(data_size), bitsNb((entriesNb + 8 * sizeof(uint) - 1 ) / (8 * sizeof(uint)))
 {
 	if (copy)
 	{

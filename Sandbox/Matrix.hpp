@@ -111,6 +111,9 @@ public:
 
 protected:
 
+	//alocates memory
+	void allocate(int size);
+
 	// Hash
 	size_t _hash;
 
