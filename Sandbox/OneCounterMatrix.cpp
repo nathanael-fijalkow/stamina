@@ -196,17 +196,19 @@ Matrix * OneCounterMatrix::stab() const
 	//system("pause");
 	diags[INC] = diags[EPS]; //IC impossible, restriction to E
 
-	bool t = 0;//temporary result for coef i,j
 
 	for (char act = 0; act<4; act++){
 		for (uint i = 0; i <n; i++){
 			memset(new_row, 0, bitsN*sizeof(uint));
 			memset(new_col, 0, bitsN*sizeof(uint));
 			for (uint j = 0; j<n; j++){
+				bool t = false;//temporary result for coef i,j
 
 				//look for a possible path
 				for (int b = 0; b<bitsN; b++){ t = t || ((rows[act][i]->bits[b] & diags[act][b] & cols[act][j]->bits[b]) != 0); }
 				new_row[j / (8 * sizeof(uint))] |= (t ? 1 : 0) << (j % (sizeof(uint) * 8));
+
+				t = false;
 				for (int b = 0; b<bitsN; b++){ t = t || ((rows[act][j]->bits[b] & diags[act][b] & cols[act][i]->bits[b]) != 0); }
 				new_col[j / (8 * sizeof(uint))] |= (t ? 1 : 0) << (j % (sizeof(uint) * 8));
 

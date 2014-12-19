@@ -41,45 +41,45 @@ int main(int argc, char **argv)
 	matb.coefficients[8] = 2;
 	*/
 
-	// 	ExplicitMatrix mata(2);
-	//mata.coefficients[0] = 2;
-	//mata.coefficients[1] = 5;
-	//mata.coefficients[2] = 5;
-	//mata.coefficients[3] = 2;
+	 	ExplicitMatrix mata(2);
+	mata.coefficients[0] = 2;
+	mata.coefficients[1] = 5;
+	mata.coefficients[2] = 5;
+	mata.coefficients[3] = 2;
 
-	//ExplicitMatrix matb(2);
-	//matb.coefficients[0] = 5;
-	//matb.coefficients[1] = 1;
-	//matb.coefficients[2] = 5;
-	//matb.coefficients[3] = 1;
+	ExplicitMatrix matb(2);
+	matb.coefficients[0] = 5;
+	matb.coefficients[1] = 1;
+	matb.coefficients[2] = 5;
+	matb.coefficients[3] = 1;
 
-	//OneCounterMatrix a(mata);
- //   OneCounterMatrix b(matb);
-
-
-ExplicitMatrix mata(1);
-mata.coefficients[0] = RESET;
-
-ExplicitMatrix matb(1);
-matb.coefficients[0] =EPS;
-
-ExplicitMatrix matc(1);
-matc.coefficients[0] = INC;
-
-ExplicitMatrix matd(1);
-matd.coefficients[0] =OM;
+	OneCounterMatrix a(mata);
+    OneCounterMatrix b(matb);
 
 
-OneCounterMatrix a(mata);
- OneCounterMatrix b(matb);
-OneCounterMatrix c(matc);
- OneCounterMatrix d(matd);
+//ExplicitMatrix mata(1);
+//mata.coefficients[0] = RESET;
+//
+//ExplicitMatrix matb(1);
+//matb.coefficients[0] =EPS;
+//
+//ExplicitMatrix matc(1);
+//matc.coefficients[0] = INC;
+//
+//ExplicitMatrix matd(1);
+//matd.coefficients[0] =OM;
+//
+
+//OneCounterMatrix a(mata);
+// OneCounterMatrix b(matb);
+//OneCounterMatrix c(matc);
+// OneCounterMatrix d(matd);
 
 	//a.print();
 	//cout<<"\n";
 	//b.print();
 	
-	UnstableStabMonoid monoid(3);
+	UnstableStabMonoid monoid(2);
 	
 	/*
 
@@ -102,16 +102,17 @@ OneCounterMatrix c(matc);
 
 	UnstableMarkovMonoid monoid(2);
 
+	*/
 	a.print();
 	cout << "\n";
 	b.print();
 
-	*/
 	
-	monoid.addLetter('a', mata);
+	
+ monoid.addLetter('a', mata);
 	monoid.addLetter('b', matb);
-    monoid.addLetter('c', matc);
-	monoid.addLetter('d', matd);
+ //   monoid.addLetter('c', matc);
+//	monoid.addLetter('d', matd);
 
 	monoid.ComputeMonoid();
 	
