@@ -109,6 +109,12 @@ UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim)
 	init(dim);
 };
 
+// Constructor
+UnstableStabMonoid::UnstableStabMonoid(uint dim)
+{
+	init(dim);
+};
+
 // Free known vectors
 UnstableMonoid::~UnstableMonoid()
 {
@@ -121,9 +127,21 @@ Matrix * UnstableMarkovMonoid::convertExplicitMatrix(const ExplicitMatrix & mat)
 	return new ProbMatrix(mat);
 }
 
+Matrix * UnstableStabMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
+{
+	return new OneCounterMatrix(mat);
+}
+
 pair <Matrix *, bool> UnstableMarkovMonoid::addMatrix(Matrix * mat)
 {
 	ProbMatrix * mmat = (ProbMatrix *)mat;
+	auto it = matrices.emplace(*mmat);
+	return pair<Matrix *, bool>((Matrix *)&(*it.first), it.second);
+}
+
+pair <Matrix *, bool> UnstableStabMonoid::addMatrix(Matrix * mat)
+{
+	OneCounterMatrix * mmat = (OneCounterMatrix *)mat;
 	auto it = matrices.emplace(*mmat);
 	return pair<Matrix *, bool>((Matrix *)&(*it.first), it.second);
 }

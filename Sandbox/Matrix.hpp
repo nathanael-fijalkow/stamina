@@ -312,8 +312,8 @@ public:
 protected:
 
 	// Four C-style matrices of size stateNb containing all rows, state per state
-	const Vector ** rows[4];
-	const Vector ** cols[4];
+	const Vector *** rows;
+	const Vector *** cols;
 
 	void update_hash()
 	{

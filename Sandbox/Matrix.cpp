@@ -147,13 +147,13 @@ bool Vector::operator==(const Vector & vec) const
 	return true;
 }
 
-// Class Matrix
+// Class ProbMatrix
 void ProbMatrix::allocate()
 {
-	row_pluses = (const Vector **)malloc(stateNb * sizeof(void *));
-	row_ones = (const Vector **)malloc(stateNb * sizeof(void *));
-	col_pluses = (const Vector **)malloc(stateNb * sizeof(void *));
-	col_ones = (const Vector **)malloc(stateNb * sizeof(void *));
+	row_pluses = (const Vector **)malloc(stateNb * sizeof(Vector *));
+	row_ones = (const Vector **)malloc(stateNb * sizeof(Vector *));
+	col_pluses = (const Vector **)malloc(stateNb * sizeof(Vector *));
+	col_ones = (const Vector **)malloc(stateNb * sizeof(Vector *));
 }
 
 // Constructor
@@ -177,7 +177,7 @@ ExplicitMatrix * ExplicitMatrix::random(uint stateNb)
 	return pe;
 }
 
-// Convert an explicit matrix into a matrix
+// Convert an explicit matrix into a probmatrix
 ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix) : Matrix(explMatrix.stateNb)
 {
 	allocate();
@@ -223,6 +223,7 @@ ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix) : Matrix(explMatrix.st
 			c_ones[j] = (c2 == 2);
 		}
 #endif
+
 
 		unordered_set<Vector>::iterator it = vectors.insert(r_ones).first;
 		row_ones[i] = &(*it);
@@ -644,4 +645,192 @@ Matrix * ProbMatrix::stab() const
 bool ProbMatrix::isIdempotent() const
 {
 	return (*this == *(ProbMatrix *)(this->ProbMatrix::prod(this)));
+};
+
+
+// Class OneCounterMatrix
+void OneCounterMatrix::allocate()
+{
+	rows=(const Vector ***)malloc(4*sizeof(const Vector **));
+	cols=(const Vector ***)malloc(4*sizeof(const Vector **));
+	for(char act=0;act<4;act++){
+	rows[act] = (const Vector **) malloc(stateNb * sizeof(const Vector *));
+	cols[act] = (const Vector **) malloc(stateNb * sizeof(const Vector *));
+	}
+};
+
+//Constructor from Explicit Matrix
+OneCounterMatrix::OneCounterMatrix(const ExplicitMatrix & explMatrix) : Matrix(explMatrix.stateNb)
+{
+	//CAUTION: Sparse_Matrix not defined
+	allocate();
+	for (char act=0;act<4;act++){
+	for (uint i = 0; i < stateNb; i++)
+	{
+		vector<bool> row(stateNb);
+		vector<bool> col(stateNb);
+		
+		for (uint j = 0; j < stateNb; j++)
+		{
+			char c1 = explMatrix.coefficients[i * stateNb + j];
+			char c2 = explMatrix.coefficients[j * stateNb + i];
+			
+				
+				row[j] = (c1 <= act);			
+				col[j] = (c2 <= act);
+			
+			
+		}
+
+		unordered_set<Vector>::iterator it;
+		//vector<bool> a la place de Vector ?
+				it = vectors.insert(row).first;		
+				rows[act][i] = &(*it);
+				it = vectors.insert(col).first;		
+				cols[act][i] = &(*it);
+		}
+	}
+
+	update_hash();
 }
+
+//Print OneCounterMatrix
+void OneCounterMatrix::print(ostream & os) const 
+{
+	// CAUTION: sparse matrix not implemented
+	string actions="REIO";
+	//cout << "Row description " << endl;
+	for (uint i = 0; i < stateNb; i++){
+	
+		os << i << ":" << " ";
+		
+		for(uint j = 0; j < stateNb; j++){
+		//find the char to print as the minimal one
+			bool search=true;
+			for(char act=0;act<4;act++){
+				const Vector & row = *rows[act][i];
+				if(row.contains(j)){
+						os << actions[act]; //print the first (best) action found
+						search=false;
+						break;
+				}
+			}
+			if(search) os<<'_';
+
+		}
+		os << endl;
+	}
+}
+
+bool OneCounterMatrix::operator==(const OneCounterMatrix & mat) const
+{
+	//only on rows
+	if (mat.stateNb != stateNb) return false;
+	if (mat._hash != _hash) return false;
+
+	for(char act=0;act<4;act++){
+	const Vector ** rows1 = rows[act];
+	const Vector ** rows2 = mat.rows[act];
+	for (; rows1 != rows[act] + stateNb; rows1++, rows2++)
+		{
+		if (*rows1 != *rows2) return false;
+		}
+	}
+	return true;
+};
+
+
+Matrix * OneCounterMatrix::prod(const Matrix * pmat1) const
+{
+	const OneCounterMatrix & mat1 = *(OneCounterMatrix *)pmat1;
+	const OneCounterMatrix & mat2 = *this;
+	cout<<"\nPROD\n";
+	mat1.print();
+	cout<<"\n";
+	mat2.print();
+
+	uint n = mat1.stateNb;
+	OneCounterMatrix * result = new OneCounterMatrix(n);
+	for (char act=0;act<4;act++){
+	for (uint i = 0; i < n; i++)
+	{
+		result->rows[act][i] = sub_prod( mat1.rows[act][i], mat2.cols[act], n);
+		result->cols[act][i] = sub_prod( mat2.cols[act][i], mat1.rows[act], n);
+	}
+	}
+	result->update_hash();
+	cout<<"\n Result: \n";
+	result->print();
+	system("pause");
+	return result;
+}
+
+//works only on idempotents
+Matrix * OneCounterMatrix::stab() const
+{
+	cout <<"\nSTAB\n";
+	print();
+	uint n = stateNb;
+	OneCounterMatrix * result = new OneCounterMatrix(n);
+
+	uint * diags[4]; //sharp of the diagonal, for now on one uint
+	
+	
+	//a peaufiner, pour l'instant 1 a priori, on ne prend que celui du premier vecteur.
+	uint bitsN=rows[0][0]->bitsNb;
+
+for(char act=0;act<4;act++){
+		uint *diag=(uint *) malloc(bitsN * sizeof(uint));;
+	for(int b=0;b<bitsN;b++){ //initialisation de la diagonale
+			diag[b]=0; 
+		}
+		//compute the diagonal 
+	cout<<" act:"<<(int)act<<"\n";
+	for (int i = 0; i <n ; i++)
+	{
+		bool d=rows[act][i]->contains(i);
+		cout<<d;
+		if (d) diag[i / (8 * sizeof(uint))] = (diag[i / (8 * sizeof(uint))]) | ( 1 << (i % (sizeof(uint) * 8))) ;
+		
+	}
+	cout<<"\n";
+	diags[act]=diag;
+
+	
+	for(uint i=0;i<n;i++){//initialize vectors to 0
+		result->rows[act][i]=zero_vector;
+		result->cols[act][i]=zero_vector;
+	}
+}
+diags[INC]=diags[EPS]; //IC impossible, restriction to E
+
+bool t=0;//temporary result for coef i,j
+
+for(char act=0;act<4;act++){
+	for (uint i =0; i <n; i++){
+	for(uint j=0; j<n;j++){
+		
+		//look for a possible path
+		for(int b=0;b<bitsN;b++){t = t || ((rows[act][i]->bits[b] & diags[act][b] & cols[act][j]->bits[b])!=0);}
+			//cout << "success: " << i<< " "<<j <<"\n";
+		if(t) { //put 1 in result(i,j)
+			//a verifier
+			result->rows[act][i]->bits[j / (8 * sizeof(uint))] = result->rows[act][i]->bits[j / (8 * sizeof(uint))] | ( 1 << (j % (sizeof(uint) * 8)));
+			result->cols[act][j]->bits[i / (8 * sizeof(uint))] = result->cols[act][j]->bits[i / (8 * sizeof(uint))] | ( 1 << (i % (sizeof(uint) * 8)));
+		}
+			
+		
+	}
+	}
+}
+
+	result->update_hash();
+	cout<<"\nStabResult:\n";
+	result->print();
+	return result;
+}
+
+bool OneCounterMatrix::isIdempotent() const
+{
+	return (*this == *(OneCounterMatrix *)(this->OneCounterMatrix::prod(this)));
+};
