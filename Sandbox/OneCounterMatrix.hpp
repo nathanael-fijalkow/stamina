@@ -16,6 +16,9 @@ public:
 	// Constructor from explicit representation
 	OneCounterMatrix(const ExplicitMatrix &);
 
+	// Constructor from ENTRIESnB
+	OneCounterMatrix(int nbState);
+
 	// Print
 	void print(std::ostream& os = std::cout) const;
 

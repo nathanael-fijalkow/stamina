@@ -81,7 +81,7 @@ Vector::Vector(size_t * data, size_t data_size, bool copy) : entriesNb(data_size
 	update_hash();
 };
 #else
-Vector::Vector(uint * data, size_t data_size, bool copy) : entriesNb(data_size), bitsNb((entriesNb + 8 * sizeof(uint) - 1) / (8 * sizeof(uint)))
+Vector::Vector(uint * data, size_t entriesNb, bool copy) : entriesNb(entriesNb), bitsNb((entriesNb + 8 * sizeof(uint) - 1) / (8 * sizeof(uint)))
 {
 	if (copy)
 	{

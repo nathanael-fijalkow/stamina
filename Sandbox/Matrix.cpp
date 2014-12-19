@@ -41,7 +41,7 @@ std::ostream& operator<< (std::ostream& os, const Matrix & mat){ mat.print(os); 
 
 
 // The set of known vectors
-std::unordered_set<Vector> Matrix::vectors;
+std::unordered_set<const Vector> Matrix::vectors;
 
 // The zero vector
 const Vector * Matrix::zero_vector = NULL;

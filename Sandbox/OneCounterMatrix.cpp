@@ -11,6 +11,13 @@ void OneCounterMatrix::allocate()
 	}
 };
 
+
+OneCounterMatrix::OneCounterMatrix(int stateNb) : Matrix(stateNb)
+{
+	allocate();
+	update_hash();
+}
+
 //Constructor from Explicit Matrix
 OneCounterMatrix::OneCounterMatrix(const ExplicitMatrix & explMatrix) : Matrix(explMatrix.stateNb)
 {
@@ -113,7 +120,7 @@ Matrix * OneCounterMatrix::prod(const Matrix * pmat1) const
 	result->update_hash();
 	cout << "\n Result: \n";
 	result->print();
-	system("pause");
+//	system("pause");
 	return result;
 }
 
@@ -130,9 +137,12 @@ Matrix * OneCounterMatrix::stab() const
 
 	//a peaufiner, pour l'instant 1 a priori, on ne prend que celui du premier vecteur.
 	uint bitsN = rows[0][0]->bitsNb;
+	uint *diag = (uint *)malloc(bitsN * sizeof(uint));
+	uint *new_row = (uint *)malloc(bitsN * sizeof(uint));
+	uint *new_col = (uint *)malloc(bitsN * sizeof(uint));
 
 	for (char act = 0; act<4; act++){
-		uint *diag = (uint *)malloc(bitsN * sizeof(uint));;
+	
 		for (int b = 0; b<bitsN; b++){ //initialisation de la diagonale
 			diag[b] = 0;
 		}
@@ -149,10 +159,6 @@ Matrix * OneCounterMatrix::stab() const
 		diags[act] = diag;
 
 
-		for (uint i = 0; i<n; i++){//initialize vectors to 0
-			result->rows[act][i] = zero_vector;
-			result->cols[act][i] = zero_vector;
-		}
 	}
 	diags[INC] = diags[EPS]; //IC impossible, restriction to E
 
@@ -160,21 +166,29 @@ Matrix * OneCounterMatrix::stab() const
 
 	for (char act = 0; act<4; act++){
 		for (uint i = 0; i <n; i++){
+			memset(new_row, 0, bitsN*sizeof(uint));
+			memset(new_col, 0, bitsN*sizeof(uint));
 			for (uint j = 0; j<n; j++){
 
 				//look for a possible path
 				for (int b = 0; b<bitsN; b++){ t = t || ((rows[act][i]->bits[b] & diags[act][b] & cols[act][j]->bits[b]) != 0); }
-				//cout << "success: " << i<< " "<<j <<"\n";
-				if (t) { //put 1 in result(i,j)
-					//a verifier
-					result->rows[act][i]->bits[j / (8 * sizeof(uint))] = result->rows[act][i]->bits[j / (8 * sizeof(uint))] | (1 << (j % (sizeof(uint) * 8)));
-					result->cols[act][j]->bits[i / (8 * sizeof(uint))] = result->cols[act][j]->bits[i / (8 * sizeof(uint))] | (1 << (i % (sizeof(uint) * 8)));
-				}
-
+				new_row[j / (8 * sizeof(uint))] |= (t ? 1 : 0) << (j % (sizeof(uint) * 8));
+				for (int b = 0; b<bitsN; b++){ t = t || ((rows[act][j]->bits[b] & diags[act][b] & cols[act][i]->bits[b]) != 0); }
+				new_col[j / (8 * sizeof(uint))] |= (t ? 1 : 0) << (j % (sizeof(uint) * 8));
 
 			}
+
+			auto it = vectors.emplace(new_row, n).first;
+			result->rows[act][i] = &(*it);
+			it = vectors.emplace(new_col, n).first;
+			result->cols[act][i] = &(*it);
+
 		}
 	}
+
+	free(new_row);
+	free(new_col);
+	free(diag);
 
 	result->update_hash();
 	cout << "\nStabResult:\n";

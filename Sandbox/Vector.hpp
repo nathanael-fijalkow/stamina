@@ -58,7 +58,7 @@ public:
 	// Third constructor
 	Vector(std::vector <bool> data);
 
-	Vector(uint * data, size_t data_size, bool copy = true);
+	Vector(uint * data, size_t entriesNb, bool copy = true);
 #endif
 
 	// Function returning the hash
@@ -110,13 +110,21 @@ private:
 /* Defines default hash for the class of Vector */
 namespace std
 {
-	template <> struct hash < Vector >
+	template <> struct hash < const Vector >
 	{
 		size_t operator()(const Vector & vec) const
 		{
 			return vec.Hash();
 		}
 	};
+
+		template <> struct hash < Vector >
+		{
+			size_t operator()(const Vector & vec) const
+			{
+				return vec.Hash();
+			}
+		};
 }
 
 #endif
