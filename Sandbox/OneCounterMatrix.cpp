@@ -122,12 +122,8 @@ bool OneCounterMatrix::operator==(const OneCounterMatrix & mat) const
 
 Matrix * OneCounterMatrix::prod(const Matrix * pmat1) const
 {
-	const OneCounterMatrix & mat1 = *(OneCounterMatrix *)pmat1;
-	const OneCounterMatrix & mat2 = *this;
-	cout << "\nPROD\n";
-	mat1.print();
-	cout << "\n";
-	mat2.print();
+	const OneCounterMatrix & mat1 = *this;
+	const OneCounterMatrix & mat2 = *(OneCounterMatrix *)pmat1;
 
 	uint n = mat1.stateNb;
 	OneCounterMatrix * result = new OneCounterMatrix(n);
@@ -155,17 +151,12 @@ Matrix * OneCounterMatrix::prod(const Matrix * pmat1) const
 
 
 	result->update_hash();
-	cout << "\n Result: \n";
-	result->print();
-//	system("pause");
 	return result;
 }
 
 //works only on idempotents
 Matrix * OneCounterMatrix::stab() const
 {
-	cout << "\nSTAB\n";
-	print();
 	uint n = stateNb;
 	OneCounterMatrix * result = new OneCounterMatrix(n);
 
@@ -228,8 +219,6 @@ Matrix * OneCounterMatrix::stab() const
 	free(diags[RESET]);free(diags[EPS]);free(diags[OM]);
 
 	result->update_hash();
-	cout << "\nStabResult:\n";
-	result->print();
 	return result;
 }
 

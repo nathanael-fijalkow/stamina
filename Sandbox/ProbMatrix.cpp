@@ -288,8 +288,8 @@ bool ProbMatrix::check() const
 // Function computing the product of two matrices
 Matrix * ProbMatrix::prod(const Matrix * pmat1) const
 {
-	const ProbMatrix & mat1 = *(ProbMatrix *)pmat1;
-	const ProbMatrix & mat2 = *this;
+	const ProbMatrix & mat1 = *this;
+	const ProbMatrix & mat2 = *(ProbMatrix *)pmat1;
 	uint n = mat1.stateNb;
 	ProbMatrix * result = new ProbMatrix(n);
 

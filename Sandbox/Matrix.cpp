@@ -142,7 +142,7 @@ const Vector * Matrix::sub_prodor(const Vector * vec, const Vector ** mat, const
 
 // Construct a vector obtained by multiplying the line vec by all columns of mat, twice, and then disjunction of the two.
 const Vector * Matrix::sub_prod2(const Vector * vec1, const Vector ** mat1,const Vector * vec2, const Vector ** mat2, size_t stateNb){
-	if (vec1 == Matrix::zero_vector || vec2==Matrix::zero_vector)	return Matrix::zero_vector;
+	if (vec1 == Matrix::zero_vector && vec2==Matrix::zero_vector)	return Matrix::zero_vector;
 //no Sparse_Matrix
 
 	uint * new_vec1 = (uint *)malloc(  vec1->bitsNb * sizeof(uint));
@@ -185,14 +185,15 @@ const Vector * Matrix::sub_prod2(const Vector * vec1, const Vector ** mat1,const
 		new_vec2[j / (8 * sizeof(uint))] = (new_vec2[j / (8 * sizeof(uint)) ] << 1) | (ok ? 1 : 0);
 	}
 
-
 	uint * new_vec = (uint *)malloc(  vec1->bitsNb * sizeof(uint));
 	for (int i = 0; i < vec2->bitsNb; i++) new_vec[i]=new_vec1[i] | new_vec2[i];
-	
 
-	auto it = vectors.emplace(new_vec, vec1->entriesNb, false).first;
+	auto it = vectors.emplace(new_vec, vec1->entriesNb);
+
+	free(new_vec);
+
 	//cout << "Final result "; (*it).print(); cout << endl;
-	return &(*it);
+	return &(*it.first);
 }
 
 // Create a new vector, keep only coordinates of v that are true in tab

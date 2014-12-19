@@ -11,6 +11,7 @@ class OneCounterMatrix : public Matrix
 #define EPS 1
 #define INC 2
 #define OM 3
+#define BOT 4
 
 public:
 	// Constructor from explicit representation

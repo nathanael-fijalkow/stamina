@@ -88,6 +88,9 @@ UnstableMonoid::UnstableMonoid(int dim)
 // Adds a letter
 const Matrix * UnstableMonoid::addLetter(char a, ExplicitMatrix & mat)
 {
+//	if (mat.stateNb != dim)
+//		throw runtime_error("Cannot add an element of dim " + toString(mat.stateNb) + " to a monoid of size " + toString(dim));
+
 	unordered_set<LetterExpr>::const_iterator it = letterExpressions.emplace(a).first;
 	auto pmat = convertExplicitMatrix(mat);
 	auto it2 = addMatrix(pmat);

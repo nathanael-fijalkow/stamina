@@ -17,31 +17,32 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	cout << "Acme++ rules" << endl;
-	/*
+	
 	ExplicitMatrix mata(3);
-	mata.coefficients[0] = 5;
-	mata.coefficients[1] = 1;
-	mata.coefficients[2] = 3;
-	mata.coefficients[3] = 2;
-	mata.coefficients[4] = 1;
-	mata.coefficients[5] = 5;
-	mata.coefficients[6] = 4;
-	mata.coefficients[7] = 5;
-	mata.coefficients[8] = 0;
+	mata.coefficients[0] = BOT;
+	mata.coefficients[1] = EPS;
+	mata.coefficients[2] = INC;
+	mata.coefficients[3] = INC;
+	mata.coefficients[4] = EPS;
+	mata.coefficients[5] = BOT;
+	mata.coefficients[6] = BOT;
+	mata.coefficients[7] = BOT;
+	mata.coefficients[8] = RESET;
 
 	ExplicitMatrix matb(3);
-	matb.coefficients[0] = 0;
-	matb.coefficients[1] = 2;
-	matb.coefficients[2] = 0;
-	matb.coefficients[3] = 5;
-	matb.coefficients[4] = 1;
-	matb.coefficients[5] = 2;
-	matb.coefficients[6] = 0;
-	matb.coefficients[7] = 4;
-	matb.coefficients[8] = 2;
-	*/
+	matb.coefficients[0] = RESET;
+	matb.coefficients[1] = INC;
+	matb.coefficients[2] = RESET;
+	matb.coefficients[3] = BOT;
+	matb.coefficients[4] = EPS;
+	matb.coefficients[5] = INC;
+	matb.coefficients[6] = RESET;
+	matb.coefficients[7] = BOT;
+	matb.coefficients[8] = INC;
+	
 
-	 	ExplicitMatrix mata(2);
+	/*
+ 	ExplicitMatrix mata(2);
 	mata.coefficients[0] = 2;
 	mata.coefficients[1] = 5;
 	mata.coefficients[2] = 5;
@@ -53,6 +54,7 @@ int main(int argc, char **argv)
 	matb.coefficients[2] = 5;
 	matb.coefficients[3] = 1;
 
+	*/
 	OneCounterMatrix a(mata);
     OneCounterMatrix b(matb);
 
@@ -79,7 +81,7 @@ int main(int argc, char **argv)
 	//cout<<"\n";
 	//b.print();
 	
-	UnstableStabMonoid monoid(2);
+	UnstableStabMonoid monoid(3);
 	
 	/*
 
