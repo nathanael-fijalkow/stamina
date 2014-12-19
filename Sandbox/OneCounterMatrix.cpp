@@ -177,12 +177,8 @@ Matrix * OneCounterMatrix::stab() const
 		//compute the diagonal 
 		//cout << " act:" << (int)act << "\n";
 		for (int i = 0; i <n; i++)
-		{
-			bool d = rows[act][i]->contains(i);
-			cout << d;
-			if (d) diags[act][i / (8 * sizeof(uint))] |= (1 << (i % (sizeof(uint) * 8)));
-
-		}
+			if (rows[act][i]->contains(i))
+				diags[act][i / (8 * sizeof(uint))] |= (1 << (i % (sizeof(uint) * 8)));
 	}
 	//system("pause");
 	diags[INC] = diags[EPS]; //IC impossible, restriction to E

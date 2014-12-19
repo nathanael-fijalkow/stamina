@@ -121,12 +121,13 @@ protected:
 	void check_size(int i)
 	{
 		cout << expr_to_mat.size() << " exprs ";
-		cout << " and " << rewriteRules.size() << " rules " << i << " prods" << endl;
+		cout << " and " << rewriteRules.size() << " rules and " << Matrix::vectors.size() << "vectors and " << i << " expressions to process." << endl;
 		cnt = MAX_MONOID_SIZE / 100;
+
 		if (new_elements.size() > MAX_MONOID_SIZE)
 				throw std::runtime_error("Monoid too large");
-			if (i > 100* MAX_MONOID_SIZE)
-				throw std::runtime_error("Too much work");
+/*			if (i > 100* MAX_MONOID_SIZE)
+				throw std::runtime_error("Too much work");*/
 	}
 
 	int _sharp_height;

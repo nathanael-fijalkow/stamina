@@ -131,10 +131,12 @@ const Vector * Matrix::sub_prodor(const Vector * vec, const Vector ** mat, const
 			}
 		//cout << "Equal " << (ok ? 1 : 0) << endl;
 		new_vec[j / (8 * sizeof(uint))] = (new_vec[j / (8 * sizeof(uint))] << 1) | (ok ? 1 : 0);
-		new_vec[j] |= vecor->bits[j];
 	}
 
-	auto it = vectors.emplace(new_vec, vec->entriesNb).first;
+	for (int j = 0; j < vecor->bitsNb; j++)
+		new_vec[j] |= vecor->bits[j];
+
+	auto & it = vectors.emplace(new_vec, vec->entriesNb).first;
 	free(new_vec);
 	//cout << "Final result "; (*it).print(); cout << endl;
 	return &(*it);
