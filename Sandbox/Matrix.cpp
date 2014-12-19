@@ -180,8 +180,12 @@ const Vector * Matrix::purge(const Vector *varg, bool * tab){
 	for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++)
 		if (tab[*ent]) *data++ = *ent;
 
-	unordered_set<Vector>::iterator it = vectors.emplace(datastart, nbtab, false).first;
+	unordered_set<Vector>::iterator it = vectors.emplace(datastart, nbtab).first;
 	return &(*it);
+
+	free(new_vec1);
+	free(new_vec2);
+	free(new_vec);
 }
 #else
 // Create a new vector, keep only coordinates of v that are true in tab
