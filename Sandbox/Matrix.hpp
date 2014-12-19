@@ -92,6 +92,10 @@ protected:
 	// Function used in the product
 	static const Vector * sub_prod(const Vector *, const Vector **, size_t stateNb);
 
+	//used in the product of OneCounter
+	static const Vector * sub_prod2(const Vector * vec1, const Vector ** mat1,const Vector * vec2, const Vector ** mat2, size_t stateNb);
+
+
 	// Create a new vector, keep only coordinates of v that are true in tab
 #if USE_SPARSE_MATRIX
 	static const Vector * purge(const Vector *varg, bool * tab);

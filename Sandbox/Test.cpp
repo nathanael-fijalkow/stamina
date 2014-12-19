@@ -17,7 +17,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	cout << "Acme++ rules" << endl;
-	
+	/*
 	ExplicitMatrix mata(3);
 	mata.coefficients[0] = 5;
 	mata.coefficients[1] = 1;
@@ -39,13 +39,45 @@ int main(int argc, char **argv)
 	matb.coefficients[6] = 0;
 	matb.coefficients[7] = 4;
 	matb.coefficients[8] = 2;
-	
-	OneCounterMatrix a(mata);
-    OneCounterMatrix b(matb);
+	*/
 
-	a.print();
-	cout<<"\n";
-	b.print();
+	// 	ExplicitMatrix mata(2);
+	//mata.coefficients[0] = 2;
+	//mata.coefficients[1] = 5;
+	//mata.coefficients[2] = 5;
+	//mata.coefficients[3] = 2;
+
+	//ExplicitMatrix matb(2);
+	//matb.coefficients[0] = 5;
+	//matb.coefficients[1] = 1;
+	//matb.coefficients[2] = 5;
+	//matb.coefficients[3] = 1;
+
+	//OneCounterMatrix a(mata);
+ //   OneCounterMatrix b(matb);
+
+
+ExplicitMatrix mata(1);
+mata.coefficients[0] = RESET;
+
+ExplicitMatrix matb(1);
+matb.coefficients[0] =EPS;
+
+ExplicitMatrix matc(1);
+matc.coefficients[0] = INC;
+
+ExplicitMatrix matd(1);
+matd.coefficients[0] =OM;
+
+
+OneCounterMatrix a(mata);
+ OneCounterMatrix b(matb);
+OneCounterMatrix c(matc);
+ OneCounterMatrix d(matd);
+
+	//a.print();
+	//cout<<"\n";
+	//b.print();
 	
 	UnstableStabMonoid monoid(3);
 	
@@ -78,6 +110,8 @@ int main(int argc, char **argv)
 	
 	monoid.addLetter('a', mata);
 	monoid.addLetter('b', matb);
+    monoid.addLetter('c', matc);
+	monoid.addLetter('d', matd);
 
 	monoid.ComputeMonoid();
 	

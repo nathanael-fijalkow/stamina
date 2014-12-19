@@ -112,6 +112,61 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat, size_t 
 }
 
 
+// Construct a vector obtained by multiplying the line vec by all columns of mat, twice, and then disjunction of the two.
+const Vector * Matrix::sub_prod2(const Vector * vec1, const Vector ** mat1,const Vector * vec2, const Vector ** mat2, size_t stateNb){
+	if (vec1 == Matrix::zero_vector || vec2==Matrix::zero_vector)	return Matrix::zero_vector;
+//no Sparse_Matrix
+
+	uint * new_vec1 = (uint *)malloc(  vec1->bitsNb * sizeof(uint));
+	memset(new_vec1, 0, (size_t) ( vec1->bitsNb  * sizeof(uint) ));
+
+
+	for (int j = vec1->entriesNb - 1; j >=0; j--)
+	{
+		//cout << "Vector "; vec->print(); cout << endl;
+		//cout << "times "; mat[j]->print(); cout << endl;
+
+		bool ok = false;
+		if (mat1[j] != Matrix::zero_vector)
+			for (int i = 0; i < vec1->bitsNb; i++)
+			{
+			ok = (vec1->bits[i] & mat1[j]->bits[i]) != 0;
+			if (ok) break;
+			}
+		//cout << "Equal " << (ok ? 1 : 0) << endl;
+		new_vec1[j / (8 * sizeof(uint))] = (new_vec1[j / (8 * sizeof(uint)) ] << 1) | (ok ? 1 : 0);
+	}
+
+		uint * new_vec2 = (uint *)malloc(  vec2->bitsNb * sizeof(uint));
+	memset(new_vec2, 0, (size_t) ( vec2->bitsNb  * sizeof(uint) ));
+
+
+	for (int j = vec2->entriesNb - 1; j >=0; j--)
+	{
+		//cout << "Vector "; vec->print(); cout << endl;
+		//cout << "times "; mat[j]->print(); cout << endl;
+
+		bool ok = false;
+		if (mat2[j] != Matrix::zero_vector)
+			for (int i = 0; i < vec2->bitsNb; i++)
+			{
+			ok = (vec2->bits[i] & mat2[j]->bits[i]) != 0;
+			if (ok) break;
+			}
+		//cout << "Equal " << (ok ? 1 : 0) << endl;
+		new_vec2[j / (8 * sizeof(uint))] = (new_vec2[j / (8 * sizeof(uint)) ] << 1) | (ok ? 1 : 0);
+	}
+
+
+	uint * new_vec = (uint *)malloc(  vec1->bitsNb * sizeof(uint));
+	for (int i = 0; i < vec2->bitsNb; i++) new_vec[i]=new_vec1[i] | new_vec2[i];
+	
+
+	auto it = vectors.emplace(new_vec, vec1->entriesNb, false).first;
+	//cout << "Final result "; (*it).print(); cout << endl;
+	return &(*it);
+}
+
 // Create a new vector, keep only coordinates of v that are true in tab
 #if USE_SPARSE_MATRIX
 const Vector * Matrix::purge(const Vector *varg, bool * tab){
@@ -126,8 +181,12 @@ const Vector * Matrix::purge(const Vector *varg, bool * tab){
 	for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++)
 		if (tab[*ent]) *data++ = *ent;
 
-	unordered_set<Vector>::iterator it = vectors.emplace(datastart, nbtab, false).first;
+	unordered_set<Vector>::iterator it = vectors.emplace(datastart, nbtab).first;
 	return &(*it);
+
+	free(new_vec1);
+	free(new_vec2);
+	free(new_vec);
 }
 #else
 // Create a new vector, keep only coordinates of v that are true in tab

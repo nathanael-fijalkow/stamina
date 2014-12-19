@@ -110,7 +110,14 @@ Matrix * OneCounterMatrix::prod(const Matrix * pmat1) const
 
 	uint n = mat1.stateNb;
 	OneCounterMatrix * result = new OneCounterMatrix(n);
-	for (char act = 0; act<4; act++){
+
+
+	for (uint i = 0; i < n; i++)//special case for the reset: reset on one side and increment on the other is enough
+	{
+	result->rows[RESET][i] = sub_prod2(mat1.rows[RESET][i], mat2.cols[INC],mat1.rows[INC][i], mat2.cols[RESET], n);
+	result->cols[RESET][i] = sub_prod2(mat2.cols[INC][i], mat1.rows[RESET],mat2.cols[INC][i], mat1.rows[RESET], n);
+	}
+	for (char act = EPS; act<4; act++){
 		for (uint i = 0; i < n; i++)
 		{
 			result->rows[act][i] = sub_prod(mat1.rows[act][i], mat2.cols[act], n);
@@ -137,29 +144,26 @@ Matrix * OneCounterMatrix::stab() const
 
 	//a peaufiner, pour l'instant 1 a priori, on ne prend que celui du premier vecteur.
 	uint bitsN = rows[0][0]->bitsNb;
-	uint *diag = (uint *)malloc(bitsN * sizeof(uint));
 	uint *new_row = (uint *)malloc(bitsN * sizeof(uint));
 	uint *new_col = (uint *)malloc(bitsN * sizeof(uint));
 
 	for (char act = 0; act<4; act++){
-	
+		if(act==INC) continue;
+		diags[act]=(uint *)malloc(bitsN * sizeof(uint));
 		for (int b = 0; b<bitsN; b++){ //initialisation de la diagonale
-			diag[b] = 0;
+			diags[act][b] = 0;
 		}
 		//compute the diagonal 
-		cout << " act:" << (int)act << "\n";
+		//cout << " act:" << (int)act << "\n";
 		for (int i = 0; i <n; i++)
 		{
 			bool d = rows[act][i]->contains(i);
 			cout << d;
-			if (d) diag[i / (8 * sizeof(uint))] = (diag[i / (8 * sizeof(uint))]) | (1 << (i % (sizeof(uint) * 8)));
+			if (d) diags[act][i / (8 * sizeof(uint))] |= (1 << (i % (sizeof(uint) * 8)));
 
 		}
-		cout << "\n";
-		diags[act] = diag;
-
-
 	}
+	//system("pause");
 	diags[INC] = diags[EPS]; //IC impossible, restriction to E
 
 	bool t = 0;//temporary result for coef i,j
@@ -188,7 +192,8 @@ Matrix * OneCounterMatrix::stab() const
 
 	free(new_row);
 	free(new_col);
-	free(diag);
+
+	free(diags[RESET]);free(diags[EPS]);free(diags[OM]);
 
 	result->update_hash();
 	cout << "\nStabResult:\n";
