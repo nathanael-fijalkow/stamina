@@ -57,12 +57,16 @@ ostream& operator<<(ostream& st, const Monoid & monoid)
 
 
 
+void UnstableMonoid::clear_known_data()
+{
+	Matrix::vectors.clear();
+}
+
 void UnstableMonoid::init(int dim)
 {
 	this->dim = dim;
 	_sharp_height = 0;
 	cnt = 0;
-	Matrix::vectors.clear();
 #if USE_SPARSE_MATRIX
 	Matrix::zero_vector = &*Matrix::vectors.emplace(0).first;
 #else
@@ -79,30 +83,7 @@ UnstableMonoid::UnstableMonoid(int dim)
 };
 
 
-// Constructor
-UnstableStabMonoid::UnstableStabMonoid(uint dim)
-{
-	init(dim);
-};
 
-// Free known vectors
-UnstableMonoid::~UnstableMonoid()
-{
-	Matrix::vectors.clear();
-	Matrix::zero_vector = NULL;;
-};
-
-Matrix * UnstableStabMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
-{
-	return new OneCounterMatrix(mat);
-}
-
-pair <Matrix *, bool> UnstableStabMonoid::addMatrix(Matrix * mat)
-{
-	OneCounterMatrix * mmat = (OneCounterMatrix *)mat;
-	auto it = matrices.emplace(*mmat);
-	return pair<Matrix *, bool>((Matrix *)&(*it.first), it.second);
-}
 
 // Adds a letter
 const Matrix * UnstableMonoid::addLetter(char a, ExplicitMatrix & mat)

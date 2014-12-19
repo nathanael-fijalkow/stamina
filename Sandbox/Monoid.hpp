@@ -61,6 +61,9 @@ public:
 	// Adds a rewrite rule
 	void addRewriteRule(const ExtendedExpression *, const ExtendedExpression *);
 
+	//clear all known vectors and matrices
+	static void clear_known_data();
+
 	// Three sets containing the known expressions
 	unordered_set<SharpedExpr> sharpExpressions;
 	unordered_set<ConcatExpr> concatExpressions;
@@ -131,32 +134,5 @@ protected:
 
 
 
-#endif
-
-
-protected:
-	pair <Matrix *, bool> addMatrix(Matrix * mat);
-
-	/* converts an explicit matrix */
-	Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
-
-};
-
-
-class UnstableStabMonoid : public UnstableMonoid
-{
-public:
-		// Creates zero vector
-	UnstableStabMonoid(uint dim);
-
-	// The set containing the known matrices
-	unordered_set <OneCounterMatrix> matrices;
-
-	protected:
-	pair <Matrix *, bool> addMatrix(Matrix * mat);
-
-	/* converts an explicit matrix */
-	Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
-};
 
 #endif

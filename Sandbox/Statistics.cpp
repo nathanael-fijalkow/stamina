@@ -52,6 +52,8 @@ int main(int argc, char **argv)
 		cout << endl << "#" << nb  << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed <<  endl;
 		file2 << endl << "#" << nb << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed << endl;
 
+		UnstableMarkovMonoid::clear_known_data();
+
 		UnstableMarkovMonoid monoid(n);
 
 		ExplicitMatrix m1(n), m2(n);

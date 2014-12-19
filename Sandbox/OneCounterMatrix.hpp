@@ -37,17 +37,17 @@ public:
 protected:
 
 	// Four C-style matrices of size stateNb containing all rows, state per state
-	const Vector ** rows[4];
-	const Vector ** cols[4];
+	const Vector *** rows;
+	const Vector *** cols;
 
 	void update_hash()
 	{
 		_hash = 0;
 		for (int i = 0; i<4; i++){
 			for (const Vector ** p = rows[i]; p != rows[i] + stateNb; p++)
-				_hash ^= std::hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+				_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 			for (const Vector ** p = cols[i]; p != cols[i] + stateNb; p++)
-				_hash ^= std::hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
+				_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 		}
 	};
 

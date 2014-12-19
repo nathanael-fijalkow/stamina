@@ -1,8 +1,7 @@
 #include <iostream>
 
-#include "Expressions.hpp"
-#include "Matrix.hpp"
-#include "Monoid.hpp"
+#include "MarkovMonoid.hpp"
+#include "StabilisationMonoid.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -18,7 +17,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	cout << "Acme++ rules" << endl;
-	/*
+	
 	ExplicitMatrix mata(3);
 	mata.coefficients[0] = 5;
 	mata.coefficients[1] = 1;
@@ -49,8 +48,8 @@ int main(int argc, char **argv)
 	b.print();
 	
 	UnstableStabMonoid monoid(3);
-	*/
-
+	
+	/*
 
  	ExplicitMatrix mata(2);
 	mata.coefficients[0] = 2;
@@ -64,14 +63,18 @@ int main(int argc, char **argv)
 	matb.coefficients[2] = 0;
 	matb.coefficients[3] = 2;
 
+
 	ProbMatrix a(mata);
     ProbMatrix b(matb);
 
+
 	UnstableMarkovMonoid monoid(2);
-	
+
 	a.print();
-	cout<<"\n";
+	cout << "\n";
 	b.print();
+
+	*/
 	
 	monoid.addLetter('a', mata);
 	monoid.addLetter('b', matb);
