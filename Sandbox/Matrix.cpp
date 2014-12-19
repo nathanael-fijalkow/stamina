@@ -111,6 +111,34 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat, size_t 
 #endif
 }
 
+const Vector * Matrix::sub_prodor(const Vector * vec, const Vector ** mat, const Vector * vecor, size_t stateNb)
+{
+	uint * new_vec = (uint *)malloc(vec->bitsNb * sizeof(uint));
+	memset(new_vec, 0, (size_t)(vec->bitsNb  * sizeof(uint)));
+
+
+	for (int j = vec->entriesNb - 1; j >= 0; j--)
+	{
+		//cout << "Vector "; vec->print(); cout << endl;
+		//cout << "times "; mat[j]->print(); cout << endl;
+
+		bool ok = false;
+		if (mat[j] != Matrix::zero_vector)
+			for (int i = 0; i < vec->bitsNb; i++)
+			{
+			ok = (vec->bits[i] & mat[j]->bits[i]) != 0;
+			if (ok) break;
+			}
+		//cout << "Equal " << (ok ? 1 : 0) << endl;
+		new_vec[j / (8 * sizeof(uint))] = (new_vec[j / (8 * sizeof(uint))] << 1) | (ok ? 1 : 0);
+		new_vec[j] |= vecor->bits[j];
+	}
+
+	auto it = vectors.emplace(new_vec, vec->entriesNb).first;
+	free(new_vec);
+	//cout << "Final result "; (*it).print(); cout << endl;
+	return &(*it);
+}
 
 // Construct a vector obtained by multiplying the line vec by all columns of mat, twice, and then disjunction of the two.
 const Vector * Matrix::sub_prod2(const Vector * vec1, const Vector ** mat1,const Vector * vec2, const Vector ** mat2, size_t stateNb){

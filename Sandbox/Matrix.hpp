@@ -92,6 +92,8 @@ protected:
 	// Function used in the product
 	static const Vector * sub_prod(const Vector *, const Vector **, size_t stateNb);
 
+	static const Vector * sub_prodor(const Vector *, const Vector **, const Vector *,size_t stateNb);
+
 	//used in the product of OneCounter
 	static const Vector * sub_prod2(const Vector * vec1, const Vector ** mat1,const Vector * vec2, const Vector ** mat2, size_t stateNb);
 

@@ -58,14 +58,34 @@ void OneCounterMatrix::print(std::ostream & os) const
 {
 	// CAUTION: sparse matrix not implemented
 	string actions = "REIO";
-	//cout << "Row description " << endl;
+	/*
 	for (uint i = 0; i < stateNb; i++){
+		for (char act = 0; act < 4; act++){
+				{
+					const Vector & row = *rows[act][i];
+					os << row.bits << endl;
+				}
+		}
+	}
 
+	for (uint i = 0; i < stateNb; i++){
+		for (char act = 0; act < 4; act++){
+				{
+					const Vector & col = *cols[act][i];
+					os << col.bits << endl;
+				}
+		}
+	}
+	*/
+
+
+		//cout << "Row description " << endl;
+	for (uint i = 0; i < stateNb; i++){
 		os << i << ":" << " ";
-
 		for (uint j = 0; j < stateNb; j++){
 			//find the char to print as the minimal one
 			bool search = true;
+		//	os << "{";
 			for (char act = 0; act<4; act++){
 				const Vector & row = *rows[act][i];
 				if (row.contains(j)){
@@ -75,6 +95,7 @@ void OneCounterMatrix::print(std::ostream & os) const
 				}
 			}
 			if (search) os << '_';
+//			os << "}";
 
 		}
 		os << endl;
@@ -115,15 +136,24 @@ Matrix * OneCounterMatrix::prod(const Matrix * pmat1) const
 	for (uint i = 0; i < n; i++)//special case for the reset: reset on one side and increment on the other is enough
 	{
 	result->rows[RESET][i] = sub_prod2(mat1.rows[RESET][i], mat2.cols[INC],mat1.rows[INC][i], mat2.cols[RESET], n);
-	result->cols[RESET][i] = sub_prod2(mat2.cols[INC][i], mat1.rows[RESET],mat2.cols[INC][i], mat1.rows[RESET], n);
+	result->cols[RESET][i] = sub_prod2(mat2.cols[RESET][i], mat1.rows[INC],mat2.cols[INC][i], mat1.rows[RESET], n);
 	}
-	for (char act = EPS; act<4; act++){
+
+	for (uint i = 0; i < n; i++)
+	{
+		result->rows[EPS][i] = sub_prodor(mat1.rows[EPS][i], mat2.cols[EPS], result->rows[RESET][i], n);
+		result->cols[EPS][i] = sub_prodor(mat2.cols[EPS][i], mat1.rows[EPS], result->cols[RESET][i], n);
+	}
+
+	for (char act = INC; act<4; act++){
 		for (uint i = 0; i < n; i++)
 		{
 			result->rows[act][i] = sub_prod(mat1.rows[act][i], mat2.cols[act], n);
 			result->cols[act][i] = sub_prod(mat2.cols[act][i], mat1.rows[act], n);
 		}
 	}
+
+
 	result->update_hash();
 	cout << "\n Result: \n";
 	result->print();
