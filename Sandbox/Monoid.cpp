@@ -313,11 +313,12 @@ void UnstableMonoid::CloseByProduct()
 			const ExtendedExpression * expr_right = new_elements[j];
 			process_expression(expr_left,expr_right);
 			process_expression(expr_right,expr_left);
-			if (--cnt == 0)
+/*			if (--cnt == 0)
 			{
 				cout << "Scanning known elts: ";
 				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i - 1) + new_elements.size()* new_elements.size());
 			}
+			*/
 			j++;
 		}
 		i++;		
@@ -335,11 +336,12 @@ void UnstableMonoid::CloseByProduct()
 		{
 			const ExtendedExpression * expr_right = new_elements[j];
 			process_expression(expr_left,expr_right);
-			if (--cnt == 0)
+/*			if (--cnt == 0)
 			{
 				cout << "Scanning new elts: ";
 				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i -1));
 			}
+			*/
 			j++;
 		}
 		i++;			
