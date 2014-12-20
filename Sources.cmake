@@ -1,6 +1,11 @@
 set (SOURCES
 	Expressions.cpp
-	MarkovMonoid.cpp
+	Vector.cpp
 	Matrix.cpp
-    )
+    ProbMatrix.cpp
+    OneCounterMatrix.cpp
+	Monoid.cpp
+	StabilisationMonoid.cpp
+	MarkovMonoid.cpp
+	)
 

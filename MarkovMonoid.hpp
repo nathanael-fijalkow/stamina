@@ -1,82 +1,45 @@
+/* INCLUDES */
 #ifndef MARKOV_MONOID_HPP
 #define MARKOV_MONOID_HPP
 
-#include <map>
+#include "ProbMatrix.hpp"
+#include "Monoid.hpp"
 
-#include "Matrix.hpp"
-#include "Expressions.hpp"
 
-using namespace std;
 
-// This class describes a Markov Monoid
-class MarkovMonoid
+class UnstableMarkovMonoid : public UnstableMonoid
 {
 public:
-	// the two maps are inverses of one another
-	map <const ExtendedExpression *, const Matrix *> expr_to_mat;
-	map <const Matrix *, const ExtendedExpression *> mat_to_expr;
-
-	// the map of rewrite rules
-	map <const ExtendedExpression *, const ExtendedExpression *> rewriteRules;
-
-	// Print
-	void print();
-
-protected:
-	// Constructor
-	MarkovMonoid(){};
-};
-
-// This class describes Markov Monoid under construction, it extends the class MarkovMonoid
-class UnstableMarkovMonoid : public MarkovMonoid
-{
-public:
-
-	// creates zero vector
+	// Creates zero vector
 	UnstableMarkovMonoid(uint dim);
 
-	// Cleans up knowns vectors
-	~UnstableMarkovMonoid();
-
-	// Adds a new letter
-	void addLetter(char a, ExplicitMatrix & mat);
-
-	// Adds a pair (expression, matrix) in the monoid
-	void addElement(const ExtendedExpression *, const Matrix * mat);
-
-	// Adds a rewrite rule
-	void addRewriteRule(const ExtendedExpression *, const ExtendedExpression *);
-
-	// Three sets containing the known expressions
-	unordered_set<SharpedExpr> sharpExpressions;
-	unordered_set<ConcatExpr> concatExpressions;
-	unordered_set<LetterExpr> letterExpressions;
-
 	// The set containing the known matrices
-	unordered_set <Matrix> matrices;
+	unordered_set<ProbMatrix> matrices;
 
-	// The vector of known elements
-	vector<const ExtendedExpression *> elements;
+	//Computes the maximum number of leaks and the associated expression 
+	pair<int, const ExtendedExpression *> maxLeakNb();
 
-	// The vector of elements added at last closure by product step
-	vector<const ExtendedExpression *> new_elements;
+	//get recurrent states
+	const Vector * recurrent_states(const Matrix * mat);
 
-	// Function closing the current monoid by concatenating all elements
-	bool CloseByProduct();
+	//get recurrence classes
+	const Vector * recurrence_classes(const Matrix * mat);
 
-	// Function closing the current monoid by stabilizing all idempotents elements
-	void CloseByStabilization();
+#if CACHE_RECURRENT_STATES
+	// maps from matrice to states which are recurrent
+	map <const Matrix *, const Vector *> mat_to_recurrent_states;
+	// maps from matrice to one recurrent state per class
+	map <const Matrix *, const Vector *> mat_to_recurrence_classes;
+
+#endif
+
 
 protected:
+	pair <Matrix *, bool> addMatrix(Matrix * mat);
 
-	// Function processing an expression, computing products
-	void process_expression(const ExtendedExpression * elt_left,const ExtendedExpression * elt_right);
+	/* converts an explicit matrix */
+	Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
 
-	// Function processing an expression, computing stabilization
-	void sharpify_expression(const ExtendedExpression *);
-
-	// Number of states of the automaton
-	uint dim;
 };
 
 

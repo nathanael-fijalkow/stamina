@@ -1,8 +1,7 @@
 #include <iostream>
 
-#include "Expressions.hpp"
-#include "Matrix.hpp"
 #include "MarkovMonoid.hpp"
+#include "StabilisationMonoid.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -14,100 +13,195 @@
 
 using namespace std;
 
+
 int main(int argc, char **argv)
 {
 	cout << "Acme++ rules" << endl;
 
-	unsigned int seed = time(NULL);
+	/*
+	ExplicitMatrix mata(3);
+	mata.coefficients[0] = BOT;
+	mata.coefficients[1] = EPS;
+	mata.coefficients[2] = INC;
+	mata.coefficients[3] = INC;
+	mata.coefficients[4] = EPS;
+	mata.coefficients[5] = BOT;
+	mata.coefficients[6] = BOT;
+	mata.coefficients[7] = BOT;
+	mata.coefficients[8] = RESET;
 
-	unsigned int nb_samples = 1;
+	ExplicitMatrix matb(3);
+	matb.coefficients[0] = RESET;
+	matb.coefficients[1] = INC;
+	matb.coefficients[2] = RESET;
+	matb.coefficients[3] = BOT;
+	matb.coefficients[4] = EPS;
+	matb.coefficients[5] = INC;
+	matb.coefficients[6] = RESET;
+	matb.coefficients[7] = BOT;
+	matb.coefficients[8] = INC;
+	*/
 
-	float pzeros = 0.6f;
-	float ppluses = 0.025f;
+	
+	string mat = "";
+	mat += "___I__E";
+	mat += "__R____";
+	mat += "_I__E__";
+	mat += "_____E_";
+	mat += "_I_____";
+	mat += "_I__E__";
+	mat += "E_R____";
 
-	int int0 = (int)(pzeros * RAND_MAX);
-	int int1 = (int)((pzeros + ppluses) * RAND_MAX);
+	ExplicitMatrix mata(7);
+	for (int i = 0; i < 7 * 7; i++)
+		mata.coefficients[i] =
+		(mat[i] == '_') ? BOT :
+		(mat[i] == 'I') ? INC :
+		(mat[i] == 'E') ? EPS :
+		(mat[i] == 'R') ? RESET:
+		-1;
 
-	int max_state_nb = 10;
+	mat = "";
+	mat += "__E____";
+	mat += "__E__I_";
+	mat += "____I__";
+	mat += "__I____";
+	mat += "_I_____";
+	mat += "E_____I";
+	mat += "_______";
 
-	stringstream filename;
-	filename << "Experiment seed " << seed << " samples " << nb_samples;
-	filename << " densities 0 plus 1 " << (int)(1000 * pzeros) << "  " << (int)(1000 * ppluses) << " " << (int)(1000 * (1.0 - ppluses - pzeros));
-	filename << ".csv";
+	ExplicitMatrix matb(7);
+	for (int i = 0; i < 7 * 7; i++)
+		matb.coefficients[i] =
+		(mat[i] == '_') ? BOT :
+		(mat[i] == 'I') ? INC :
+		(mat[i] == 'E') ? EPS :
+		(mat[i] == 'R') ? RESET :
+		-1;
 
-	ofstream file(filename.str());
+	mat = "";
+	mat += "_R_____";
+	mat += "___R___";
+	mat += "__E__E_";
+	mat += "_______";
+	mat += "____I__";
+	mat += "__II___";
+	mat += "R____RR";
 
-	file << "Size;Seed;ElementsNb;RewriteRulesNb;VectorNb" << endl;
+	ExplicitMatrix matc(7);
+	for (int i = 0; i < 7 * 7; i++)
+		matc.coefficients[i] =
+		(mat[i] == '_') ? BOT :
+		(mat[i] == 'I') ? INC :
+		(mat[i] == 'E') ? EPS :
+		(mat[i] == 'R') ? RESET :
+		-1;
+		
 
-	uint nb = 0;
-	while (nb++ < nb_samples)
-	{
+	/*
+	ExplicitMatrix mata(3);
+	mata.coefficients = new char[64] { BOT, EPS };
+	mata.coefficients[1] = EPS;
+	mata.coefficients[2] = INC;
+	mata.coefficients[3] = INC;
+	mata.coefficients[4] = EPS;
+	mata.coefficients[5] = BOT;
+	mata.coefficients[6] = BOT;
+	mata.coefficients[7] = BOT;
+	mata.coefficients[8] = RESET;
 
-		seed = hash_value( seed << 6 | seed >> 3);
-		srand(seed);
+	ExplicitMatrix matb(3);
+	matb.coefficients[0] = RESET;
+	matb.coefficients[1] = INC;
+	matb.coefficients[2] = RESET;
+	matb.coefficients[3] = BOT;
+	matb.coefficients[4] = EPS;
+	matb.coefficients[5] = INC;
+	matb.coefficients[6] = RESET;
+	matb.coefficients[7] = BOT;
+	matb.coefficients[8] = INC;
+	*/
+/*
+	
+ 	ExplicitMatrix mata(2);
+	mata.coefficients[0] = INC;
+	mata.coefficients[1] = BOT;
+	mata.coefficients[2] = BOT;
+	mata.coefficients[3] = INC;
 
-		int n = 10 + (rand() % max_state_nb);
+	ExplicitMatrix matb(2);
+	matb.coefficients[0] = BOT;
+	matb.coefficients[1] = EPS;
+	matb.coefficients[2] = BOT;
+	matb.coefficients[3] = E;
+	*/
+	
+	/*
+	OneCounterMatrix a(mata);
+    OneCounterMatrix b(matb);
+	OneCounterMatrix c(matc);
+	*/
 
-		cout << endl;
-		cout << "************ " << nb << "/" << nb_samples << " SIZE " << n << " SEED " << seed << "  **********" << endl;
+//ExplicitMatrix mata(1);
+//mata.coefficients[0] = RESET;
+//
+//ExplicitMatrix matb(1);
+//matb.coefficients[0] =EPS;
+//
+//ExplicitMatrix matc(1);
+//matc.coefficients[0] = INC;
+//
+//ExplicitMatrix matd(1);
+//matd.coefficients[0] =OM;
+//
 
-		srand(seed);
+//OneCounterMatrix a(mata);
+// OneCounterMatrix b(matb);
+//OneCounterMatrix c(matc);
+// OneCounterMatrix d(matd);
 
-		UnstableMarkovMonoid monoid(n);
+	//a.print();
+	//cout<<"\n";
+	//b.print();
+	
+	UnstableStabMonoid monoid(7);
+	
+	/*
+
+ 	ExplicitMatrix mata(2);
+	mata.coefficients[0] = 2;
+	mata.coefficients[1] = 2;
+	mata.coefficients[2] = 0;
+	mata.coefficients[3] = 2;
+
+	ExplicitMatrix matb(2);
+	matb.coefficients[0] = 2;
+	matb.coefficients[1] = 0;
+	matb.coefficients[2] = 0;
+	matb.coefficients[3] = 2;
 
 
-		ExplicitMatrix m1(n), m2(n);
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < n; j++)
-			{
-				int r = rand();
-				if (r < int0)
-					m1.coefficients[n*i + j] = 0;
-				else if (r > int1)
-					m1.coefficients[n*i + j] = 2;
-				else
-					m1.coefficients[n*i + j] = 1;
-				r = rand();
-				if (r < int0)
-					m2.coefficients[n*i + j] = 0;
-				else if (r > int1)
-					m2.coefficients[n*i + j] = 2;
-				else
-					m2.coefficients[n*i + j] = 1;
-			}
-		}
+	ProbMatrix a(mata);
+    ProbMatrix b(matb);
 
-		cout << "Computing matrix " << endl;
-		monoid.addLetter('a', m1);
-		monoid.addLetter('b', m2);
 
-		int sz = monoid.elements.size();
-		cout << sz << " elements in the tab elements." << endl;
-		cout << "Closing by product " << endl;
+	UnstableMarkovMonoid monoid(2);
 
-		monoid.CloseByProduct();
+	*/
 
-		int s = monoid.expr_to_mat.size();
-		cout << s << " elements." << endl;
-		cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
+	
+	
+ monoid.addLetter('a', mata);
+	monoid.addLetter('b', matb);
+//	monoid.addLetter('c', matc);
+	//   monoid.addLetter('c', matc);
+//	monoid.addLetter('d', matd);
 
-		monoid.print();
+	monoid.ComputeMonoid();
+	
+	cout << monoid.expr_to_mat.size() << " elements." << endl;
+	cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
 
-		cout << "Closing by stabilization " << endl;
-
-		monoid.CloseByStabilization();
-
-		s = monoid.expr_to_mat.size();
-		cout << s << " elements." << endl;
-		cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
-
-		monoid.print();
-
-	}
-
-	file.close();
-
-	cout << "Experiment over " << endl;
-
+	//monoid.print() ;
+	system("pause");
 }

@@ -1,16 +1,26 @@
+/* INCLUDES */
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
+
+#include <string.h>
+#include <iostream>
 #include <unordered_set>
-#include <vector>
 
 #include "Expressions.hpp"
+#include "Vector.hpp"
 
 typedef size_t HashMat;
 typedef size_t HashRowCol;
 
+
 using namespace std;
 
+/* if 1 recurrent states and idempotent matrices are stored in a static array*/
+#define CACHE_RECURRENT_STATES 1
+
+
+/* CLASS DEFINITIONS */
 // Class of explicit matrices, represented as arrays
 class ExplicitMatrix
 {
@@ -19,189 +29,83 @@ public:
 	const uint stateNb;
 
 	// coefficients is a C-style array
-	//  the coefficient i,j is stored at position  i * n + j
+	// the coefficient i,j is stored at position  i * n + j
 	// 0 means 0, 1 means +, 2 means 1
 	char * coefficients;
 
 	// Constructor 
 	ExplicitMatrix(uint stateNb);
 
+	//Random matrix
+	static ExplicitMatrix  * random(uint stateNb);
+
 	// Free a useless explicit matrix
 	~ExplicitMatrix();
 };
 
-// Class of vectors
-class Vector
-{
-public:
-	// Entries is a C-style array containing all the non-zero values in increasing order
-	size_t * entries;
-
-	// Number of non-zero entries
-	const uint entriesNb;
-
-	// Constructor
-	Vector(uint size);
-
-	// Constructor
-	Vector(const Vector & other);
-
-	// ????
-	Vector(vector <size_t> data);
-
-	// ?????
-	Vector(size_t * data, size_t data_size);
-
-	// Function returning the hash
-	size_t Hash() const { return _hash; };
-
-	// Equality operator
-	bool operator == (const Vector & vec) const;
-
-	// Free a useless vector
-	~Vector();
-
-	//
-	const size_t * end() const { return entries + entriesNb; };
-
-	// Print
-	void print() const;
-
-protected:
-
-	// Hash
-	size_t _hash;
-
-	static hash <vector <bool> > hash_val;
-
-	// Function computing the hash
-	void update_hash(){
-	_hash = 0;
-	for (size_t * index = entries; index != entries + entriesNb; index++)
-		_hash ^= hash_value(*index) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	} ;
-
-private:
-
-	// Equality operator
-	Vector & operator = (const Vector & other);
-
-};
-
-/* Defines default hash for the class of Vector */
-namespace std
-{
-	template <> struct hash< Vector >
-	{
-		size_t operator()(const Vector & expr) const
-		{
-			return expr.Hash();
-		}
-	};
-}
 
 class Matrix
 {
 public:
-	// Number of states of the matrix
-	const uint stateNb;
-
-	// Constructor
-	Matrix(const ExplicitMatrix &);
-
-	// Constructor
-	Matrix(uint stateNb);
+	// Number of states of the matrix is Vector::StateNb
+	// Constructor from state nb
+	Matrix();
 
 	// Print
-	virtual void print() const = 0;
-
-	// Equality operator
-	virtual bool operator == (const Matrix & mat) const = 0;
+	virtual void print(std::ostream& os = std::cout) const = 0;
 
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns
-	//the caller is in charge of deleting the return object
-	virtual Matrix * prod(const Matrix *) const = 0;
+	//The caller is in charge of deleting the returned object
+	virtual Matrix * prod(const Matrix  *) const = 0;
+
+	// compute stabilisation
+	//The caller is in charge of deleting the returned object
 	virtual Matrix * stab() const = 0;
 
 	// Function returning the hash
 	HashMat hash() const { return _hash; };
 
+	// Function checking whether a matrix is idempotent
+	virtual bool isIdempotent() const = 0;
+
+	// Two STATIC elements
 	// This is the set of known vectors
-	// Note that it is static
-	static unordered_set <Vector> vectors;
+	static std::unordered_set <const Vector> vectors;
 
 	// This is the constant vector with only zero entries
 	static const Vector * zero_vector;
 
-	// Function checking whether a matrix is idempotent
-	bool isIdempotent() const;
+	// True if it is unecessary to use centralized vector storage
+	static bool UseCentralizedVectorStorage(){ return Vector::GetBitSize() > 1; }
 
 protected:
+
 	// The hash expression
 	HashMat _hash;
 
 	// Function computing the hash
 	virtual void update_hash() = 0;
 	
-	// Function allocating memory for pluses and ones
-	void allocate();
-
 	// Function used in the product
-	static const Vector * sub_prod(const Vector *, const Vector **, size_t stateNb);
-
-	// Function checking whether a state is idempotent
-    bool recurrent(int) const;
-};
+	static const Vector * sub_prod(const Vector *, const Vector **);
 
 
-class ProbMatrix : public Matrix
-{
-public:
-	// Function computing the product and stabilization
-	// They update the matrices, rows and columns
-	//the caller is in charge of deleting the return object
-	Matrix * prod(const Matrix *) const;
-	Matrix * stab() const;
-
-	// Print
-	void print() const;
-
-	// Equality operator
-	bool operator == (const Matrix & mat) const;
-
-protected:
-	// Four C-style matrices of size stateNb containing all rows, state per state
-	const Vector ** row_pluses;
-	const Vector ** row_ones;
-	const Vector ** col_pluses;
-	const Vector ** col_ones;
-
-	void update_hash(){
-		_hash = 0;
-		for (const Vector ** p = col_ones; p != col_ones + stateNb; p++)
-			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-		for (const Vector ** p = col_pluses; p != col_pluses + stateNb; p++)
-			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-		for (const Vector ** p = row_ones; p != row_ones + stateNb; p++)
-			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-		for (const Vector ** p = row_pluses; p != row_pluses + stateNb; p++)
-			_hash ^= hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-	};
-
+	// Create a new vector, keep only coordinates of v that are true in tab
+#if USE_SPARSE_MATRIX
+	static const Vector * purge(const Vector *varg, bool * tab);
+#else
+	static const Vector * purge(const Vector *varg, const Vector * tab);
+#endif
 
 };
 
-class OneCounterMatrix : public Matrix
-{
-public:
-	// Function computing the product and stabilization
-	// They update the matrices, rows and columns
-	//the caller is in charge of deleting the return object
-	Matrix * prod(const Matrix *) const;
-	Matrix * stab() const;
 
-};
+
+
+/* for printing to a file */
+std::ostream& operator<<(std::ostream& os, const Matrix & mat);
+
 
 // Defines default hash for the matrix class
 namespace std
@@ -213,7 +117,7 @@ namespace std
 			return mat.hash();
 		}
 	};
-}
 
+}
 
 #endif
