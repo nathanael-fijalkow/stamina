@@ -3,6 +3,7 @@
 #include "Expressions.hpp"
 #include "Matrix.hpp"
 #include "MarkovMonoid.hpp"
+#include "StabilisationMonoid.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -25,7 +26,7 @@ int main(int argc, char **argv)
 	unsigned int nb_samples = 100000;
 
 
-	int max_state_nb = 10;
+	int max_state_nb = 12;
 
 	stringstream filename;
 	filename << "Experiment seed " << seed << " samples " << nb_samples << " maxstatenb " << max_state_nb;
@@ -53,7 +54,8 @@ int main(int argc, char **argv)
 		file2 << endl << "#" << nb << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed << endl;
 
 
-		UnstableMarkovMonoid monoid(n);
+//		UnstableMarkovMonoid monoid(n);
+		UnstableStabMonoid monoid(n);
 
 		ExplicitMatrix m1(n), m2(n);
 		int max_tries = 100;
@@ -62,14 +64,24 @@ int main(int argc, char **argv)
 			{
 				for (int j = 0; j < n; j++)
 				{
-					if (rand() < da)
-						m1.coefficients[n*i + j] = 0;
+					if (rand() < da / 2)
+						m1.coefficients[n*i + j] = BOT;
+					else if (rand() < da)
+						m1.coefficients[n*i + j] = INC;
+					else if (rand() < 2 * da)
+						m1.coefficients[n*i + j] = EPS;
 					else
-						m1.coefficients[n*i + j] = 2;
-					if (rand() < db)
-						m2.coefficients[n*i + j] = 0;
+						m1.coefficients[n*i + j] = RESET;
+
+					if (rand() < db / 2)
+						m2.coefficients[n*i + j] = BOT;
+					else if (rand() < db)
+						m2.coefficients[n*i + j] = INC;
+					else if (rand() < 2 * db)
+						m2.coefficients[n*i + j] = EPS;
 					else
-						m2.coefficients[n*i + j] = 2;
+						m2.coefficients[n*i + j] = RESET;
+
 				}
 				m1.coefficients[n * i + rand() % n] = 2;
 				m2.coefficients[n * i + rand() % n] = 2;
@@ -94,6 +106,7 @@ int main(int argc, char **argv)
 			cout << "Sharpheight " << monoid.sharp_height() << endl;
 			file2 << "Sharpheight " << monoid.sharp_height() << endl;
 
+			/*
 			auto l = monoid.maxLeakNb();
 			if (l.first == 0)
 			{
@@ -105,11 +118,11 @@ int main(int argc, char **argv)
 				cout << "Maxleaknb " << l.first << " on expression " << endl << *(l.second) << endl << "and matrix " << endl << *(monoid.expr_to_mat[l.second]) << endl;
 				file2 << "Maxleaknb " << l.first << " on expression " << endl << *(l.second) << endl << "and matrix " << endl << *(monoid.expr_to_mat[l.second]) << endl;
 			}
-			
+			*/
 			//file << "Size;Proba;Seed;ElementsNb;RewriteRulesNb;VectorNb;LeakNb" << endl;
 
 			file << nb << ";" << n << ";" << density_a << ";" << density_b << ";" << monoid.expr_to_mat.size();
-			file << ";" << monoid.rewriteRules.size() << ";" << Matrix::vectors.size() << ";" << l.first << ";" << monoid.sharp_height() << endl;
+			file << ";" << monoid.rewriteRules.size() << ";" << Matrix::vectors.size() << ";" << /* l.first << ";" << monoid.sharp_height() << */endl;
 
 			//		Sleep(10000);
 		}
