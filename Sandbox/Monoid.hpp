@@ -2,6 +2,8 @@
 #ifndef MONOID_HPP
 #define MONOID_HPP
 
+#include <mutex>
+
 #include <map>
 #include <set>
 
@@ -61,9 +63,6 @@ public:
 	// Adds a rewrite rule
 	void addRewriteRule(const ExtendedExpression *, const ExtendedExpression *);
 
-	//clear all known vectors and matrices
-	static void clear_known_data();
-
 	// Three sets containing the known expressions
 	unordered_set<SharpedExpr> sharpExpressions;
 	unordered_set<ConcatExpr> concatExpressions;
@@ -93,6 +92,9 @@ public:
 
 protected:
 
+	/* static mutex, one computation at a time */
+	static mutex singleton;
+
 	/* returns a pair with the Matrix inserted or an already known matrix and a bool indicating whether the matrix was already known */
 	virtual pair <Matrix *, bool> addMatrix(Matrix * mat) = 0;
 
@@ -106,9 +108,6 @@ protected:
 
 	// Function processing an expression, computing stabilization
 	void sharpify_expression(const ExtendedExpression *);
-
-	// Number of states of the automaton
-	uint dim;
 
 	//check idempotence
 	bool is_idempotent(const Matrix * mat);

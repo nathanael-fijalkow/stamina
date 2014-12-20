@@ -42,6 +42,7 @@ int main(int argc, char **argv)
 	matb.coefficients[8] = INC;
 	*/
 
+	
 	string mat = "";
 	mat += "___I__E";
 	mat += "__R____";
@@ -95,7 +96,7 @@ int main(int argc, char **argv)
 		(mat[i] == 'E') ? EPS :
 		(mat[i] == 'R') ? RESET :
 		-1;
-
+		
 
 	/*
 	ExplicitMatrix mata(3);
@@ -120,21 +121,21 @@ int main(int argc, char **argv)
 	matb.coefficients[7] = BOT;
 	matb.coefficients[8] = INC;
 	*/
-
-	/*
+/*
+	
  	ExplicitMatrix mata(2);
-	mata.coefficients[0] = 2;
-	mata.coefficients[1] = 5;
-	mata.coefficients[2] = 5;
-	mata.coefficients[3] = 2;
+	mata.coefficients[0] = INC;
+	mata.coefficients[1] = BOT;
+	mata.coefficients[2] = BOT;
+	mata.coefficients[3] = INC;
 
 	ExplicitMatrix matb(2);
-	matb.coefficients[0] = 5;
-	matb.coefficients[1] = 1;
-	matb.coefficients[2] = 5;
-	matb.coefficients[3] = 1;
-
+	matb.coefficients[0] = BOT;
+	matb.coefficients[1] = EPS;
+	matb.coefficients[2] = BOT;
+	matb.coefficients[3] = E;
 	*/
+	
 	/*
 	OneCounterMatrix a(mata);
     OneCounterMatrix b(matb);

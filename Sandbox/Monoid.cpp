@@ -57,14 +57,9 @@ ostream& operator<<(ostream& st, const Monoid & monoid)
 
 
 
-void UnstableMonoid::clear_known_data()
-{
-	Matrix::vectors.clear();
-}
-
 void UnstableMonoid::init(int dim)
 {
-	this->dim = dim;
+	Vector::SetSize(dim);
 	_sharp_height = 0;
 	cnt = 0;
 #if USE_SPARSE_MATRIX
@@ -73,12 +68,18 @@ void UnstableMonoid::init(int dim)
 	vector<bool> zero(dim);
 	for (int i = 0; i < dim; i++)
 		zero[i] = false;
-	Matrix::zero_vector = &*Matrix::vectors.emplace(zero).first;
+	if (Matrix::UseCentralizedVectorStorage())
+		Matrix::zero_vector = &*Matrix::vectors.emplace(zero).first;
 #endif
 }
 
+mutex UnstableMonoid::singleton;
+
 UnstableMonoid::UnstableMonoid(int dim)
 {
+	if(!singleton.try_lock())
+		throw runtime_error("Cannot create more than one unstable monoid at a time");
+
 	init(dim);
 };
 
@@ -88,8 +89,8 @@ UnstableMonoid::UnstableMonoid(int dim)
 // Adds a letter
 const Matrix * UnstableMonoid::addLetter(char a, ExplicitMatrix & mat)
 {
-//	if (mat.stateNb != dim)
-//		throw runtime_error("Cannot add an element of dim " + toString(mat.stateNb) + " to a monoid of size " + toString(dim));
+//	if (mat.Vector::GetStateNb() != dim)
+//		throw runtime_error("Cannot add an element of dim " + toString(mat.Vector::GetStateNb()) + " to a monoid of size " + toString(dim));
 
 	unordered_set<LetterExpr>::const_iterator it = letterExpressions.emplace(a).first;
 	auto pmat = convertExplicitMatrix(mat);
@@ -214,7 +215,7 @@ void UnstableMonoid::process_expression(const ExtendedExpression * elt_left, con
 
 	for (int right_idx = subtrees_nb_right - 1; right_idx >= 0; right_idx--)
 	{
-		for (int left_idx = subtrees_nb_right; left_idx < subtrees_nb; left_idx++)
+		for (uint left_idx = subtrees_nb_right; left_idx < subtrees_nb; left_idx++)
 		{
 			new_expr.sons = subtrees + right_idx;
 			new_expr.sonsNb = left_idx - right_idx + 1;
@@ -426,6 +427,8 @@ void UnstableMonoid::CloseByStabilization()
 
 void UnstableMonoid::ComputeMonoid()
 {
+	Matrix::vectors.clear();
+
 	cnt = MAX_MONOID_SIZE / 100;
 
 	new_elements.clear();

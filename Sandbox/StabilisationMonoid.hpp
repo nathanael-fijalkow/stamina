@@ -11,14 +11,16 @@ public:
 	// Creates zero vector
 	UnstableStabMonoid(uint dim);
 
-	// The set containing the known matrices
-	unordered_set <OneCounterMatrix> matrices;
+	// The set containing the known small matrices
+	unordered_set <OneCounterSmallMatrix> small_matrices;
+	unordered_set <OneCounterLargeMatrix> large_matrices;
 
 protected:
 	pair <Matrix *, bool> addMatrix(Matrix * mat);
 
 	/* converts an explicit matrix */
 	Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
+
 };
 
 

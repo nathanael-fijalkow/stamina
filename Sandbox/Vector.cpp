@@ -14,13 +14,7 @@ Vector::Vector(uint size) : entriesNb(size)
 	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
 }
 #else
-Vector::Vector(uint size) : entriesNb(size), bitsNb((entriesNb + 8 * sizeof(uint) - 1) / (8 * sizeof(uint)))
-{
-	allocate(size);
-}
-#endif
-
-void Vector::allocate(int size)
+Vector::Vector()
 {
 #if USE_SPARSE_MATRIX
 	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
@@ -28,20 +22,20 @@ void Vector::allocate(int size)
 	bits = (uint *)malloc(bitsNb * sizeof(uint));
 	memset(bits, (char)0, bitsNb * sizeof(uint));
 #endif
+	update_hash();
 }
+#endif
 
 
 // Second constructor
-Vector::Vector(const Vector & other) : entriesNb(other.entriesNb), bitsNb((entriesNb + 8 * sizeof(uint) - 1) / (8 * sizeof(uint)))
+Vector::Vector(const Vector & other)
 {
-	allocate(other.entriesNb);
-
-	_hash = other.Hash();
 #if USE_SPARSE_MATRIX
 	memcpy(entries, other.entries, entriesNb * sizeof(size_t));
 #else
 	memcpy(bits, other.bits, bitsNb * sizeof(size_t));
 #endif
+	_hash = other.Hash();
 }
 
 // Third constructor
@@ -53,14 +47,10 @@ Vector::Vector(vector<size_t> data) : entriesNb(data.size()), bitsNb((entriesNb 
 	for (vector<size_t>::iterator it = data.begin(); it != data.end(); it++)
 		*p++ = *it;
 #else
-Vector::Vector(vector<bool> data) : entriesNb(data.size()), bitsNb((entriesNb + 8 * sizeof(uint) - 1) / (8 * sizeof(uint)))
+Vector::Vector(vector<bool> data)
 {
-	allocate(entriesNb);
 	for (int i = data.size() - 1; i >= 0; i--)
-	{
 		bits[i / (8 * sizeof(uint))] = (bits[i / (8 * sizeof(uint))] << 1) | (data[i] ? 1 : 0);
-		//		cout << "i:" << i << " bool " << data[i] << " stored " << bits[i / (8 * sizeof(uint))] << endl;
-	}
 #endif
 	update_hash();
 }
@@ -81,7 +71,7 @@ Vector::Vector(size_t * data, size_t data_size, bool copy) : entriesNb(data_size
 	update_hash();
 };
 #else
-Vector::Vector(uint * data, size_t entriesNb, bool copy) : entriesNb(entriesNb), bitsNb((entriesNb + 8 * sizeof(uint) - 1) / (8 * sizeof(uint)))
+Vector::Vector(uint * data, bool copy)
 {
 	if (copy)
 	{
@@ -103,11 +93,17 @@ void Vector::print(ostream & os) const
 		os << *v << " ";
 	os << endl;
 #else
-	for (int i = 0; i < entriesNb; i++)
+	for (uint i = 0; i < entriesNb; i++)
 		os << (contains(i) ? "1" : "0");
 	os << endl;
 #endif
 }
+
+// Number of entries
+uint Vector::entriesNb = 0;
+
+// size of the bits array
+uint Vector::bitsNb = 0;
 
 Vector::~Vector()
 {
@@ -133,7 +129,7 @@ bool Vector::operator==(const Vector & vec) const
 			return false;
 	}
 #else
-	for (int i = 0; i < bitsNb; i++)
+	for (uint i = 0; i < bitsNb; i++)
 		if (bits[i] != vec.bits[i]) return false;
 #endif
 	return true;

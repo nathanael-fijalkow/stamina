@@ -26,24 +26,34 @@ public:
 	const size_t * end() const { return entries + entriesNb; };
 
 #else
-	// Number of entries
-	const uint entriesNb;
+
+	//set Vector size
+	static void SetSize(uint size)
+	{
+		entriesNb = size;
+		bitsNb = (entriesNb + 8 * sizeof(uint) - 1) / (8 * sizeof(uint));
+	}
+
+	static uint GetStateNb()
+	{
+		return entriesNb;
+	}
+
+	static uint GetBitSize()
+	{
+		return bitsNb;
+	}
 
 	// Entries is an array containing integers whose first entriesNb bits encode the entries
 	// thus the array size is the smallest integer larger than entriesNb / (sizeof(uint) * 8) 
 	uint * bits;
 
-	bool contains(size_t n) const { return bits[n / (sizeof(uint) * 8)] & (1 << (n % (sizeof(uint) * 8))); };
-
-	// size of th ebits array
-	const uint bitsNb;
-
-	Vector() : bits(NULL), bitsNb(0), entriesNb(0) {};
+	bool contains(size_t n) const { return  ( bits[n / (sizeof(uint) * 8)] & (1 << (n % (sizeof(uint) * 8)) ) ) != 0; };
 
 #endif
 
-	// First constructor
-	Vector(uint size);
+	// Construct new vector, size is fixed by set_size
+	Vector();
 
 	// Second constructor
 	Vector(const Vector & other);
@@ -58,7 +68,7 @@ public:
 	// Third constructor
 	Vector(std::vector <bool> data);
 
-	Vector(uint * data, size_t entriesNb, bool copy = true);
+	Vector(uint * data, bool copy = true);
 #endif
 
 	// Function returning the hash
@@ -76,8 +86,11 @@ public:
 
 protected:
 
-	//alocates memory
-	void allocate(int size);
+	// Number of entries
+	static uint entriesNb;
+
+	// size of the bits array
+	static uint bitsNb;
 
 	// Hash
 	size_t _hash;

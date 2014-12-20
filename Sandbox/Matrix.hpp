@@ -47,11 +47,9 @@ public:
 class Matrix
 {
 public:
-	// Number of states of the matrix
-	const uint stateNb;
-
+	// Number of states of the matrix is Vector::StateNb
 	// Constructor from state nb
-	Matrix(uint stateNb);
+	Matrix();
 
 	// Print
 	virtual void print(std::ostream& os = std::cout) const = 0;
@@ -78,6 +76,9 @@ public:
 	// This is the constant vector with only zero entries
 	static const Vector * zero_vector;
 
+	// True if it is unecessary to use centralized vector storage
+	static bool UseCentralizedVectorStorage(){ return Vector::GetBitSize() > 1; }
+
 protected:
 
 	// The hash expression
@@ -86,16 +87,8 @@ protected:
 	// Function computing the hash
 	virtual void update_hash() = 0;
 	
-	// Function allocating memory, used by the constructor
-	virtual void allocate() = 0;
-
 	// Function used in the product
-	static const Vector * sub_prod(const Vector *, const Vector **, size_t stateNb);
-
-	static const Vector * sub_prodor(const Vector *, const Vector **, const Vector *,size_t stateNb);
-
-	//used in the product of OneCounter
-	static const Vector * sub_prod2(const Vector * vec1, const Vector ** mat1,const Vector * vec2, const Vector ** mat2, size_t stateNb);
+	static const Vector * sub_prod(const Vector *, const Vector **);
 
 
 	// Create a new vector, keep only coordinates of v that are true in tab

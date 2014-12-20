@@ -44,7 +44,7 @@ public:
 
 protected:
 
-	// Four C-style matrices of size stateNb containing all rows, state per state
+	// Four C-style matrices of size Vector::GetStateNb() containing all rows, state per state
 	const Vector ** row_pluses;
 	const Vector ** row_ones;
 	const Vector ** col_pluses;
@@ -53,13 +53,13 @@ protected:
 	void update_hash()
 	{
 		_hash = 0;
-		for (const Vector ** p = col_ones; p != col_ones + stateNb; p++)
+		for (const Vector ** p = col_ones; p != col_ones + Vector::GetStateNb(); p++)
 			_hash ^= std::hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-		for (const Vector ** p = col_pluses; p != col_pluses + stateNb; p++)
+		for (const Vector ** p = col_pluses; p != col_pluses + Vector::GetStateNb(); p++)
 			_hash ^= std::hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-		for (const Vector ** p = row_ones; p != row_ones + stateNb; p++)
+		for (const Vector ** p = row_ones; p != row_ones + Vector::GetStateNb(); p++)
 			_hash ^= std::hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
-		for (const Vector ** p = row_pluses; p != row_pluses + stateNb; p++)
+		for (const Vector ** p = row_pluses; p != row_pluses + Vector::GetStateNb(); p++)
 			_hash ^= std::hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 	};
 

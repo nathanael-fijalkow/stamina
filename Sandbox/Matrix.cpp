@@ -3,9 +3,9 @@
 using namespace std;
 
 // Class ExplicitMatrix
-ExplicitMatrix::ExplicitMatrix(uint stateNb) : stateNb(stateNb)
+ExplicitMatrix::ExplicitMatrix(uint size) : stateNb(size)
 {
-	coefficients = (char *)malloc(stateNb * stateNb * sizeof(char));
+	coefficients = (char *)malloc(size * size * sizeof(char));
 };
 
 ExplicitMatrix::~ExplicitMatrix()
@@ -16,7 +16,7 @@ ExplicitMatrix::~ExplicitMatrix()
 
 
 // Constructor
-Matrix::Matrix(uint stateNb) : _hash(0), stateNb(stateNb)
+Matrix::Matrix() : _hash(0)
 {
 };
 
@@ -25,11 +25,11 @@ ExplicitMatrix * ExplicitMatrix::random(uint stateNb)
 {
 	ExplicitMatrix * pe = new ExplicitMatrix(stateNb);
 	ExplicitMatrix & e = *pe;
-	for (int i = 0; i < stateNb; i++)
+	for (uint i = 0; i < Vector::GetStateNb(); i++)
 	{
 		int sel = (stateNb * rand() / (RAND_MAX + 1));
 		e.coefficients[i*stateNb + sel] = 2;
-		for (int j = 0; j < stateNb; j++)
+		for (uint j = 0; j < stateNb; j++)
 			if (j != sel)
 				e.coefficients[i*stateNb + j] = (rand() < RAND_MAX / 30) ? 2 : 0;
 	}
@@ -47,15 +47,15 @@ std::unordered_set<const Vector> Matrix::vectors;
 const Vector * Matrix::zero_vector = NULL;
 
 // Construct a vector obtained by multiplying the line vec by all columns of mat
-const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat, size_t stateNb){
+const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat){
 	if (vec == Matrix::zero_vector)	return Matrix::zero_vector;
 
 #if USE_SPARSE_MATRIX
 
-	size_t * new_vec = (size_t *)malloc(stateNb * sizeof(size_t));
+	size_t * new_vec = (size_t *)malloc(Vector::GetStateNb() * sizeof(size_t));
 	size_t * new_vec_start = new_vec;
 
-	for (uint j = 0; j < stateNb; j++)
+	for (uint j = 0; j < Vector::GetStateNb(); j++)
 	{
 		if (mat[j] == Matrix::zero_vector) continue;
 
@@ -85,18 +85,18 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat, size_t 
 	return &(*it);
 #else
 
-	uint * new_vec = (uint *)malloc(  vec->bitsNb * sizeof(uint));
-	memset(new_vec, 0, (size_t) ( vec->bitsNb  * sizeof(uint) ));
+	uint * new_vec = (uint *)malloc(  Vector::GetBitSize() * sizeof(uint));
+	memset(new_vec, 0, (size_t)(Vector::GetBitSize()  * sizeof(uint)));
 
 
-	for (int j = vec->entriesNb - 1; j >=0; j--)
+	for (int j = Vector::GetStateNb() - 1; j >= 0; j--)
 	{
 		//cout << "Vector "; vec->print(); cout << endl;
 		//cout << "times "; mat[j]->print(); cout << endl;
 
 		bool ok = false;
 		if (mat[j] != Matrix::zero_vector)
-			for (int i = 0; i < vec->bitsNb; i++)
+			for (uint i = 0; i < Vector::GetBitSize(); i++)
 			{
 			ok = (vec->bits[i] & mat[j]->bits[i]) != 0;
 			if (ok) break;
@@ -104,98 +104,11 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat, size_t 
 		//cout << "Equal " << (ok ? 1 : 0) << endl;
 		new_vec[j / (8 * sizeof(uint))] = (new_vec[j / (8 * sizeof(uint)) ] << 1) | (ok ? 1 : 0);
 	}
-	auto it = vectors.emplace(new_vec, vec->entriesNb).first;
-	free(new_vec);
-	//cout << "Final result "; (*it).print(); cout << endl;
-	return &(*it);
+		auto it = vectors.emplace(new_vec, Vector::GetStateNb()).first;
+		free(new_vec);
+		//cout << "Final result "; (*it).print(); cout << endl;
+		return &(*it);
 #endif
-}
-
-const Vector * Matrix::sub_prodor(const Vector * vec, const Vector ** mat, const Vector * vecor, size_t stateNb)
-{
-	uint * new_vec = (uint *)malloc(vec->bitsNb * sizeof(uint));
-	memset(new_vec, 0, (size_t)(vec->bitsNb  * sizeof(uint)));
-
-
-	for (int j = vec->entriesNb - 1; j >= 0; j--)
-	{
-		//cout << "Vector "; vec->print(); cout << endl;
-		//cout << "times "; mat[j]->print(); cout << endl;
-
-		bool ok = false;
-		if (mat[j] != Matrix::zero_vector)
-			for (int i = 0; i < vec->bitsNb; i++)
-			{
-			ok = (vec->bits[i] & mat[j]->bits[i]) != 0;
-			if (ok) break;
-			}
-		//cout << "Equal " << (ok ? 1 : 0) << endl;
-		new_vec[j / (8 * sizeof(uint))] = (new_vec[j / (8 * sizeof(uint))] << 1) | (ok ? 1 : 0);
-	}
-
-	for (int j = 0; j < vecor->bitsNb; j++)
-		new_vec[j] |= vecor->bits[j];
-
-	auto & it = vectors.emplace(new_vec, vec->entriesNb).first;
-	free(new_vec);
-	//cout << "Final result "; (*it).print(); cout << endl;
-	return &(*it);
-}
-
-// Construct a vector obtained by multiplying the line vec by all columns of mat, twice, and then disjunction of the two.
-const Vector * Matrix::sub_prod2(const Vector * vec1, const Vector ** mat1,const Vector * vec2, const Vector ** mat2, size_t stateNb){
-	if (vec1 == Matrix::zero_vector && vec2==Matrix::zero_vector)	return Matrix::zero_vector;
-//no Sparse_Matrix
-
-	uint * new_vec1 = (uint *)malloc(  vec1->bitsNb * sizeof(uint));
-	memset(new_vec1, 0, (size_t) ( vec1->bitsNb  * sizeof(uint) ));
-
-
-	for (int j = vec1->entriesNb - 1; j >=0; j--)
-	{
-		//cout << "Vector "; vec->print(); cout << endl;
-		//cout << "times "; mat[j]->print(); cout << endl;
-
-		bool ok = false;
-		if (mat1[j] != Matrix::zero_vector)
-			for (int i = 0; i < vec1->bitsNb; i++)
-			{
-			ok = (vec1->bits[i] & mat1[j]->bits[i]) != 0;
-			if (ok) break;
-			}
-		//cout << "Equal " << (ok ? 1 : 0) << endl;
-		new_vec1[j / (8 * sizeof(uint))] = (new_vec1[j / (8 * sizeof(uint)) ] << 1) | (ok ? 1 : 0);
-	}
-
-		uint * new_vec2 = (uint *)malloc(  vec2->bitsNb * sizeof(uint));
-	memset(new_vec2, 0, (size_t) ( vec2->bitsNb  * sizeof(uint) ));
-
-
-	for (int j = vec2->entriesNb - 1; j >=0; j--)
-	{
-		//cout << "Vector "; vec->print(); cout << endl;
-		//cout << "times "; mat[j]->print(); cout << endl;
-
-		bool ok = false;
-		if (mat2[j] != Matrix::zero_vector)
-			for (int i = 0; i < vec2->bitsNb; i++)
-			{
-			ok = (vec2->bits[i] & mat2[j]->bits[i]) != 0;
-			if (ok) break;
-			}
-		//cout << "Equal " << (ok ? 1 : 0) << endl;
-		new_vec2[j / (8 * sizeof(uint))] = (new_vec2[j / (8 * sizeof(uint)) ] << 1) | (ok ? 1 : 0);
-	}
-
-	uint * new_vec = (uint *)malloc(  vec1->bitsNb * sizeof(uint));
-	for (int i = 0; i < vec2->bitsNb; i++) new_vec[i]=new_vec1[i] | new_vec2[i];
-
-	auto it = vectors.emplace(new_vec, vec1->entriesNb);
-
-	free(new_vec);
-
-	//cout << "Final result "; (*it).print(); cout << endl;
-	return &(*it.first);
 }
 
 // Create a new vector, keep only coordinates of v that are true in tab
@@ -222,12 +135,12 @@ const Vector * Matrix::purge(const Vector *varg, bool * tab){
 #else
 // Create a new vector, keep only coordinates of v that are true in tab
 const Vector * Matrix::purge(const Vector *varg, const Vector * tab){
-	uint * new_vec = (uint *) malloc(varg->bitsNb * sizeof(uint));
+	uint * new_vec = (uint *)malloc(Vector::GetBitSize() * sizeof(uint));
 
-	for (int i = 0; i < varg->bitsNb; i++)
+	for (uint i = 0; i < Vector::GetBitSize(); i++)
 		new_vec[i] = (varg->bits[i] & tab->bits[i]);
 
-	auto it = vectors.emplace(new_vec, varg->entriesNb, false).first;
+	auto it = vectors.emplace(new_vec, false).first;
 	return &(*it);
 }
 #endif
