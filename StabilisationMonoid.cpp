@@ -6,6 +6,11 @@
 
 #include "StabilisationMonoid.hpp"
 
+UnstableStabMonoid::UnstableStabMonoid(uint dim) : UnstableMonoid(dim)
+{
+
+}
+
 Matrix * UnstableStabMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
 {
 	if (Matrix::UseCentralizedVectorStorage())
@@ -30,20 +35,6 @@ pair <Matrix *, bool> UnstableStabMonoid::addMatrix(Matrix * mat)
 	}
 }
 
-// Constructor
-UnstableStabMonoid::UnstableStabMonoid(uint dim)
-{
-	init(dim);
-};
-
-// Free known vectors
-UnstableMonoid::~UnstableMonoid()
-{
-	Matrix::vectors.clear();
-	Matrix::zero_vector = NULL;;
-	singleton.unlock();
-	
-};
 
 #define VERBOSE_MONOID_COMPUTATION 0
 

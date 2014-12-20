@@ -42,62 +42,93 @@ int main(int argc, char **argv)
 	matb.coefficients[8] = INC;
 	*/
 
-	
-	string mat = "";
-	mat += "___I__E";
-	mat += "__R____";
-	mat += "_I__E__";
-	mat += "_____E_";
-	mat += "_I_____";
-	mat += "_I__E__";
-	mat += "E_R____";
+	string amat = "";
+	amat += "___I__E";
+	amat += "__R____";
+	amat += "_I__E__";
+	amat += "_____E_";
+	amat += "_I_____";
+	amat += "_I__E__";
+	amat += "E_R____";
 
-	ExplicitMatrix mata(7);
-	for (int i = 0; i < 7 * 7; i++)
-		mata.coefficients[i] =
-		(mat[i] == '_') ? BOT :
-		(mat[i] == 'I') ? INC :
-		(mat[i] == 'E') ? EPS :
-		(mat[i] == 'R') ? RESET:
-		-1;
 
-	mat = "";
-	mat += "__E____";
-	mat += "__E__I_";
-	mat += "____I__";
-	mat += "__I____";
-	mat += "_I_____";
-	mat += "E_____I";
-	mat += "_______";
+	string bmat = "";
+	bmat += "__E____";
+	bmat += "__E__I_";
+	bmat += "____I__";
+	bmat += "__I____";
+	bmat += "_I_____";
+	bmat += "E_____I";
+	bmat += "_______";
 
-	ExplicitMatrix matb(7);
-	for (int i = 0; i < 7 * 7; i++)
-		matb.coefficients[i] =
-		(mat[i] == '_') ? BOT :
-		(mat[i] == 'I') ? INC :
-		(mat[i] == 'E') ? EPS :
-		(mat[i] == 'R') ? RESET :
-		-1;
+	/*
+	string cmat = "";
+	cmat += "_R_____";
+	cmat += "___R___";
+	cmat += "__E__E_";
+	cmat += "_______";
+	cmat += "____I__";
+	cmat += "__II___";
+	cmat += "R____RR";
+	*/
 
-	mat = "";
-	mat += "_R_____";
-	mat += "___R___";
-	mat += "__E__E_";
-	mat += "_______";
-	mat += "____I__";
-	mat += "__II___";
-	mat += "R____RR";
+	/*
+	string amat = "";
+	amat += "___I__E___I__E";
+	amat += "__R_____I__E__";
+	amat += "_I__E____R____";
+	amat += "_____E__I_____";
+	amat += "_I__E___I_____";
+	amat += "_____E__I__E__";
+	amat += "___I__EE_R____";
+	amat += "___I__E___I__E";
+	amat += "__R_____I__E__";
+	amat += "_I__E____R____";
+	amat += "_____E__I_____";
+	amat += "_I__E___I_____";
+	amat += "_____E__I__E__";
+	amat += "___I__EE_R____";
 
-	ExplicitMatrix matc(7);
-	for (int i = 0; i < 7 * 7; i++)
-		matc.coefficients[i] =
-		(mat[i] == '_') ? BOT :
-		(mat[i] == 'I') ? INC :
-		(mat[i] == 'E') ? EPS :
-		(mat[i] == 'R') ? RESET :
-		-1;
-		
 
+	string bmat = "";
+	bmat += "__E__I___E____";
+	bmat += "____I____E__I_";
+	bmat += "__I________I__";
+	bmat += "_I_______I____";
+	bmat += "E_____I_I_____";
+	bmat += "__I________I__";
+	bmat += "______________";
+	bmat += "__E__I___E____";
+	bmat += "____I____E__I_";
+	bmat += "__I________I__";
+	bmat += "_I_______I____";
+	bmat += "E_____I_I_____";
+	bmat += "__I________I__";
+	bmat += "______________";
+	*/
+
+	vector<ExplicitMatrix> mats;
+	mats.emplace_back( sqrt(amat.size()) );
+	mats.emplace_back( sqrt(amat.size()) );
+	//mats.push_back( sqrt(amat.size()) );
+
+	vector<string> cmats;
+	cmats.push_back(amat);
+	cmats.push_back(bmat);
+	//cmats.push_back(cmat);
+
+	for (int i = 0; i < mats.size(); i++)
+	{
+		auto & mat = mats[i];
+		auto & cmat = cmats[i];
+		for (int i = 0; i< mat.stateNb * mat.stateNb; i++)
+			mat.coefficients[i] =
+			(cmat[i] == '_') ? BOT :
+			(cmat[i] == 'I') ? INC :
+			(cmat[i] == 'E') ? EPS :
+			(cmat[i] == 'R') ? RESET :
+			BOT;
+	}
 	/*
 	ExplicitMatrix mata(3);
 	mata.coefficients = new char[64] { BOT, EPS };
@@ -164,7 +195,6 @@ int main(int argc, char **argv)
 	//cout<<"\n";
 	//b.print();
 	
-	UnstableStabMonoid monoid(7);
 	
 	/*
 
@@ -190,9 +220,10 @@ int main(int argc, char **argv)
 	*/
 
 	
-	
- monoid.addLetter('a', mata);
-	monoid.addLetter('b', matb);
+	UnstableStabMonoid monoid(mats[0].stateNb);
+
+ monoid.addLetter('a', mats[0]);
+ monoid.addLetter('b', mats[1]);
 //	monoid.addLetter('c', matc);
 	//   monoid.addLetter('c', matc);
 //	monoid.addLetter('d', matd);
@@ -201,6 +232,9 @@ int main(int argc, char **argv)
 	
 	cout << monoid.expr_to_mat.size() << " elements." << endl;
 	cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
+	
+	mats.clear();
+	cmats.clear();
 
 	//monoid.print() ;
 	system("pause");

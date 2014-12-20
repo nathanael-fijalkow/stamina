@@ -39,7 +39,11 @@ public:
 protected:
 
 	// Constructor
-	Monoid(){};
+	Monoid();
+	~Monoid();
+
+	/* static mutex, ensures at most one monoid is instatntiated at a time */
+	static mutex singleton;
 
 
 
@@ -53,9 +57,8 @@ class UnstableMonoid : public Monoid
 {
 public:
 
-	UnstableMonoid(int dim);
+	UnstableMonoid(uint dim);
 	~UnstableMonoid();
-	void init(int dim);
 
 	// Adds a new letter
 	const Matrix * addLetter(char a, ExplicitMatrix & mat);
@@ -91,9 +94,6 @@ public:
 	};
 
 protected:
-
-	/* static mutex, one computation at a time */
-	static mutex singleton;
 
 	/* returns a pair with the Matrix inserted or an already known matrix and a bool indicating whether the matrix was already known */
 	virtual pair <Matrix *, bool> addMatrix(Matrix * mat) = 0;

@@ -26,7 +26,7 @@ class ExplicitMatrix
 {
 public:
 	// Number of states of the matrix
-	const uint stateNb;
+	uint stateNb;
 
 	// coefficients is a C-style array
 	// the coefficient i,j is stored at position  i * n + j
@@ -38,6 +38,9 @@ public:
 
 	//Random matrix
 	static ExplicitMatrix  * random(uint stateNb);
+
+	ExplicitMatrix& operator=(const ExplicitMatrix & other);
+	ExplicitMatrix(const ExplicitMatrix & other);
 
 	// Free a useless explicit matrix
 	~ExplicitMatrix();

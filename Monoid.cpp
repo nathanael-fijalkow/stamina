@@ -55,35 +55,7 @@ ostream& operator<<(ostream& st, const Monoid & monoid)
 	return st;
 }
 
-
-
-void UnstableMonoid::init(int dim)
-{
-	Vector::SetSize(dim);
-	_sharp_height = 0;
-	cnt = 0;
-#if USE_SPARSE_MATRIX
-	Matrix::zero_vector = &*Matrix::vectors.emplace(0).first;
-#else
-	vector<bool> zero(dim);
-	for (int i = 0; i < dim; i++)
-		zero[i] = false;
-	if (Matrix::UseCentralizedVectorStorage())
-		Matrix::zero_vector = &*Matrix::vectors.emplace(zero).first;
-#endif
-}
-
 mutex UnstableMonoid::singleton;
-
-UnstableMonoid::UnstableMonoid(int dim)
-{
-	if(!singleton.try_lock())
-		throw runtime_error("Cannot create more than one unstable monoid at a time");
-
-	init(dim);
-};
-
-
 
 
 // Adds a letter
@@ -484,3 +456,44 @@ void UnstableMonoid::ComputeMonoid()
 	} while (new_elements.size() != 0);
 
 }
+
+Monoid::Monoid()
+{
+	bool res = singleton.try_lock();
+	if (!res)
+	{
+		string msg = "Only one monoid can be instantiated at a time";
+		cout << msg << endl;
+		throw runtime_error(msg.c_str());
+	}
+}
+Monoid::~Monoid()
+{
+	singleton.unlock();
+}
+
+// Constructor
+UnstableMonoid::UnstableMonoid(uint dim)
+{
+	Vector::SetSize(dim);
+	_sharp_height = 0;
+	cnt = 0;
+#if USE_SPARSE_MATRIX
+	Matrix::zero_vector = &*Matrix::vectors.emplace(0).first;
+#else
+	if (Matrix::UseCentralizedVectorStorage())
+	{
+		vector<bool> zero(dim);
+		for (int i = 0; i < dim; i++)
+			zero[i] = false;
+		Matrix::zero_vector = &*Matrix::vectors.emplace(zero).first;
+	}
+#endif
+};
+
+// Free known vectors
+UnstableMonoid::~UnstableMonoid()
+{
+	Matrix::vectors.clear();
+	Matrix::zero_vector = NULL;
+};

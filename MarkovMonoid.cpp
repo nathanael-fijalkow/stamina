@@ -34,9 +34,8 @@ pair<int, const ExtendedExpression *> UnstableMarkovMonoid::maxLeakNb()
 }
 
 // Constructor
-UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim)
+UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : UnstableMonoid(dim)
 {
-	init(dim);
 };
 
 

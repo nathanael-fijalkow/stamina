@@ -8,9 +8,22 @@ ExplicitMatrix::ExplicitMatrix(uint size) : stateNb(size)
 	coefficients = (char *)malloc(size * size * sizeof(char));
 };
 
+ExplicitMatrix& ExplicitMatrix::operator=(const ExplicitMatrix & other)
+{
+	stateNb = other.stateNb;
+	coefficients = (char *)malloc(stateNb * stateNb * sizeof(char));
+	memcpy(coefficients, other.coefficients, stateNb * stateNb * sizeof(char));
+	return *this;
+}
+
+ExplicitMatrix::ExplicitMatrix(const ExplicitMatrix & other)
+{
+	*this = other;
+}
+
 ExplicitMatrix::~ExplicitMatrix()
 {
-	free(coefficients);
+	delete(coefficients);
 	coefficients = NULL;
 };
 
