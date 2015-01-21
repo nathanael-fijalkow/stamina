@@ -11,9 +11,12 @@ typedef unsigned int uint;
 #define _HASH_SEED      (size_t)0xdeadbeef
 
 #ifndef MSVC
+namespace std
+{
 size_t hash_value(const size_t & _Keyval)
 {
         return ((size_t)_Keyval ^ _HASH_SEED);
+}
 }
 #else
 #include <functional>

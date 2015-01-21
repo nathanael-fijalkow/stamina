@@ -26,6 +26,9 @@ if(MSVC)
 		)
 	
 	link_directories("${SDKDIRECTORY}")
+else()
+set(CMAKE_CXX_FLAGS 
+    "${CMAKE_CXX_FLAGS} -std=c++11")
 endif (MSVC)
 
 option (HAVE_COLORS
