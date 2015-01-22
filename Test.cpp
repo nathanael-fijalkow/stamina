@@ -6,6 +6,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <math.h>
+
 #ifdef MSVC
 #include <windows.h>
 #include <time.h>

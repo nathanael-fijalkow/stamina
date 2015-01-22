@@ -189,13 +189,13 @@ const Vector * ProbMatrix::recurrent_states() const
 #else
 	size_t s = (Vector::GetStateNb() + 8 * sizeof(uint) - 1) / (8 * sizeof(uint));
 
-	uint * new_vec = (uint *)malloc(s * sizeof(uint));
-	memset((void *)new_vec, (int)0, (size_t)(s * sizeof(uint)));
+	size_t * new_vec = (size_t *)malloc(s * sizeof(size_t));
+	memset((void *)new_vec, (int)0, (size_t)(s * sizeof(size_t)));
 
 	for (int i = Vector::GetStateNb() - 1; i >= 0; i--)
 		new_vec[i / (8 * sizeof(uint))] = (new_vec[i / (8 * sizeof(uint))] << 1) | (recurrent(i) ? 1 : 0);
 
-	unordered_set<Vector>::iterator it = vectors.emplace(new_vec, false).first;
+	auto it = vectors.emplace(new_vec, false).first;
 	return &(*it);
 
 #endif
@@ -216,8 +216,8 @@ const Vector * ProbMatrix::recurrence_classes(const Vector * recs) const
 	return &(*it);
 #else
 	uint s = (Vector::GetStateNb() + 8 * sizeof(uint) - 1) / (8 * sizeof(uint));
-	uint * new_vec = (uint *)malloc(s * sizeof(uint));
-	memcpy(new_vec, recs->bits, Vector::GetBitSize() * sizeof(uint));
+	size_t * new_vec = (size_t *)malloc(s * sizeof(size_t));
+	memcpy(new_vec, recs->bits, Vector::GetBitSize() * sizeof(size_t));
 
 	//for each recurrent state we remove all its successors from the list of recurrent states
 	uint b = 1;
@@ -238,7 +238,7 @@ const Vector * ProbMatrix::recurrence_classes(const Vector * recs) const
 		b *= 2;
 	}
 
-	unordered_set<Vector>::iterator it = vectors.emplace(new_vec, false).first;
+	auto it = vectors.emplace(new_vec, false).first;
 	return &(*it);
 
 

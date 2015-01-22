@@ -74,7 +74,7 @@ public:
 
 	// Two STATIC elements
 	// This is the set of known vectors
-	static std::unordered_set <const Vector> vectors;
+	static std::unordered_set <Vector> vectors;
 
 	// This is the constant vector with only zero entries
 	static const Vector * zero_vector;

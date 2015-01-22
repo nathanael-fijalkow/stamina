@@ -55,7 +55,7 @@ ostream& operator<<(ostream& st, const Monoid & monoid)
 	return st;
 }
 
-mutex UnstableMonoid::singleton;
+mutex Monoid::singleton;
 
 
 // Adds a letter

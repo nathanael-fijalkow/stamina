@@ -40,7 +40,7 @@ ExplicitMatrix * ExplicitMatrix::random(uint stateNb)
 	ExplicitMatrix & e = *pe;
 	for (uint i = 0; i < Vector::GetStateNb(); i++)
 	{
-		int sel = (stateNb * rand() / (RAND_MAX + 1));
+		int sel = (stateNb * rand() / RAND_MAX);
 		e.coefficients[i*stateNb + sel] = 2;
 		for (uint j = 0; j < stateNb; j++)
 			if (j != sel)
@@ -54,7 +54,7 @@ std::ostream& operator<< (std::ostream& os, const Matrix & mat){ mat.print(os); 
 
 
 // The set of known vectors
-std::unordered_set<const Vector> Matrix::vectors;
+std::unordered_set<Vector> Matrix::vectors;
 
 // The zero vector
 const Vector * Matrix::zero_vector = NULL;
@@ -98,8 +98,8 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat){
 	return &(*it);
 #else
 
-	uint * new_vec = (uint *)malloc(  Vector::GetBitSize() * sizeof(uint));
-	memset(new_vec, 0, (size_t)(Vector::GetBitSize()  * sizeof(uint)));
+	size_t * new_vec = (size_t *)malloc(  Vector::GetBitSize() * sizeof(size_t));
+	memset(new_vec, 0, (size_t)(Vector::GetBitSize()  * sizeof(size_t)));
 
 
 	for (int j = Vector::GetStateNb() - 1; j >= 0; j--)
@@ -148,7 +148,7 @@ const Vector * Matrix::purge(const Vector *varg, bool * tab){
 #else
 // Create a new vector, keep only coordinates of v that are true in tab
 const Vector * Matrix::purge(const Vector *varg, const Vector * tab){
-	uint * new_vec = (uint *)malloc(Vector::GetBitSize() * sizeof(uint));
+	size_t * new_vec = (size_t *)malloc(Vector::GetBitSize() * sizeof(size_t));
 
 	for (uint i = 0; i < Vector::GetBitSize(); i++)
 		new_vec[i] = (varg->bits[i] & tab->bits[i]);

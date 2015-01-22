@@ -101,7 +101,7 @@ protected:
 	/* converts an explicit matrix */
 	virtual Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const = 0;
 
-	UnstableMonoid::UnstableMonoid() : _sharp_height(0), cnt(0){};
+	UnstableMonoid() : _sharp_height(0), cnt(0){};
 
 	// Function processing an expression, computing products
 	void process_expression(const ExtendedExpression * elt_left,const ExtendedExpression * elt_right);

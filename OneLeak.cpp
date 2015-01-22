@@ -2,7 +2,7 @@
 
 #include "Expressions.hpp"
 #include "Matrix.hpp"
-#include "Monoid.hpp"
+#include "MarkovMonoid.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 	while (true)
 	{
 		int stateNb = 5;
-		UnstableMonoid monoid(stateNb);
+		UnstableMarkovMonoid monoid(stateNb);
 		
 		ExplicitMatrix * a = ExplicitMatrix::random(stateNb);
 		ExplicitMatrix * b = ExplicitMatrix::random(stateNb);
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 
 
 
-		int ln = monoid.maxLeakNb();
+		int ln = monoid.maxLeakNb().first;
 
 		cout << endl << stateNb << " states and " <<  monoid.expr_to_mat.size() << " elements and " << monoid.rewriteRules.size() << " rewrite rules and ";
 		cout << " max leak number " << ln << endl;

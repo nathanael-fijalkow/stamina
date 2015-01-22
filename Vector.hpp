@@ -46,7 +46,7 @@ public:
 
 	// Entries is an array containing integers whose first entriesNb bits encode the entries
 	// thus the array size is the smallest integer larger than entriesNb / (sizeof(uint) * 8) 
-	uint * bits;
+	size_t * bits;
 
 	bool contains(size_t n) const { return  ( bits[n / (sizeof(uint) * 8)] & (1 << (n % (sizeof(uint) * 8)) ) ) != 0; };
 
@@ -68,7 +68,7 @@ public:
 	// Third constructor
 	Vector(std::vector <bool> data);
 
-	Vector(uint * data, bool copy = true);
+	Vector(size_t * data, bool copy = true);
 #endif
 
 	// Function returning the hash

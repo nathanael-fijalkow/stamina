@@ -19,8 +19,8 @@ Vector::Vector()
 #if USE_SPARSE_MATRIX
 	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
 #else
-	bits = (uint *)malloc(bitsNb * sizeof(uint));
-	memset(bits, (char)0, bitsNb * sizeof(uint));
+	bits = (size_t *)malloc(bitsNb * sizeof(size_t));
+	memset(bits, (char)0, bitsNb * sizeof(size_t));
 #endif
 	update_hash();
 }
@@ -71,11 +71,11 @@ Vector::Vector(size_t * data, size_t data_size, bool copy) : entriesNb(data_size
 	update_hash();
 };
 #else
-Vector::Vector(uint * data, bool copy)
+Vector::Vector(size_t * data, bool copy)
 {
 	if (copy)
 	{
-		bits = (size_t *)malloc(bitsNb * sizeof(uint));
+		bits = (size_t *)malloc(bitsNb * sizeof(size_t));
 		memcpy(bits, data, bitsNb * sizeof(size_t));
 	}
 	else

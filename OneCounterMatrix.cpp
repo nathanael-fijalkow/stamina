@@ -225,12 +225,12 @@ Matrix * OneCounterLargeMatrix::stab() const
 
 	//a peaufiner, pour l'instant 1 a priori, on ne prend que celui du premier vecteur.
 	uint bitsN = Vector::GetBitSize();
-	uint *new_row = (uint *)malloc(bitsN * sizeof(uint));
-	uint *new_col = (uint *)malloc(bitsN * sizeof(uint));
+	size_t *new_row = (size_t *)malloc(bitsN * sizeof(size_t));
+	size_t *new_col = (size_t *)malloc(bitsN * sizeof(size_t));
 
 	for (char act = 0; act<4; act++){
 		if(act==INC) continue;
-		diags[act]=(uint *)malloc(bitsN * sizeof(uint));
+		diags[act]=(uint *)malloc(bitsN * sizeof(size_t));
 		for (uint b = 0; b<bitsN; b++){ //initialisation de la diagonale
 			diags[act][b] = 0;
 		}
@@ -238,7 +238,7 @@ Matrix * OneCounterLargeMatrix::stab() const
 		//cout << " act:" << (int)act << "\n";
 		for (uint i = 0; i <n; i++)
 			if (rows[act][i]->contains(i))
-				diags[act][i / (8 * sizeof(uint))] |= (1 << (i % (sizeof(uint) * 8)));
+				diags[act][i / (8 * sizeof(size_t))] |= (1 << (i % (sizeof(size_t) * 8)));
 	}
 	//system("pause");
 	diags[INC] = diags[EPS]; //IC impossible, restriction to E
@@ -246,18 +246,18 @@ Matrix * OneCounterLargeMatrix::stab() const
 
 	for (char act = 0; act<4; act++){
 		for (uint i = 0; i <n; i++){
-			memset(new_row, 0, bitsN*sizeof(uint));
-			memset(new_col, 0, bitsN*sizeof(uint));
+			memset(new_row, 0, bitsN*sizeof(size_t));
+			memset(new_col, 0, bitsN*sizeof(size_t));
 			for (uint j = 0; j<n; j++){
 				bool t = false;//temporary result for coef i,j
 
 				//look for a possible path
 				for (uint b = 0; b<bitsN; b++){ t = t || ((rows[act][i]->bits[b] & diags[act][b] & cols[act][j]->bits[b]) != 0); }
-				new_row[j / (8 * sizeof(uint))] |= (t ? 1 : 0) << (j % (sizeof(uint) * 8));
+				new_row[j / (8 * sizeof(size_t))] |= (t ? 1 : 0) << (j % (sizeof(size_t) * 8));
 
 				t = false;
 				for (uint b = 0; b<bitsN; b++){ t = t || ((rows[act][j]->bits[b] & diags[act][b] & cols[act][i]->bits[b]) != 0); }
-				new_col[j / (8 * sizeof(uint))] |= (t ? 1 : 0) << (j % (sizeof(uint) * 8));
+				new_col[j / (8 * sizeof(size_t))] |= (t ? 1 : 0) << (j % (sizeof(size_t) * 8));
 
 			}
 
@@ -354,8 +354,8 @@ bool OneCounterLargeMatrix::isIdempotent() const
 
 const Vector * OneCounterLargeMatrix::sub_prodor(const Vector * vec, const Vector ** mat, const Vector * vecor)
 {
-	uint * new_vec = (uint *)malloc(Vector::GetBitSize() * sizeof(uint));
-	memset(new_vec, 0, (size_t)(Vector::GetBitSize()  * sizeof(uint)));
+	size_t * new_vec = (size_t *)malloc(Vector::GetBitSize() * sizeof(size_t));
+	memset(new_vec, 0, (size_t)(Vector::GetBitSize()  * sizeof(size_t)));
 
 	for (int j = Vector::GetStateNb() - 1; j >= 0; j--)
 	{
@@ -372,7 +372,7 @@ const Vector * OneCounterLargeMatrix::sub_prodor(const Vector * vec, const Vecto
 	for (uint j = 0; j < Vector::GetBitSize(); j++)
 		new_vec[j] |= vecor->bits[j];
 
-	auto & it = vectors.emplace(new_vec).first;
+	auto it = vectors.emplace(new_vec).first;
 	free(new_vec);
 	//cout << "Final result "; (*it).print(); cout << endl;
 	return &(*it);
@@ -383,8 +383,8 @@ const Vector * OneCounterLargeMatrix::sub_prod2(const Vector * vec1, const Vecto
 	if (vec1 == Matrix::zero_vector && vec2 == Matrix::zero_vector)	return Matrix::zero_vector;
 	//no Sparse_Matrix
 
-	uint * new_vec1 = (uint *)malloc(Vector::GetBitSize() * sizeof(uint));
-	memset(new_vec1, 0, (size_t)(Vector::GetBitSize()  * sizeof(uint)));
+	size_t * new_vec1 = (size_t *)malloc(Vector::GetBitSize() * sizeof(size_t));
+	memset(new_vec1, 0, (size_t)(Vector::GetBitSize()  * sizeof(size_t)));
 
 
 	for (int j = Vector::GetStateNb() - 1; j >= 0; j--)
@@ -400,11 +400,11 @@ const Vector * OneCounterLargeMatrix::sub_prod2(const Vector * vec1, const Vecto
 			if (ok) break;
 			}
 		//cout << "Equal " << (ok ? 1 : 0) << endl;
-		new_vec1[j / (8 * sizeof(uint))] = (new_vec1[j / (8 * sizeof(uint))] << 1) | (ok ? 1 : 0);
+		new_vec1[j / (8 * sizeof(size_t))] = (new_vec1[j / (8 * sizeof(size_t))] << 1) | (ok ? 1 : 0);
 	}
 
-	uint * new_vec2 = (uint *)malloc(Vector::GetBitSize() * sizeof(uint));
-	memset(new_vec2, 0, (size_t)(Vector::GetBitSize()  * sizeof(uint)));
+	size_t * new_vec2 = (size_t *)malloc(Vector::GetBitSize() * sizeof(size_t));
+	memset(new_vec2, 0, (size_t)(Vector::GetBitSize()  * sizeof(size_t)));
 
 
 	for (int j = Vector::GetStateNb() - 1; j >= 0; j--)
@@ -420,10 +420,10 @@ const Vector * OneCounterLargeMatrix::sub_prod2(const Vector * vec1, const Vecto
 			if (ok) break;
 			}
 		//cout << "Equal " << (ok ? 1 : 0) << endl;
-		new_vec2[j / (8 * sizeof(uint))] = (new_vec2[j / (8 * sizeof(uint))] << 1) | (ok ? 1 : 0);
+		new_vec2[j / (8 * sizeof(size_t))] = (new_vec2[j / (8 * sizeof(size_t))] << 1) | (ok ? 1 : 0);
 	}
 
-	uint * new_vec = (uint *)malloc(Vector::GetBitSize() * sizeof(uint));
+	size_t * new_vec = (size_t *)malloc(Vector::GetBitSize() * sizeof(size_t));
 	for (uint i = 0; i < Vector::GetBitSize(); i++) new_vec[i] = new_vec1[i] | new_vec2[i];
 
 	auto it = vectors.emplace(new_vec);
