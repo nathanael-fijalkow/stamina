@@ -433,7 +433,7 @@ void UnstableMonoid::ComputeMonoid()
 		cout << endl << "Starting iteration " << i << endl << endl ;
 		cout << endl << "------> Closure by product" << endl ;
 #endif
-		cout << "Concatenation" << endl;
+//		cout << "Concatenation" << endl;
 		CloseByProduct();
 
 		cur_index = 0;
@@ -448,7 +448,7 @@ void UnstableMonoid::ComputeMonoid()
 #if VERBOSE_MONOID_COMPUTATION
 		cout << "------> Closure by stabilization" << endl << endl;
 #endif
-		cout << "Stabilization" << endl;
+//		cout << "Stabilization" << endl;
 		CloseByStabilization();
 		_sharp_height++;
 		to_be_sharpified.clear();

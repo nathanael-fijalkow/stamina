@@ -44,7 +44,7 @@ public:
 
 protected:
 
-	// Four C-style matrices of size Vector::GetStateNb() containing all rows, state per state
+	// Four C-style matrices of size Vector::GetStateNb() containing all rows and cols, state per state
 	const Vector ** row_pluses;
 	const Vector ** row_ones;
 	const Vector ** col_pluses;

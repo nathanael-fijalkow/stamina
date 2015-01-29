@@ -23,38 +23,28 @@ int main(int argc, char **argv)
 
 	unsigned int seed = time(NULL);
 
-	unsigned int nb_samples = 100000;
+	unsigned int nb_samples = 100;
 
-
-	int max_state_nb = 12;
+	int max_state_nb = 15;
 
 	stringstream filename;
 	filename << "Experiment seed " << seed << " samples " << nb_samples << " maxstatenb " << max_state_nb;
 
-	//filename << " densities 0 / 1 " << (int)(1000 * pzeros) << " / " << (int)(1000 * (1.0 - pzeros));
-
-	ofstream file(filename.str() + ".csv");
-	ofstream file2(filename.str() + " monoids.txt");
+	ofstream file("Exp/" + filename.str() + ".csv");
+	ofstream file2("Exp/" + filename.str() + " monoids.txt");
 
 	file << "#;Size;Densitya;Densityb;ElementsNb;RewriteRulesNb;VectorNb;LeakNb;SharpHeight" << endl;
 
 	uint nb = 0;
 	while (nb++ < nb_samples)
 	{
-		int n = 1 + (rand() % max_state_nb);
+		int n = 5 + (rand() % max_state_nb);
 
 		int da = rand();
 		float density_a = 1.0 - (da * 1.0) / RAND_MAX;
 		int db = rand();
 		float density_b = 1.0 - (db * 1.0) / RAND_MAX;
 
-		file2 << endl << "******************************************************" << endl << endl;
-
-		cout << endl << "#" << nb  << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed <<  endl;
-		file2 << endl << "#" << nb << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed << endl;
-
-
-//		UnstableMarkovMonoid monoid(n);
 		UnstableStabMonoid monoid(n);
 
 		ExplicitMatrix m1(n), m2(n);
@@ -68,7 +58,7 @@ int main(int argc, char **argv)
 						m1.coefficients[n*i + j] = BOT;
 					else if (rand() < da)
 						m1.coefficients[n*i + j] = INC;
-					else if (rand() < 2 * da)
+					else if (rand() < 2.5 * da)
 						m1.coefficients[n*i + j] = EPS;
 					else
 						m1.coefficients[n*i + j] = RESET;
@@ -77,7 +67,7 @@ int main(int argc, char **argv)
 						m2.coefficients[n*i + j] = BOT;
 					else if (rand() < db)
 						m2.coefficients[n*i + j] = INC;
-					else if (rand() < 2 * db)
+					else if (rand() < 2.5 * db)
 						m2.coefficients[n*i + j] = EPS;
 					else
 						m2.coefficients[n*i + j] = RESET;
@@ -90,9 +80,6 @@ int main(int argc, char **argv)
 			auto a = monoid.addLetter('a', m1);
 			auto b = monoid.addLetter('b', m2);
 
-				cout << "a" << endl << *a << endl << "b" << endl << *b << endl;
-				file2 << "a" << endl << *a << endl << "b" << endl << *b << endl;
-
 		try
 		{
 			monoid.ComputeMonoid();
@@ -100,11 +87,20 @@ int main(int argc, char **argv)
 			//monoid.print();
 
 			int s = monoid.expr_to_mat.size();
-			cout << s << " elements." << monoid.rewriteRules.size() << " rewrite rules " << endl;
-			file2 << s << " elements." << monoid.rewriteRules.size() << " rewrite rules " << endl;
+			if(s > 100){
+				file2 << endl << "******************************************************" << endl << endl;
 
-			cout << "Sharpheight " << monoid.sharp_height() << endl;
-			file2 << "Sharpheight " << monoid.sharp_height() << endl;
+				cout << endl << "#" << nb  << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed <<  endl;
+				file2 << endl << "#" << nb << " size " << n << " 1-density " << density_a << " " << density_b << " seed " << seed << endl;
+
+				cout << "a" << endl << *a << endl << "b" << endl << *b << endl;
+				file2 << "a" << endl << *a << endl << "b" << endl << *b << endl;
+
+				cout << s << " elements.\n" << monoid.rewriteRules.size() << " rewrite rules " << endl;
+				file2 << s << " elements.\n" << monoid.rewriteRules.size() << " rewrite rules " << endl;
+
+				cout << "Sharpheight " << monoid.sharp_height() << endl;
+				file2 << "Sharpheight " << monoid.sharp_height() << endl;
 
 			/*
 			auto l = monoid.maxLeakNb();
@@ -121,9 +117,9 @@ int main(int argc, char **argv)
 			*/
 			//file << "Size;Proba;Seed;ElementsNb;RewriteRulesNb;VectorNb;LeakNb" << endl;
 
-			file << nb << ";" << n << ";" << density_a << ";" << density_b << ";" << monoid.expr_to_mat.size();
-			file << ";" << monoid.rewriteRules.size() << ";" << Matrix::vectors.size() << ";" << /* l.first << ";" << monoid.sharp_height() << */endl;
-
+				file << nb << ";" << n << ";" << density_a << ";" << density_b << ";" << monoid.expr_to_mat.size();
+				file << ";" << monoid.rewriteRules.size() << ";" << Matrix::vectors.size() << ";" << /* l.first << ";" << monoid.sharp_height() << */endl;
+			}
 			//		Sleep(10000);
 		}
 		catch (const runtime_error & err)
