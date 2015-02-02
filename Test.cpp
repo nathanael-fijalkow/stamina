@@ -189,6 +189,7 @@ int main(int argc, char **argv)
 //matd.coefficients[0] =OM;
 //
 
+VectorInt::SetSize(3);
 MultiCounterMatrix a(mata,2);
 MultiCounterMatrix b(matb,2);
 //OneCounterMatrix c(matc);
@@ -221,11 +222,11 @@ MultiCounterMatrix b(matb,2);
 
 	*/
 
-/*	
-	UnstableStabMonoid monoid(mats[0].stateNb);
 
- monoid.addLetter('a', mats[0]);
- monoid.addLetter('b', mats[1]);
+	UnstableMultiMonoid monoid(3,2);
+
+ monoid.addLetter('a', mata);
+ monoid.addLetter('b', matb);
 //	monoid.addLetter('c', matc);
 	//   monoid.addLetter('c', matc);
 //	monoid.addLetter('d', matd);
@@ -235,10 +236,9 @@ MultiCounterMatrix b(matb,2);
 	cout << monoid.expr_to_mat.size() << " elements." << endl;
 	cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
 	
-	mats.clear();
-	cmats.clear();
+//	mats.clear();
+//	cmats.clear();
 
-	//monoid.print() ;
+	monoid.print() ;
 	system("pause");
-*/
 }

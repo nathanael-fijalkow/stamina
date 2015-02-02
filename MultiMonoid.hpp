@@ -1,6 +1,6 @@
 /* INCLUDES */
-#ifndef STAB_MONOID_HPP
-#define STAB_MONOID_HPP
+#ifndef MULTI_MONOID_HPP
+#define MULTI_MONOID_HPP
 
 #include "Monoid.hpp"
 #include "MultiCounterMatrix.hpp"
@@ -9,7 +9,7 @@ class UnstableMultiMonoid : public UnstableMonoid
 {
 public:
 	// Creates zero vector
-	UnstableMultiMonoid(uint dim);
+	UnstableMultiMonoid(uint dim, uint counter_number);
 
 	// The set containing the known small matrices
 	unordered_set <MultiCounterMatrix> matrices;

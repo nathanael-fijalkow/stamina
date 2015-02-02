@@ -8,13 +8,13 @@ MultiCounterMatrix::MultiCounterMatrix()
 	cols = (const VectorInt **)malloc(VectorInt::GetStateNb() * sizeof(VectorInt*));
 }
 
-void MultiCounterMatrix::init_act_prod()//char N)
+void MultiCounterMatrix::init_act_prod(char N)
 {
-//	this->N = N;
-	act_prod = (char **)malloc((2 * N + 2)  *  sizeof(char*));
-	for (uint i = 0; i < VectorInt::GetStateNb(); i++){
-		act_prod[i] = (char *)malloc((2 * N + 2)  *  sizeof(char));
-		for (uint j = 0; j < VectorInt::GetStateNb(); j++){
+	MultiCounterMatrix::N = N;
+	act_prod = (char **)malloc((2 * N + 3)  *  sizeof(char*));
+	for (uint i = 0; i < (2 * N + 3); i++){
+		act_prod[i] = (char *)malloc((2 * N + 3)  *  sizeof(char));
+		for (uint j = 0; j < (2 * N + 3); j++){
 			act_prod[i][j] =
 				(i == 2 * N + 2 | j == 2 * N + 2) ? 2 * N + 2
 				: (i == 2 * N + 1 | j == 2 * N + 1) ? 2 * N + 1
@@ -28,8 +28,9 @@ void MultiCounterMatrix::init_act_prod()//char N)
 }
 
 //Constructor from Explicit Matrix
-MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N)
+MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N) : MultiCounterMatrix()
 {
+	VectorInt::SetSize(explMatrix.stateNb);
 	this->N = N;
 	for (uint i = 0; i < VectorInt::GetStateNb(); i++)
 	{
@@ -41,10 +42,10 @@ MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N
 			row[j] = explMatrix.coefficients[i * VectorInt::GetStateNb() + j];
 			col[j] = explMatrix.coefficients[j * VectorInt::GetStateNb() + i];
 		}
-		unordered_set<VectorInt>::iterator it;
-		it = int_vectors.insert(row).first;
+		auto it1 = int_vectors.emplace(row);
+		auto it = it1.first;
 		rows[i] = &(*it);
-		it = int_vectors.insert(col).first;
+		it = int_vectors.emplace(col).first;
 		cols[i] = &(*it);
 	}
 	update_hash();
@@ -67,7 +68,10 @@ void MultiCounterMatrix::print(std::ostream & os) const
 	for (uint i = 0; i < VectorInt::GetStateNb(); i++){
 		os << i << ":" << " ";
 		for (uint j = 0; j < VectorInt::GetStateNb(); j++)
-			os << " " << (rows[i]->coefs[j] == 6) ? "_" : rows[i]->coefs[j]) ;
+		{
+
+			os << " " << (int)((rows[i]->coefs[j] == 6) ? 6 : rows[i]->coefs[j]);
+		}
 		os << endl;
 	}
 }
@@ -132,7 +136,7 @@ Matrix * MultiCounterMatrix::stab() const
 
 	
 	char * diags; //sharp of the diagonal
-	diags=(char *)malloc((2*N+2)*sizeof(char));
+	diags=(char *)malloc(n*sizeof(char));
 
 	char *new_row = (char *)malloc(n * sizeof(char));
 	char *new_col = (char *)malloc(n * sizeof(char));

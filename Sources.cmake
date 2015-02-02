@@ -9,5 +9,6 @@ set (SOURCES
 	MarkovMonoid.cpp
 	MultiCounterMatrix.cpp
 	VectorInt.cpp
+	MultiMonoid.cpp
 	)
 

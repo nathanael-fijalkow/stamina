@@ -10,8 +10,6 @@ class MultiCounterMatrix : public Matrix
 {
 
 protected:
-	// Number of counters
-	static char N;
 
 	// This matrix act_prod is of size (2N+2)*(2N+2), it is computed once and for all.
 	static char ** act_prod;
@@ -39,8 +37,12 @@ protected:
 	static const VectorInt * zero_int_vector;
 
 public:
+
+	// Number of counters
+	static char N;
+
 	/* called once each time a new monoid is created, given th enumber of counters*/
-	void init_act_prod();
+	static void init_act_prod(char N);
 
 	/* coefficients getters and setters */
 	string get(int i, int j) const;

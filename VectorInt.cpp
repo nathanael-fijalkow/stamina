@@ -24,12 +24,10 @@ VectorInt::VectorInt(const VectorInt & other)
 }
 
 // Third constructor
-VectorInt::VectorInt(vector<char> data)
+VectorInt::VectorInt(vector<char> data) : VectorInt()
 {
-	throw runtime_error("Unimpleme,nted");
-/*	for (int i = data.size() - 1; i >= 0; i--)
-		coefs[i / (8 * sizeof(uint))] = (bits[i / (8 * sizeof(uint))] << 1) | (data[i] ? 1 : 0);
-		*/
+	for (int i = data.size() - 1; i >= 0; i--)
+		coefs[i] = data[i];
 	update_hash();
 }
 

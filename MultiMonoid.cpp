@@ -6,14 +6,15 @@
 
 #include "MultiMonoid.hpp"
 
-UnstableMultiMonoid::UnstableMultiMonoid(uint dim) : UnstableMonoid(dim)
+UnstableMultiMonoid::UnstableMultiMonoid(uint dim, uint counter_number) : UnstableMonoid(dim)
 {
-
+	VectorInt::SetSize(dim);
+	MultiCounterMatrix::init_act_prod(counter_number);
 }
 
 Matrix * UnstableMultiMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
 {
-	return new MultiCounterMatrix(mat);
+	return new MultiCounterMatrix(mat,MultiCounterMatrix::N);
 }
 
 pair <Matrix *, bool> UnstableMultiMonoid::addMatrix(Matrix * mat)

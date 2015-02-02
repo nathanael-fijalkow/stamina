@@ -23,22 +23,5 @@ protected:
 
 };
 
-class UnstableMultiStabMonoid : public UnstableMonoid
-{
-public:
-	// Creates zero vector
-	UnstableMultiStabMonoid(uint dim);
-
-	// The set containing the known small matrices
-	unordered_set <MultiCounterMatrix> matrices;
-
-protected:
-	pair <Matrix *, bool> addMatrix(Matrix * mat);
-
-	/* converts an explicit matrix */
-	Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
-
-};
-
 
 #endif
