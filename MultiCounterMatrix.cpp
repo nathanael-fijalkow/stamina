@@ -16,15 +16,23 @@ void MultiCounterMatrix::init_act_prod(char N)
 		act_prod[i] = (char *)malloc((2 * N + 3)  *  sizeof(char));
 		for (uint j = 0; j < (2 * N + 3); j++){
 			act_prod[i][j] =
-				(i == 2 * N + 2 | j == 2 * N + 2) ? 2 * N + 2
-				: (i == 2 * N + 1 | j == 2 * N + 1) ? 2 * N + 1
-				: ((i <= N & j <= N) | (N < i & N < j)) ? ( i< j ? i : j)
-				: (i <= N & N < j & i <= j - N) ? i
-				: (i <= N & N < j & i > j - N) ? j
-				: (j <= N & N < i & j <= i - N) ? j
+				(i == 2 * N + 2 || j == 2 * N + 2) ? 2 * N + 2
+				: (i == 2 * N + 1 || j == 2 * N + 1) ? 2 * N + 1
+				: ((i <= N & j <= N) || (N < i & N < j)) ? ( i< j ? i : j)
+				: (i <= N & N < j & i < j - N) ? i
+				: (i <= N & N < j & i >= j - N) ? j
+				: (j <= N & N < i & j < i - N) ? j
 				: /*(j <= N & N < i & j > i - N) ?*/ i;
 		}
 	}
+	for (uint i = 0; i < (2 * N + 3); i++){
+		for (uint j = 0; j < (2 * N + 3); j++){
+			cout << (int)  act_prod[i][j] << " ";
+		}
+		cout << endl;
+	}
+
+
 }
 
 //Constructor from Explicit Matrix
