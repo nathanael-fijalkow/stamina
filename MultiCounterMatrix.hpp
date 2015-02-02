@@ -2,12 +2,19 @@
 #define MULTICOUNTERMATRIX_HPP
 
 #include "Matrix.hpp"
+#include "VectorInt.hpp"
 
-
-
+#define MIN_ACME(a,b){ a < b ? a : b }
 
 class MultiCounterMatrix : public Matrix
 {
+
+protected:
+	// Number of counters
+	static char N;
+
+	// This matrix act_prod is of size (2N+2)*(2N+2), it is computed once and for all.
+	static char ** act_prod;
 
 // encoding for counter actions, smaller is better
 // 0: R_0 = (R,R,...,R) 
@@ -25,16 +32,18 @@ class MultiCounterMatrix : public Matrix
 
 // 2N+2: BOT
 
-public:
-	// Number of counters
-	int N;
-	
-	// Size
-	int Nb_state;
+	/* the set of all vectors */
+	static std::unordered_set<VectorInt> int_vectors;
 
-	// This matrix mat_prod is of size (2N+2)*(2N+2), it is computed once and for all.
-	// Quel est le mot clé pour la rendre globale ?
-	int ** mat_prod;
+	// This is the constant vector with only zero entries
+	static const VectorInt * zero_int_vector;
+
+public:
+	/* called once each time a new monoid is created, given th enumber of counters*/
+	void init_act_prod(char N);
+
+	/* coefficients getters and setters */
+	string get(int i, int j) const;
 
 	// Print
 	void print(std::ostream& os = std::cout) const;
@@ -59,12 +68,6 @@ public:
 
 	// Equality operator
 	bool operator == (const MultiCounterMatrix & mat) const;
-	
-protected:
-	// C-style matrices of size VectorInt::GetStateNb() containing all rows
-	const VectorInt ** rows;
-	// C-style matrices of size VectorInt::GetStateNb() containing all cols
-	const VectorInt ** cols;
 
 	void update_hash()
 	{
@@ -75,10 +78,19 @@ protected:
 			_hash ^= std::hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 	};
 
-	static const Vector * sub_prodor(const Vector *, const Vector **, const Vector *);
+protected:
+	// C-style arrays of size VectorInt::GetStateNb() containing all rows
+	const VectorInt ** rows;
+	// C-style arrays of size VectorInt::GetStateNb() containing all cols
+	const VectorInt ** cols;
+
+	// Function used in the product
+	static const VectorInt * sub_prod_int(const VectorInt *, const VectorInt **);
+
+	static const VectorInt * sub_prodor(const VectorInt *, const VectorInt **, const VectorInt *);
 
 	//used in the product of MultiCounter
-	static const Vector * sub_prod2(const Vector * vec1, const Vector ** mat1, const Vector * vec2, const Vector ** mat2);
+	static const VectorInt * sub_prod2(const VectorInt * vec1, const VectorInt ** mat1, const VectorInt * vec2, const VectorInt ** mat2);
 
 };
 

@@ -9,7 +9,8 @@ OneCounterLargeMatrix::OneCounterLargeMatrix()
 		rows[act] = (const Vector **)malloc(Vector::GetStateNb() * sizeof(const Vector *));
 		cols[act] = (const Vector **)malloc(Vector::GetStateNb() * sizeof(const Vector *));
 	}
-	update_hash();
+	//useless?
+	//update_hash();
 }
 
 OneCounterSmallMatrix::OneCounterSmallMatrix()

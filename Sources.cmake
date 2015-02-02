@@ -7,5 +7,7 @@ set (SOURCES
 	Monoid.cpp
 	StabilisationMonoid.cpp
 	MarkovMonoid.cpp
+	MultiCounterMatrix.cpp
+	VectorInt.cpp
 	)
 

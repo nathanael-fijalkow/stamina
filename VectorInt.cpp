@@ -1,6 +1,6 @@
 
 #include <Expressions.hpp>
-#include <Vector.hpp>
+#include <VectorInt.hpp>
 #include <string.h>
 #include <iostream>
 
@@ -8,129 +8,69 @@ using namespace std;
 
 // Class Vector
 // First constructor
-#if USE_SPARSE_MATRIX
-Vector::Vector(uint size) : entriesNb(size)
+VectorInt::VectorInt()
 {
-	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
-}
-#else
-Vector::Vector()
-{
-#if USE_SPARSE_MATRIX
-	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
-#else
-	bits = (size_t *)malloc(bitsNb * sizeof(size_t));
-	memset(bits, (char)0, bitsNb * sizeof(size_t));
-#endif
+	coefs = (char *)malloc(entriesNb * sizeof(char));
+	memset(coefs, (char)0, entriesNb * sizeof(char));
 	update_hash();
 }
-#endif
 
 
 // Second constructor
-Vector::Vector(const Vector & other)
+VectorInt::VectorInt(const VectorInt & other)
 {
-#if USE_SPARSE_MATRIX
-	memcpy(entries, other.entries, entriesNb * sizeof(size_t));
-#else
-	memcpy(bits, other.bits, bitsNb * sizeof(size_t));
-#endif
+	memcpy(coefs, other.coefs, entriesNb * sizeof(char));
 	_hash = other.Hash();
 }
 
 // Third constructor
-#if USE_SPARSE_MATRIX
-Vector::Vector(vector<size_t> data) : entriesNb(data.size()), bitsNb((entriesNb + 8 * sizeof(uint) - 1) / (8 * sizeof(uint)))
+VectorInt::VectorInt(vector<char> data)
 {
-	entries = (size_t *)malloc(entriesNb * sizeof(size_t));
-	size_t * p = entries;
-	for (vector<size_t>::iterator it = data.begin(); it != data.end(); it++)
-		*p++ = *it;
-#else
-Vector::Vector(vector<bool> data)
-{
-	for (int i = data.size() - 1; i >= 0; i--)
-		bits[i / (8 * sizeof(uint))] = (bits[i / (8 * sizeof(uint))] << 1) | (data[i] ? 1 : 0);
-#endif
+	throw runtime_error("Unimpleme,nted");
+/*	for (int i = data.size() - 1; i >= 0; i--)
+		coefs[i / (8 * sizeof(uint))] = (bits[i / (8 * sizeof(uint))] << 1) | (data[i] ? 1 : 0);
+		*/
 	update_hash();
 }
 
 // Fourth constructor
-#if USE_SPARSE_MATRIX
-Vector::Vector(size_t * data, size_t data_size, bool copy) : entriesNb(data_size), bitsNb((entriesNb + 8 * sizeof(uint) - 1) / (8 * sizeof(uint)))
+VectorInt::VectorInt(char * data, bool copy)
 {
 	if (copy)
 	{
-		entries = (size_t *)malloc(entriesNb * sizeof(size_t));
-		memcpy(entries, data, entriesNb * sizeof(size_t));
+		coefs = (char *)malloc(entriesNb * sizeof(char));
+		memcpy(coefs, data, entriesNb * sizeof(char));
 	}
 	else
 	{
-		entries = data;
+		coefs = data;
 	}
 	update_hash();
 };
-#else
-Vector::Vector(size_t * data, bool copy)
-{
-	if (copy)
-	{
-		bits = (size_t *)malloc(bitsNb * sizeof(size_t));
-		memcpy(bits, data, bitsNb * sizeof(size_t));
-	}
-	else
-	{
-		bits = data;
-	}
-	update_hash();
-};
-#endif
 
-void Vector::print(ostream & os) const
+void VectorInt::print(ostream & os) const
 {
-#if USE_SPARSE_MATRIX
-	for (size_t * v = entries; v != entries + entriesNb; v++)
-		os << *v << " ";
-	os << endl;
-#else
+	throw runtime_error("Unimplemented");
+	/*
 	for (uint i = 0; i < entriesNb; i++)
 		os << (contains(i) ? "1" : "0");
 	os << endl;
-#endif
+	*/
 }
 
 // Number of entries
-uint Vector::entriesNb = 0;
+uint VectorInt::entriesNb = 0;
 
-// size of the bits array
-uint Vector::bitsNb = 0;
-
-Vector::~Vector()
+VectorInt::~VectorInt()
 {
-#if USE_SPARSE_MATRIX
-	free(entries);
-	entries = NULL;
-#else
-	free(bits);
-	bits = NULL;
-#endif
+	free(coefs);
+	coefs = NULL;
 }
 
-bool Vector::operator==(const Vector & vec) const
+bool VectorInt::operator==(const VectorInt & vec) const
 {
 	if (entriesNb != vec.entriesNb) return false;
-#if USE_SPARSE_MATRIX
-	size_t * v1 = entries;
-	size_t * v2 = vec.entries;
-
-	for (; v1 != entries + entriesNb; v1++, v2++)
-	{
-		if (*v1 != *v2)
-			return false;
-	}
-#else
-	for (uint i = 0; i < bitsNb; i++)
-		if (bits[i] != vec.bits[i]) return false;
-#endif
+	for (uint i = 0; i < entriesNb; i++)
+		if (coefs[i] != vec.coefs[i]) return false;
 	return true;
 }
