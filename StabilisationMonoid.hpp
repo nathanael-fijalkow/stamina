@@ -5,7 +5,6 @@
 #include "Monoid.hpp"
 #include "MultiCounterMatrix.hpp"
 
-
 class UnstableStabMonoid : public UnstableMonoid
 {
 public:

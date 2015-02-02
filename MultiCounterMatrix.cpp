@@ -4,14 +4,13 @@
 //Constructor
 MultiCounterMatrix::MultiCounterMatrix()
 {
-	// Not implemented
 	rows = (const VectorInt **)malloc(VectorInt::GetStateNb() * sizeof(VectorInt*));
 	cols = (const VectorInt **)malloc(VectorInt::GetStateNb() * sizeof(VectorInt*));
 }
 
-void MultiCounterMatrix::init_act_prod(char N)
+void MultiCounterMatrix::init_act_prod()//char N)
 {
-	this->N = N;
+//	this->N = N;
 	act_prod = (char **)malloc((2 * N + 2)  *  sizeof(char*));
 	for (uint i = 0; i < VectorInt::GetStateNb(); i++){
 		act_prod[i] = (char *)malloc((2 * N + 2)  *  sizeof(char));
@@ -29,8 +28,9 @@ void MultiCounterMatrix::init_act_prod(char N)
 }
 
 //Constructor from Explicit Matrix
-MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix)
+MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N)
 {
+	this->N = N;
 	for (uint i = 0; i < VectorInt::GetStateNb(); i++)
 	{
 		vector<char> row(VectorInt::GetStateNb());
@@ -67,8 +67,7 @@ void MultiCounterMatrix::print(std::ostream & os) const
 	for (uint i = 0; i < VectorInt::GetStateNb(); i++){
 		os << i << ":" << " ";
 		for (uint j = 0; j < VectorInt::GetStateNb(); j++)
-		// WORK HERE
-			os << " ";
+			os << " " << (rows[i]->coefs[j] == 6) ? "_" : rows[i]->coefs[j]) ;
 		os << endl;
 	}
 }
@@ -131,63 +130,54 @@ Matrix * MultiCounterMatrix::stab() const
 	uint n = VectorInt::GetStateNb();
 	MultiCounterMatrix * result = new MultiCounterMatrix();
 
-	/*
-	char * diags[2*N+2]; //sharp of the diagonal, for now on one uint
+	
+	char * diags; //sharp of the diagonal
+	diags=(char *)malloc((2*N+2)*sizeof(char));
 
-	//a peaufiner, pour l'instant 1 a priori, on ne prend que celui du premier vecteur.
-	uint bitsN = VectorInt::GetBitSize();
-	size_t *new_row = (size_t *)malloc(bitsN * sizeof(size_t));
-	size_t *new_col = (size_t *)malloc(bitsN * sizeof(size_t));
+	char *new_row = (char *)malloc(n * sizeof(char));
+	char *new_col = (char *)malloc(n * sizeof(char));
 
-	for (char act = 0; act<2*N+2; act++){
-		if(act==INC) continue;
-		diags[act]=(uint *)malloc(bitsN * sizeof(size_t));
-		for (uint b = 0; b<bitsN; b++){ //initialisation de la diagonale
-			diags[act][b] = 0;
-		}
-		//compute the diagonal 
-		//cout << " act:" << (int)act << "\n";
-		for (uint i = 0; i <n; i++)
-			if (rows[act][i]->contains(i))
-				diags[act][i / (8 * sizeof(size_t))] |= (1 << (i % (sizeof(size_t) * 8)));
+	char cd;
+	//compute the diagonal 
+	//cout << " act:" << (int)act << "\n";
+	for (uint i = 0; i <n; i++){
+			cd=rows[i]->coefs[i];
+			diags[i] = (cd <= n) ? cd :((cd <= 2*N+1) ? 2*N+1 : 2*N+2);
+			
 	}
 	//system("pause");
-	diags[INC] = diags[EPS]; //IC impossible, restriction to E
 
-
-	for (char act = 0; act<2*N+2; act++){
 		for (uint i = 0; i <n; i++){
-			memset(new_row, 0, bitsN*sizeof(size_t));
-			memset(new_col, 0, bitsN*sizeof(size_t));
+			memset(new_row, 2*N+2, n*sizeof(char));
+			memset(new_col, 2*N+2, n*sizeof(char));
 			for (uint j = 0; j<n; j++){
-				bool t = false;//temporary result for coef i,j
-
 				//look for a possible path
-				for (uint b = 0; b<bitsN; b++){ t = t || ((rows[act][i]->bits[b] & diags[act][b] & cols[act][j]->bits[b]) != 0); }
-				new_row[j / (8 * sizeof(size_t))] |= (t ? 1 : 0) << (j % (sizeof(size_t) * 8));
-
-				t = false;
-				for (uint b = 0; b<bitsN; b++){ t = t || ((rows[act][j]->bits[b] & diags[act][b] & cols[act][i]->bits[b]) != 0); }
-				new_col[j / (8 * sizeof(size_t))] |= (t ? 1 : 0) << (j % (sizeof(size_t) * 8));
-
+				char t=2*N+2;
+				for (uint b = 0; b<n; b++){ 
+					 t = MIN_ACME(t, act_prod[rows[i]->coefs[b]][act_prod[diags[b]][cols[j]->coefs[b]]]); 
+					 }
+				new_row[j] = t;
+				
+				t=2*N+2;
+				for (uint b = 0; b<n; b++){ 
+					t = MIN_ACME(t, act_prod[rows[j]->coefs[b]][act_prod[diags[b]][cols[i]->coefs[b]]]);
+					 }
+				new_col[j] = t;
 			}
 
-			auto it = vectors.emplace(new_row).first;
-			result->rows[act][i] = &(*it);
-			it = vectors.emplace(new_col).first;
-			result->cols[act][i] = &(*it);
+			auto it = int_vectors.emplace(new_row).first;
+			result->rows[i] = &(*it);
+			it = int_vectors.emplace(new_col).first;
+			result->cols[i] = &(*it);
 
 		}
-	}
 
 	free(new_row);
 	free(new_col);
 
-	free(diags[RESET]);
-	free(diags[EPS]);
-	free(diags[OM]);
-
+	free(diags);
+	
 	result->update_hash();
-	*/
+	
 	return result;
 }

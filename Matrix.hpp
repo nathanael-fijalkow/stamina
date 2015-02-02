@@ -2,7 +2,6 @@
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
-
 #include <string.h>
 #include <iostream>
 #include <unordered_set>

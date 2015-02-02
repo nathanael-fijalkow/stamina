@@ -1,7 +1,8 @@
 #include <iostream>
 
-#include "MarkovMonoid.hpp"
+//#include "MarkovMonoid.hpp"
 #include "StabilisationMonoid.hpp"
+#include "MultiMonoid.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -19,31 +20,29 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	cout << "Acme++ rules" << endl;
-
-	/*
+	
 	ExplicitMatrix mata(3);
-	mata.coefficients[0] = BOT;
-	mata.coefficients[1] = EPS;
-	mata.coefficients[2] = INC;
-	mata.coefficients[3] = INC;
-	mata.coefficients[4] = EPS;
-	mata.coefficients[5] = BOT;
-	mata.coefficients[6] = BOT;
-	mata.coefficients[7] = BOT;
-	mata.coefficients[8] = RESET;
+	mata.coefficients[0] = 0;
+	mata.coefficients[1] = 1;
+	mata.coefficients[2] = 2;
+	mata.coefficients[3] = 3;
+	mata.coefficients[4] = 2;
+	mata.coefficients[5] = 1;
+	mata.coefficients[6] = 2;
+	mata.coefficients[7] = 1;
+	mata.coefficients[8] = 0;
 
 	ExplicitMatrix matb(3);
-	matb.coefficients[0] = RESET;
-	matb.coefficients[1] = INC;
-	matb.coefficients[2] = RESET;
-	matb.coefficients[3] = BOT;
-	matb.coefficients[4] = EPS;
-	matb.coefficients[5] = INC;
-	matb.coefficients[6] = RESET;
-	matb.coefficients[7] = BOT;
-	matb.coefficients[8] = INC;
-	*/
-
+	matb.coefficients[0] = 1;
+	matb.coefficients[1] = 2;
+	matb.coefficients[2] = 6;
+	matb.coefficients[3] = 6;
+	matb.coefficients[4] = 6;
+	matb.coefficients[5] = 4;
+	matb.coefficients[6] = 0;
+	matb.coefficients[7] = 5;
+	matb.coefficients[8] = 1;
+	
 	string amat = "";
 	amat += "___I__E";
 	amat += "__R____";
@@ -109,7 +108,8 @@ int main(int argc, char **argv)
 	bmat += "______________";
 	*/
 
-	vector<ExplicitMatrix> mats;
+/*
+	int_vector<ExplicitMatrix> mats;
 	mats.emplace_back( sqrt(amat.size()) );
 	mats.emplace_back( sqrt(amat.size()) );
 	//mats.push_back( sqrt(amat.size()) );
@@ -131,6 +131,7 @@ int main(int argc, char **argv)
 			(cmat[i] == 'R') ? RESET :
 			BOT;
 	}
+
 	/*
 	ExplicitMatrix mata(3);
 	mata.coefficients = new char[64] { BOT, EPS };
@@ -188,16 +189,15 @@ int main(int argc, char **argv)
 //matd.coefficients[0] =OM;
 //
 
-//OneCounterMatrix a(mata);
-// OneCounterMatrix b(matb);
+MultiCounterMatrix a(mata,2);
+MultiCounterMatrix b(matb,2);
 //OneCounterMatrix c(matc);
 // OneCounterMatrix d(matd);
 
-	//a.print();
-	//cout<<"\n";
-	//b.print();
-	
-	
+	a.print();
+	cout<<"\n";
+	b.print();
+		
 	/*
 
  	ExplicitMatrix mata(2);
@@ -221,7 +221,7 @@ int main(int argc, char **argv)
 
 	*/
 
-	
+/*	
 	UnstableStabMonoid monoid(mats[0].stateNb);
 
  monoid.addLetter('a', mats[0]);
@@ -240,4 +240,5 @@ int main(int argc, char **argv)
 
 	//monoid.print() ;
 	system("pause");
+*/
 }

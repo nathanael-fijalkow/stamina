@@ -40,7 +40,7 @@ protected:
 
 public:
 	/* called once each time a new monoid is created, given th enumber of counters*/
-	void init_act_prod(char N);
+	void init_act_prod();
 
 	/* coefficients getters and setters */
 	string get(int i, int j) const;
@@ -52,7 +52,7 @@ public:
 	MultiCounterMatrix();
 
 	// Constructor from explicit representation
-	MultiCounterMatrix(const ExplicitMatrix &);
+	MultiCounterMatrix(const ExplicitMatrix &, char N);
 
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns

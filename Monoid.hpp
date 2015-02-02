@@ -7,10 +7,12 @@
 #include <map>
 #include <set>
 
+#include "Expressions.hpp"
 #include "Matrix.hpp"
+
 #include "ProbMatrix.hpp"
 #include "OneCounterMatrix.hpp"
-#include "Expressions.hpp"
+#include "MultiCounterMatrix.hpp"
 
 using namespace std;
 

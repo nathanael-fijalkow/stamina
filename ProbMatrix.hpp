@@ -1,7 +1,7 @@
 #ifndef PROBMATRIX_HPP
 #define PROBMATRIX_HPP
 
-#include <Matrix.hpp>
+#include "Matrix.hpp"
 
 
 class ProbMatrix : public Matrix
