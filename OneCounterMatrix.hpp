@@ -67,6 +67,9 @@ protected:
 	/* array of size 4 of arrays of size Vector::StateNb containing bit representation */
 	uint ** rows;
 	uint ** cols;
+
+	/* intializes memory, for C++0x constructor compatibility */
+	void init();
 };
 
 /* Matrices of dimension more than sizeof(uint) */

@@ -13,18 +13,22 @@ OneCounterLargeMatrix::OneCounterLargeMatrix()
 	//update_hash();
 }
 
-OneCounterSmallMatrix::OneCounterSmallMatrix()
+void OneCounterSmallMatrix::init()
 {
 	rows = (uint **)malloc(4 * sizeof(void *));
 	cols = (uint **)malloc(4 * sizeof(void *));
 	for (char act = 0; act<4; act++){
 		rows[act] = (uint *)malloc(Vector::GetStateNb() * sizeof(uint));
 		cols[act] = (uint *)malloc(Vector::GetStateNb() * sizeof(uint));
-		
+
 		memset(rows[act], 0, Vector::GetStateNb() * sizeof(uint));
 		memset(cols[act], 0, Vector::GetStateNb() * sizeof(uint));
 	}
 	update_hash();
+}
+OneCounterSmallMatrix::OneCounterSmallMatrix()
+{
+	init();
 }
 
 //Constructor from Explicit Matrix
@@ -54,8 +58,9 @@ OneCounterLargeMatrix::OneCounterLargeMatrix(const ExplicitMatrix & explMatrix)
 	update_hash();
 }
 
-OneCounterSmallMatrix::OneCounterSmallMatrix(const ExplicitMatrix & explMatrix) : OneCounterSmallMatrix()
+OneCounterSmallMatrix::OneCounterSmallMatrix(const ExplicitMatrix & explMatrix)
 {
+	init();
 	for (char act = 0; act<4; act++){
 		for (uint i = 0; i < Vector::GetStateNb(); i++)
 		{
