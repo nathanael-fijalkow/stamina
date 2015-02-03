@@ -3,8 +3,8 @@
 
 #include "Matrix.hpp"
 #include "VectorInt.hpp"
+#include <algorithm>
 
-#define MIN_ACME(a,b){ a < b ? a : b }
 
 class MultiCounterMatrix : public Matrix
 {
@@ -35,6 +35,9 @@ protected:
 
 	// This is the constant vector with only zero entries
 	static const VectorInt * zero_int_vector;
+
+	/* initializer */
+	void init();
 
 public:
 

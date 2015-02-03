@@ -2,10 +2,15 @@
 #include <stdlib.h>
 
 //Constructor
-MultiCounterMatrix::MultiCounterMatrix()
+void MultiCounterMatrix::init()
 {
 	rows = (const VectorInt **)malloc(VectorInt::GetStateNb() * sizeof(VectorInt*));
 	cols = (const VectorInt **)malloc(VectorInt::GetStateNb() * sizeof(VectorInt*));
+}
+
+MultiCounterMatrix::MultiCounterMatrix()
+{
+	init();
 }
 
 void MultiCounterMatrix::init_act_prod(char N)
@@ -36,8 +41,9 @@ void MultiCounterMatrix::init_act_prod(char N)
 }
 
 //Constructor from Explicit Matrix
-MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N) : MultiCounterMatrix()
+MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N)
 {
+	init();
 	VectorInt::SetSize(explMatrix.stateNb);
 	this->N = N;
 	for (uint i = 0; i < VectorInt::GetStateNb(); i++)
@@ -105,7 +111,7 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(const VectorInt * vec, const 
 	{
 		char min_curr = 2 * N + 2;
 		for (uint i = 0; i < VectorInt::GetStateNb(); i++)
-			min_curr = MIN_ACME(min_curr, act_prod[ vec->coefs[i] ][ mat_cols[j]->coefs[i] ] );
+			min_curr = min(min_curr, act_prod[ vec->coefs[i] ][ mat_cols[j]->coefs[i] ] );
 		new_vec[j] = min_curr;
 	}
 
@@ -166,13 +172,13 @@ Matrix * MultiCounterMatrix::stab() const
 				//look for a possible path
 				char t=2*N+2;
 				for (uint b = 0; b<n; b++){ 
-					 t = MIN_ACME(t, act_prod[rows[i]->coefs[b]][act_prod[diags[b]][cols[j]->coefs[b]]]); 
+					 t = min(t, act_prod[rows[i]->coefs[b]][act_prod[diags[b]][cols[j]->coefs[b]]]); 
 					 }
 				new_row[j] = t;
 				
 				t=2*N+2;
 				for (uint b = 0; b<n; b++){ 
-					t = MIN_ACME(t, act_prod[rows[j]->coefs[b]][act_prod[diags[b]][cols[i]->coefs[b]]]);
+					t = min(t, act_prod[rows[j]->coefs[b]][act_prod[diags[b]][cols[i]->coefs[b]]]);
 					 }
 				new_col[j] = t;
 			}
