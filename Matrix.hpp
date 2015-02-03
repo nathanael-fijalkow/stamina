@@ -94,11 +94,7 @@ protected:
 
 
 	// Create a new vector, keep only coordinates of v that are true in tab
-#if USE_SPARSE_MATRIX
-	static const Vector * purge(const Vector *varg, bool * tab);
-#else
 	static const Vector * purge(const Vector *varg, const Vector * tab);
-#endif
 
 };
 

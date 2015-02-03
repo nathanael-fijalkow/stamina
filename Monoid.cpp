@@ -352,11 +352,8 @@ void UnstableMonoid::sharpify_expression(const ExtendedExpression * elt){
 	const Matrix * mat_e = expr_to_mat[elt];
 
 	if (is_idempotent(mat_e)){
-#if USE_SPARSE_MATRIX
-		Matrix mat = Matrix::stab(*mat_e);
-#else
 		Matrix * mat = mat_e->stab();
-#endif
+
 		auto result = addMatrix(mat);
 		unordered_set<SharpedExpr>::iterator it = sharpExpressions.emplace(elt).first;
 		// DO WE ACTUALLY NEED SHARPEXPRESSIONS (UNORDERED SET)????
@@ -401,8 +398,6 @@ void UnstableMonoid::CloseByStabilization()
 
 void UnstableMonoid::ComputeMonoid()
 {
-	Matrix::vectors.clear();
-
 	cnt = MAX_MONOID_SIZE / 100;
 
 	new_elements.clear();
@@ -475,12 +470,11 @@ Monoid::~Monoid()
 // Constructor
 UnstableMonoid::UnstableMonoid(uint dim)
 {
+	Matrix::vectors.clear();
 	Vector::SetSize(dim);
 	_sharp_height = 0;
 	cnt = 0;
-#if USE_SPARSE_MATRIX
-	Matrix::zero_vector = &*Matrix::vectors.emplace(0).first;
-#else
+
 	if (Matrix::UseCentralizedVectorStorage())
 	{
 		vector<bool> zero(dim);
@@ -488,7 +482,6 @@ UnstableMonoid::UnstableMonoid(uint dim)
 			zero[i] = false;
 		Matrix::zero_vector = &*Matrix::vectors.emplace(zero).first;
 	}
-#endif
 };
 
 // Free known vectors

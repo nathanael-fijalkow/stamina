@@ -45,9 +45,9 @@ OneCounterLargeMatrix::OneCounterLargeMatrix(const ExplicitMatrix & explMatrix)
 			}
 			unordered_set<Vector>::iterator it;
 			//vector<bool> a la place de Vector ?
-			it = vectors.insert(row).first;
+			it = vectors.emplace(row).first;
 			rows[act][i] = &(*it);
-			it = vectors.insert(col).first;
+			it = vectors.emplace(col).first;
 			cols[act][i] = &(*it);
 		}
 	}

@@ -63,41 +63,6 @@ const Vector * Matrix::zero_vector = NULL;
 const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat){
 	if (vec == Matrix::zero_vector)	return Matrix::zero_vector;
 
-#if USE_SPARSE_MATRIX
-
-	size_t * new_vec = (size_t *)malloc(Vector::GetStateNb() * sizeof(size_t));
-	size_t * new_vec_start = new_vec;
-
-	for (uint j = 0; j < Vector::GetStateNb(); j++)
-	{
-		if (mat[j] == Matrix::zero_vector) continue;
-
-		const size_t * vec_entries = vec->entries;
-		const size_t * vec_entries_end = vec->end();
-
-		const size_t * mat_entries_j = mat[j]->entries;
-		const size_t * mat_entries_j_end = mat[j]->end();
-
-		while(vec_entries != vec_entries_end && mat_entries_j != mat_entries_j_end)
-		{
-			if (*vec_entries == *mat_entries_j)
-			{
-                *new_vec++ = j;
-				break;
-			}
-            else
-            {
-                if(*vec_entries<*mat_entries_j)
-                    vec_entries++;
-                else
-                    mat_entries_j++;
-            } ;
-		} ;
-	}
-	unordered_set<Vector>::iterator it = vectors.emplace(new_vec_start, new_vec - new_vec_start, false).first;
-	return &(*it);
-#else
-
 	size_t * new_vec = (size_t *)malloc(  Vector::GetBitSize() * sizeof(size_t));
 	memset(new_vec, 0, (size_t)(Vector::GetBitSize()  * sizeof(size_t)));
 
@@ -121,31 +86,9 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat){
 		free(new_vec);
 		//cout << "Final result "; (*it).print(); cout << endl;
 		return &(*it);
-#endif
 }
 
 // Create a new vector, keep only coordinates of v that are true in tab
-#if USE_SPARSE_MATRIX
-const Vector * Matrix::purge(const Vector *varg, bool * tab){
-	// size of purged vector to precompute
-	int nbtab = 0;
-	for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++){
-		if (tab[*ent]) nbtab++;
-	}
-
-	size_t * data = (size_t*)malloc(nbtab*(sizeof(size_t)));
-	size_t * datastart = data;
-	for (size_t * ent = varg->entries; ent != varg->entries + varg->entriesNb; ent++)
-		if (tab[*ent]) *data++ = *ent;
-
-	unordered_set<Vector>::iterator it = vectors.emplace(datastart, nbtab).first;
-	return &(*it);
-
-	free(new_vec1);
-	free(new_vec2);
-	free(new_vec);
-}
-#else
 // Create a new vector, keep only coordinates of v that are true in tab
 const Vector * Matrix::purge(const Vector *varg, const Vector * tab){
 	size_t * new_vec = (size_t *)malloc(Vector::GetBitSize() * sizeof(size_t));
@@ -156,6 +99,5 @@ const Vector * Matrix::purge(const Vector *varg, const Vector * tab){
 	auto it = vectors.emplace(new_vec, false).first;
 	return &(*it);
 }
-#endif
 
 

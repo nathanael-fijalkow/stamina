@@ -19,34 +19,11 @@ ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix)
 
 	for (uint i = 0; i < Vector::GetStateNb(); i++)
 	{
-#if USE_SPARSE_MATRIX
-		vector<size_t> r_pluses;
-		vector<size_t> r_ones;
-		vector<size_t> c_pluses;
-		vector<size_t> c_ones;
-#else
 		vector<bool> r_pluses(Vector::GetStateNb());
 		vector<bool> r_ones(Vector::GetStateNb());
 		vector<bool> c_pluses(Vector::GetStateNb());
 		vector<bool> c_ones(Vector::GetStateNb());
-#endif
 
-#if USE_SPARSE_MATRIX
-		for (uint j = 0; j < Vector::GetStateNb(); j++)
-		{
-			char c1 = explMatrix.coefficients[i * Vector::GetStateNb() + j];
-			if (c1 >= 1)
-				r_pluses.push_back(j);
-			if (c1 == 2)
-				r_ones.push_back(j);
-
-			char c2 = explMatrix.coefficients[j * Vector::GetStateNb() + i];
-			if (c2 >= 1)
-				c_pluses.push_back(j);
-			if (c2 == 2)
-				c_ones.push_back(j);
-		}
-#else
 		for (uint j = 0; j < Vector::GetStateNb(); j++)
 		{
 			char c1 = explMatrix.coefficients[i * Vector::GetStateNb() + j];
@@ -57,18 +34,17 @@ ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix)
 			c_pluses[j] = (c2 >= 1);
 			c_ones[j] = (c2 == 2);
 		}
-#endif
 
-		unordered_set<Vector>::iterator it = vectors.insert(r_ones).first;
+		unordered_set<Vector>::iterator it = vectors.emplace(r_ones).first;
 		row_ones[i] = &(*it);
 
-		it = vectors.insert(r_pluses).first;
+		it = vectors.emplace(r_pluses).first;
 		row_pluses[i] = &(*it);
 
-		it = vectors.insert(c_ones).first;
+		it = vectors.emplace(c_ones).first;
 		col_ones[i] = &(*it);
 
-		it = vectors.insert(c_pluses).first;
+		it = vectors.emplace(c_pluses).first;
 		col_pluses[i] = &(*it);
 	}
 	update_hash();
@@ -85,26 +61,7 @@ void ProbMatrix::print(std::ostream & os) const
 		const Vector & pluses = *row_pluses[i];
 
 		for (uint j = 0; j < Vector::GetStateNb(); j++)
-		{
-#if USE_SPARSE_MATRIX
-			uint jones = 0, jpluses = 0;
-			if (ones.entriesNb > jones && ones.entries[jones] == j)
-			{
-				os << ((pluses.entriesNb > jpluses && pluses.entries[jpluses] == j) ? "2 " : "1 ");
-				jones++;
-				jpluses++;
-			}
-			else if (pluses.entriesNb > jpluses && pluses.entries[jpluses] == j)
-			{
-				os << "+ ";
-				jpluses++;
-			}
-			else
-				os << "_ ";
-#else
 			os << (ones.contains(j) ? "1" : pluses.contains(j) ? "+" : "_");
-#endif
-		}
 		os << endl;
 	}
 	/*
@@ -175,18 +132,6 @@ bool ProbMatrix::operator==(const ProbMatrix & mat) const
 // computes the list of recurrent states.
 const Vector * ProbMatrix::recurrent_states() const
 {
-#if USE_SPARSE_MATRIX
-	size_t * new_vec = (size_t *)malloc(Vector::GetStateNb() * sizeof(size_t));
-	size_t * new_vec_start = new_vec;
-
-	for (int i = 0; i < Vector::GetStateNb(); i++)
-		if (recurrent(i))
-			*new_vec++ = i;
-
-	unordered_set<Vector>::iterator it = vectors.emplace(new_vec_start, new_vec - new_vec_start, false).first;
-	return &(*it);
-
-#else
 	size_t s = (Vector::GetStateNb() + 8 * sizeof(uint) - 1) / (8 * sizeof(uint));
 
 	size_t * new_vec = (size_t *)malloc(s * sizeof(size_t));
@@ -198,23 +143,12 @@ const Vector * ProbMatrix::recurrent_states() const
 	auto it = vectors.emplace(new_vec, false).first;
 	return &(*it);
 
-#endif
 }
 
 /* computes the list of recurrence classesgiven the list of recurrent states.
 The matrix is assumed to be idempotent. */
 const Vector * ProbMatrix::recurrence_classes(const Vector * recs) const
 {
-#if USE_SPARSE_MATRIX
-	size_t * new_vec = (size_t *)malloc(Vector::GetStateNb() * sizeof(size_t));
-	size_t * new_vec_start = new_vec;
-	memcpy(new_vec, recs, Vector::GetStateNb() * sizeof(size_t));
-
-	throw runtime_error("Unimplemented");
-
-	unordered_set<Vector>::iterator it = vectors.emplace(new_vec_start, new_vec - new_vec_start, false).first;
-	return &(*it);
-#else
 	uint s = (Vector::GetStateNb() + 8 * sizeof(uint) - 1) / (8 * sizeof(uint));
 	size_t * new_vec = (size_t *)malloc(s * sizeof(size_t));
 	memcpy(new_vec, recs->bits, Vector::GetBitSize() * sizeof(size_t));
@@ -240,15 +174,9 @@ const Vector * ProbMatrix::recurrence_classes(const Vector * recs) const
 
 	auto it = vectors.emplace(new_vec, false).first;
 	return &(*it);
-
-
-#endif
-
 }
 
 
-#if USE_SPARSE_MATRIX
-#else
 uint ProbMatrix::countLeaks(const Vector * classes) const
 {
 	uint answer = 0;
@@ -273,7 +201,6 @@ uint ProbMatrix::countLeaks(const Vector * classes) const
 	}
 	return answer;
 }
-#endif
 
 bool ProbMatrix::check() const
 {
@@ -306,48 +233,14 @@ Matrix * ProbMatrix::prod(const Matrix * pmat1) const
 
 // Function checking whether j is recurrent. Only works if this is idempotent
 bool ProbMatrix::recurrent(int j) const{
-#if USE_SPARSE_MATRIX
-	size_t * vpred = this->col_ones[j]->entries;
-	size_t * vmax = this->col_ones[j]->entries + this->col_ones[j]->entriesNb;
-	size_t * vstart = this->row_ones[j]->entries;
-	size_t * vend = vstart + this->row_ones[j]->entriesNb;
-
-	for (size_t * vsucc = vstart; vsucc != vend; vsucc++)
-	{
-		while (*vpred<*vsucc) { vpred++; if (vpred == vmax) return false; }
-		if (*vpred != *vsucc) return false;
-		else vpred++;
-	}
-#else
 	auto r = row_ones[j];
 	for (uint i = 0; i < Vector::GetStateNb(); i++)
 		if (r->contains(i) && !row_ones[i]->contains(j))
 			return false;
-#endif
 	return true;
 }
 
 // Function computing the stabilization. mat is assumed to be idempotent
-#if USE_SPARSE_MATRIX
-Matrix Matrix::stab(const Matrix & mat)
-{
-	uint n = mat.Vector::GetStateNb();
-	Matrix result(n);
-
-	// Precompute recurrent elements, and columns
-	bool *tabrec = (bool *)malloc(n*sizeof(bool));
-	for (uint j = 0; j < n; j++){
-		tabrec[j] = mat.recurrent(j);
-		if (tabrec[j]) result.col_ones[j] = mat.col_ones[j];
-		else result.col_ones[j] = Matrix::zero_vector;
-
-		result.col_pluses[j] = mat.col_pluses[j];
-	}
-	for (uint i = 0; i < n; i++){
-		result.row_pluses[i] = mat.row_pluses[i];
-		result.row_ones[i] = purge(mat.row_ones[i], tabrec);
-	}
-#else
 Matrix * ProbMatrix::stab() const
 {
 	const Vector * recs = recurrent_states();
@@ -368,8 +261,6 @@ Matrix * ProbMatrix::stab() const
 			result->col_ones[j] = Matrix::zero_vector;
 		result->col_pluses[j] = col_pluses[j];
 	}
-
-#endif
 	result->update_hash();
 	return result;
 }
