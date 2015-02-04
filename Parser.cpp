@@ -9,11 +9,13 @@ int linenumber=0;
 istream& getfline(istream& is,string& str, char delim='\n')
 {
   do {
+    is.peek();
     getline(is,str,delim);
     if(delim!=' ')
       linenumber++;
   } while(str.empty()||str[0]=='%');
-  return is;  
+
+  return is;
 }
 
 int lttoi(string s)
@@ -54,15 +56,16 @@ Monoid* Parser::parseFile(std::istream &file)
   int finalStates[size];
   getfline(file,line);
   istringstream iss(line);
-  int i=0;
-  while(getfline(iss,line,' ')) {
-    finalStates[i]=stoi(line);
+  for(int i=0;i<size;i++){
+    getfline(iss,line,' ');
+    if(!line.empty())
+      finalStates[i]=stoi(line);
     i++;
   }
 
   ExplicitMatrix mat(size);
   UnstableMarkovMonoid* monoid = new UnstableMarkovMonoid(size);
-  for(i=0;i<alphabet.length();i++) {
+  for(int i=0;i<alphabet.length();i++) {
     string lt;
     getfline(file,lt);
     for(int j=0;j<size;j++) {

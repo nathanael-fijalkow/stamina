@@ -26,7 +26,7 @@ void pusage(char* s)
 
 int main(int argc, char **argv)
 {
-	cout << "Acme++ rules" << endl;
+  //cout << "Acme++ rules" << endl;
 	
 	// ExplicitMatrix mata(3);
 	// mata.coefficients[0] = 0;
