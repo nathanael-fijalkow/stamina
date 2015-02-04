@@ -2,7 +2,7 @@
 ********* PRINCIPE******* **************
 ****************************************
 
-L'algorithme calcule le monoide de Markov associé à des matrices lettres données explicitement.
+L'algorithme calcule le monoide de stabilisation associé à des matrices lettres données explicitement.
 
 Pour cela l'algorithme calcule toutes les matrices du monoide associées,
 ainsi qu'une #-expression canonique par matrice et
