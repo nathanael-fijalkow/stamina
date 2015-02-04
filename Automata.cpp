@@ -66,7 +66,9 @@ uint TwoPow(uint n){ return (1 << n);} //compute 2^n
 bool bit(uint n,uint k){ return (n >> k) & 1;}
 
 
-//build a subset automaton, by taking the powerset automaton and adding epsilon-transitions. We assume that we come from a deterministic automaton.
+//build a subset automaton, by taking the powerset automaton and adding epsilon-transitions.
+//We assume that we come from a deterministic automaton.
+//It also works if a nondeterminstic automaton for the complement language is given, with final states reversed.
 ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	uint n=aut->NbStates;
 	uint nspow=TwoPow(n); //new number of states
@@ -79,11 +81,11 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 		if(aut->initialstate[i]) Subaut->initialstate[myPow(2,i-1)]=true;
 	}
 	
-	//final states are subsets that contain a final state.
+	//final states are subsets where all states are final state. This is because we actually powerset the automaton for the complement.
 	for(uint i=0;i<nspow;i++){
 		uint k=0;
-		bool fin=false;
-		while(k<n and !fin) {
+		bool fin=true;
+		while(k<n and fin) {
 			fin=aut->finalstate[bit(i,k)];
 		}
 		Subaut->finalstate[i]=fin;
@@ -117,14 +119,57 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	}
 	
 	
-	//we add epsilon-transitions witnessing the inclusion relation: P->Q if P (strictly ?)contains Q
+	//we add epsilon-transitions witnessing the inclusion relation: P->Q if P is contained in Q
 	for(uint i=0;i<nspow;i++){
 		for(uint j=0;j<nspow;j++){
-			if(i|j == i) Subaut->trans_eps[i][j]=true; //test for bitwise inclusion
+			if(i|j == j) Subaut->trans_eps[i][j]=true; //test for bitwise inclusion
 		}
 	}
-	
-	
+		
 	return Subaut;
 	
+}
+
+
+
+//Multi-counter Automata
+void MultiCounterAut::init(char Nletters,uint Nstates, char Ncounters){
+	NbLetters=Nletters;
+	NbStates=Nstates;
+	NbCounters=Ncounters;
+	
+	initialstate=(bool *)malloc(Nstates*sizeof(bool));
+	memset(initialstate, false, Nstates);
+	
+	finalstate=(bool *)malloc(Nstates*sizeof(bool));
+	memset(finalstate, false, Nstates);
+	
+	trans=(char***)malloc(Nletters*sizeof(char **));
+	
+	for(int a=0;a<Nletters;a++){
+		trans[a]=(char**)malloc(Nstates*sizeof(char *));
+		for(int i=0;i<Nstates;i++){
+			trans[a][i]=(char*)malloc(Nstates*sizeof(char));
+			memset(trans[a][i], 2*Ncounters+2, Nstates);
+		}
+	}
+}
+
+//Constructor
+MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
+	init(Nletters,Nstates,Ncounters);
+	
+}
+
+
+
+
+//classical Automata with Epsilon-transitions
+MultiCounterEpsAut::MultiCounterEpsAut(char Nletters,uint Nstates, char Ncounters) : MultiCounterAut(Nletters,Nstates,Ncounters)
+{
+trans_eps=(char**)malloc(Nstates*sizeof(char *));
+		for(int i=0;i<Nstates;i++){
+			trans_eps[i]=(char*)malloc(Nstates*sizeof(char));
+			memset(trans_eps[i], 2*Ncounters+2, Nstates);
+		}
 }
