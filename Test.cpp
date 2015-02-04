@@ -1,13 +1,15 @@
 #include <iostream>
 
-//#include "MarkovMonoid.hpp"
-#include "StabilisationMonoid.hpp"
+#include "MarkovMonoid.hpp"
+//#include "StabilisationMonoid.hpp"
 #include "MultiMonoid.hpp"
+#include "Parser.hpp"
 
 #include <fstream>
 #include <sstream>
 
 #include <math.h>
+#include <unistd.h>
 
 #ifdef MSVC
 #include <windows.h>
@@ -16,51 +18,56 @@
 
 using namespace std;
 
+void pusage(char* s)
+{
+  cerr << "Usage: " << s << " [-v] file" << endl;
+  exit(-1);
+}
 
 int main(int argc, char **argv)
 {
-	cout << "Acme++ rules" << endl;
+  //cout << "Acme++ rules" << endl;
 	
-	ExplicitMatrix mata(3);
-	mata.coefficients[0] = 0;
-	mata.coefficients[1] = 1;
-	mata.coefficients[2] = 2;
-	mata.coefficients[3] = 3;
-	mata.coefficients[4] = 2;
-	mata.coefficients[5] = 1;
-	mata.coefficients[6] = 2;
-	mata.coefficients[7] = 1;
-	mata.coefficients[8] = 0;
+	// ExplicitMatrix mata(3);
+	// mata.coefficients[0] = 0;
+	// mata.coefficients[1] = 1;
+	// mata.coefficients[2] = 2;
+	// mata.coefficients[3] = 3;
+	// mata.coefficients[4] = 2;
+	// mata.coefficients[5] = 1;
+	// mata.coefficients[6] = 2;
+	// mata.coefficients[7] = 1;
+	// mata.coefficients[8] = 0;
 
-	ExplicitMatrix matb(3);
-	matb.coefficients[0] = 1;
-	matb.coefficients[1] = 2;
-	matb.coefficients[2] = 6;
-	matb.coefficients[3] = 6;
-	matb.coefficients[4] = 6;
-	matb.coefficients[5] = 4;
-	matb.coefficients[6] = 0;
-	matb.coefficients[7] = 5;
-	matb.coefficients[8] = 1;
+	// ExplicitMatrix matb(3);
+	// matb.coefficients[0] = 1;
+	// matb.coefficients[1] = 2;
+	// matb.coefficients[2] = 6;
+	// matb.coefficients[3] = 6;
+	// matb.coefficients[4] = 6;
+	// matb.coefficients[5] = 4;
+	// matb.coefficients[6] = 0;
+	// matb.coefficients[7] = 5;
+	// matb.coefficients[8] = 1;
 	
-	string amat = "";
-	amat += "___I__E";
-	amat += "__R____";
-	amat += "_I__E__";
-	amat += "_____E_";
-	amat += "_I_____";
-	amat += "_I__E__";
-	amat += "E_R____";
+	// string amat = "";
+	// amat += "___I__E";
+	// amat += "__R____";
+	// amat += "_I__E__";
+	// amat += "_____E_";
+	// amat += "_I_____";
+	// amat += "_I__E__";
+	// amat += "E_R____";
 
 
-	string bmat = "";
-	bmat += "__E____";
-	bmat += "__E__I_";
-	bmat += "____I__";
-	bmat += "__I____";
-	bmat += "_I_____";
-	bmat += "E_____I";
-	bmat += "_______";
+	// string bmat = "";
+	// bmat += "__E____";
+	// bmat += "__E__I_";
+	// bmat += "____I__";
+	// bmat += "__I____";
+	// bmat += "_I_____";
+	// bmat += "E_____I";
+	// bmat += "_______";
 
 	/*
 	string cmat = "";
@@ -189,15 +196,15 @@ int main(int argc, char **argv)
 //matd.coefficients[0] =OM;
 //
 
-VectorInt::SetSize(3);
-MultiCounterMatrix a(mata,2);
-MultiCounterMatrix b(matb,2);
+// VectorInt::SetSize(3);
+// MultiCounterMatrix a(mata,2);
+// MultiCounterMatrix b(matb,2);
 //OneCounterMatrix c(matc);
 // OneCounterMatrix d(matd);
 
-	a.print();
-	cout<<"\n";
-	b.print();
+	// a.print();
+	// cout<<"\n";
+	// b.print();
 		
 	/*
 
@@ -223,22 +230,52 @@ MultiCounterMatrix b(matb,2);
 	*/
 
 
-	UnstableMultiMonoid monoid(3,2);
+ // 	UnstableMultiMonoid monoid(3,2);
 
- monoid.addLetter('a', mata);
- monoid.addLetter('b', matb);
+ // monoid.addLetter('a', mata);
+ // monoid.addLetter('b', matb);
 //	monoid.addLetter('c', matc);
 	//   monoid.addLetter('c', matc);
 //	monoid.addLetter('d', matd);
 
-	monoid.ComputeMonoid();
+	// monoid.ComputeMonoid();
 	
-	cout << monoid.expr_to_mat.size() << " elements." << endl;
-	cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
+	// cout << monoid.expr_to_mat.size() << " elements." << endl;
+	// cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
 	
 //	mats.clear();
 //	cmats.clear();
 
-	monoid.print() ;
-	system("pause");
+	// monoid.print() ;
+
+	int opt,verbose=0;
+	ifstream ifs; 
+
+	while((opt = getopt(argc,argv, "vh")) != -1) {
+	  switch(opt) {
+	  case 'h':
+	    pusage(argv[0]);
+	  case 'v':
+	    verbose = 1;
+	    break;
+	  default:
+	    pusage(argv[0]);
+	  }
+	}
+	if (optind >= argc) {
+	  cerr << "Expected file" << endl;
+	  pusage(argv[0]);
+	}
+	
+	ifs.open(argv[optind],ifstream::in);
+	UnstableMarkovMonoid* m = dynamic_cast<UnstableMarkovMonoid *>(Parser::parseFile(ifs));
+	m->ComputeMonoid();
+	
+	pair<int, const ExtendedExpression*> r = m->maxLeakNb();
+	cout << r.first << " leak(s) found" << endl;
+	
+	if(verbose)
+	  m->print();
+
+	// system("pause");
 }
