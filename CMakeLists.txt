@@ -33,7 +33,7 @@ endif (MSVC)
 
 option (HAVE_COLORS
     "Enable terminal colors" ON)
-
+set(CMAKE_BUILD_TYPE Debug)
 if (HAVE_COLORS)
     add_definitions (-DHAVE_COLORS)
 endif (HAVE_COLORS)

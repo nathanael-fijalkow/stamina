@@ -42,7 +42,7 @@ protected:
 
 	// Constructor
 	Monoid();
-	~Monoid();
+	virtual ~Monoid();
 
 	/* static mutex, ensures at most one monoid is instatntiated at a time */
 	static mutex singleton;
