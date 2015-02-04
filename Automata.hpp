@@ -96,7 +96,13 @@ public:
 
 	//matrix for epsilon-transitions
 	char** trans_eps;
-		
+	
+	//deterministic transition table (if we know letters are deterministic, to avoid useless loops)
+	uint** transdet_state;
+	char** transdet_action;
+	
 };
+
+MultiCounterAut* EpsRemoval(MultiCounterEpsAut *aut);
 
 #endif

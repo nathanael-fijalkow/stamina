@@ -172,4 +172,33 @@ trans_eps=(char**)malloc(Nstates*sizeof(char *));
 			trans_eps[i]=(char*)malloc(Nstates*sizeof(char));
 			memset(trans_eps[i], 2*Ncounters+2, Nstates);
 		}
+		
+		
+transdet_state=(uint**)malloc(Nletters*sizeof(uint *));
+		for(char a=0;a<Nletters;a++){
+			transdet_state[a]=(uint*)malloc(Nstates*sizeof(uint));
+			memset(transdet_state[a], 0, Nstates);
+		}
+
+transdet_action=(char**)malloc(Nletters*sizeof(char *));
+		for(char a=0;a<Nletters;a++){
+			transdet_action[a]=(char*)malloc(Nstates*sizeof(char));
+			memset(transdet_action[a], 2*Ncounters+2, Nstates);
+		}
+
+			
+}
+
+//Epsilon removal in MultiCounter Automata
+//We assume the letters are deterministic in epsaut
+MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
+	uint ns=epsaut->NbStates;
+	char nl=epsaut->NbLetters;
+	char nc=epsaut->NbCounters;
+	
+	MultiCounterAut *aut=new MultiCounterAut(nl,ns,nc);
+	
+	//TODO
+	
+	return aut;
 }
