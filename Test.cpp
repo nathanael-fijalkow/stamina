@@ -9,11 +9,12 @@
 #include <sstream>
 
 #include <math.h>
-#include <unistd.h>
 
 #ifdef MSVC
 #include <windows.h>
 #include <time.h>
+#else
+#include <unistd.h>
 #endif
 
 using namespace std;

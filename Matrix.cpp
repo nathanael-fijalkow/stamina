@@ -21,6 +21,17 @@ ExplicitMatrix::ExplicitMatrix(const ExplicitMatrix & other)
 	*this = other;
 }
 
+void ExplicitMatrix::print(std::ostream& os) const
+{
+	if (!coefficients) return;
+	for (int i = 0; i < stateNb; i++)
+	{
+		for (int j = 0; j < stateNb; j++)
+			cout << (int) coefficients[i*stateNb + j] << " ";
+		cout << endl;
+	}
+}
+
 ExplicitMatrix::~ExplicitMatrix()
 {
 	delete(coefficients);
@@ -38,13 +49,14 @@ ExplicitMatrix * ExplicitMatrix::random(uint stateNb)
 {
 	ExplicitMatrix * pe = new ExplicitMatrix(stateNb);
 	ExplicitMatrix & e = *pe;
+	auto seed = rand();
 	for (uint i = 0; i < Vector::GetStateNb(); i++)
 	{
 		int sel = (stateNb * rand() / RAND_MAX);
 		e.coefficients[i*stateNb + sel] = 2;
 		for (uint j = 0; j < stateNb; j++)
 			if (j != sel)
-				e.coefficients[i*stateNb + j] = (rand() < RAND_MAX / 30) ? 2 : 0;
+				e.coefficients[i*stateNb + j] = (rand() > seed) ? 2 : 0;
 	}
 	return pe;
 }

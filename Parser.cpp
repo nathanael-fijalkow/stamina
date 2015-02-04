@@ -53,7 +53,7 @@ Monoid* Parser::parseFile(std::istream &file)
   getfline(file,line);
   initialState = stoi(line);
 
-  int finalStates[size];
+  int * finalStates = (int *) malloc(sizeof(int) * size);
   getfline(file,line);
   istringstream iss(line);
   for(int i=0;i<size;i++){
@@ -78,5 +78,7 @@ Monoid* Parser::parseFile(std::istream &file)
     }
     monoid->addLetter(lt[0],mat);
   }
+
+  delete finalStates;
   return monoid;
 }
