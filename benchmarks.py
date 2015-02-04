@@ -19,6 +19,8 @@ parser.add_argument('-m', help='size of the alphabet',
                     type=int,required=True)
 parser.add_argument('-o','--output',help='output to file')
 parser.add_argument('-a',help='accumulative generation',action='store_true')
+parser.add_argument('-r','--repeat',help='repeat the experiment x times',
+                     type=int, default=1)
 parser.add_argument('acme1', help='path to the Acme++ executable')
 parser.add_argument('acme2', help='path to the AcmeML executable')
 args = parser.parse_args()
@@ -57,21 +59,29 @@ else:
     fr=args.n
 
 for i in range(fr,args.n+1):
-    f = open(tempFile,'w')
-    f.write(gen(i,args.m))
-    f.close()
+    for x in range(0,args.repeat):
+        f = open(tempFile,'w')
+        f.write(gen(i,args.m))
+        f.close()
 
-    s = subprocess.Popen(['time','-f "%U"','./'+args.acme1,tempFile],
-                         stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    (acme_out,time_out)=s.communicate()
-    print 'Acme++ took ' + time_out
-    x1=time_out.replace('"','').strip()
-    s = subprocess.Popen(['time','-f "%U"','./'+args.acme2,'-mma',tempFile,'-silent'],
-                         stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    (acme_out,time_out)=s.communicate()
-    print 'AcmeML took ' + time_out
-    print acme_out
-    x2=time_out.replace('"','').strip()
-    if(args.output):
-        out.write(str(i)+' '+x1+' '+x2+'\n')
+        s = subprocess.Popen(['time','-f "%U"','./'+args.acme1,tempFile],
+                             stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        (acme_out,time_out)=s.communicate()
+        monsize = re.search(r'has (\d+)',acme_out).group(1)
+        
+        print 'We picked a monoid of size ' + monsize
+        x1=time_out.replace('"','').strip()
+        print 'Acme++ took ' + x1
+    
+        s = subprocess.Popen(['time','-f "%U"','./'+args.acme2,'-mma',tempFile,'-silent'],
+                             stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        (acme_out,time_out)=s.communicate()
+        if time_out.find('Stack_overflow')!=-1:     
+            print 'AcmeML had a stack overflow'
+            x2=str(-1)
+        else:
+            x2=time_out.replace('"','').strip()
+            print 'AcmeML took ' + x2
+        if(args.output):
+            out.write(str(i)+' '+monsize+''+x1+' '+x2+'\n')
 out.close()

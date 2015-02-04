@@ -273,9 +273,10 @@ int main(int argc, char **argv)
 	
 	pair<int, const ExtendedExpression*> r = m->maxLeakNb();
 	cout << r.first << " leak(s) found" << endl;
+	cout << "The monoid has " << m->expr_to_mat.size() << " elements" << endl;
 	
 	if(verbose)
 	  m->print();
-
+	
 	// system("pause");
 }
