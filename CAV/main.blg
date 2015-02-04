@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: main.aux
+The style file: alpha.bst
+Database file #1: bib.bib
+Warning--I didn't find a database entry for "FGKO14"
+You've used 3 entries,
+            2543 wiz_defined-function locations,
+            580 strings with 4837 characters,
+and the built_in function-call counts, 1326 in all, are:
+= -- 130
+> -- 41
+< -- 4
++ -- 14
+- -- 13
+* -- 79
+:= -- 201
+add.period$ -- 9
+call.type$ -- 3
+change.case$ -- 17
+chr.to.int$ -- 3
+cite$ -- 3
+duplicate$ -- 67
+empty$ -- 110
+format.name$ -- 18
+if$ -- 293
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 3
+newline$ -- 18
+num.names$ -- 9
+pop$ -- 20
+preamble$ -- 1
+purify$ -- 20
+quote$ -- 0
+skip$ -- 62
+stack$ -- 0
+substring$ -- 78
+swap$ -- 23
+text.length$ -- 4
+text.prefix$ -- 2
+top$ -- 0
+type$ -- 24
+warning$ -- 0
+while$ -- 11
+width$ -- 4
+write$ -- 41
+(There was 1 warning)
