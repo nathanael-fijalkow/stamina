@@ -52,6 +52,7 @@ public:
 
 	// Print
 	void print(std::ostream& os) const;
+  
 
 
 protected:
@@ -70,6 +71,9 @@ protected:
 		for (char * index = coefs; index != coefs + entriesNb; index++)
 			_hash ^= std::hash_value(*index) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 	};
+
+	// Initialization of content
+	void init();
 
 private:
 

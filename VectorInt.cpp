@@ -7,12 +7,17 @@
 using namespace std;
 
 // Class Vector
+//For constructors
+void VectorInt::init(){
+  	coefs = (char *)malloc(entriesNb * sizeof(char));
+	memset(coefs, (char)0, entriesNb * sizeof(char));
+	update_hash();
+}
+
 // First constructor
 VectorInt::VectorInt()
 {
-	coefs = (char *)malloc(entriesNb * sizeof(char));
-	memset(coefs, (char)0, entriesNb * sizeof(char));
-	update_hash();
+  init();
 }
 
 
@@ -24,8 +29,9 @@ VectorInt::VectorInt(const VectorInt & other)
 }
 
 // Third constructor
-VectorInt::VectorInt(vector<char> data) : VectorInt()
+VectorInt::VectorInt(vector<char> data)
 {
+        init();
 	for (int i = data.size() - 1; i >= 0; i--)
 		coefs[i] = data[i];
 	update_hash();
@@ -48,7 +54,7 @@ VectorInt::VectorInt(char * data, bool copy)
 
 void VectorInt::print(ostream & os) const
 {
-	throw runtime_error("Unimplemented");
+  // throw runtime_error("Unimplemented");
 	/*
 	for (uint i = 0; i < entriesNb; i++)
 		os << (contains(i) ? "1" : "0");
