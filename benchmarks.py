@@ -2,6 +2,8 @@
 import random
 import subprocess
 import re
+import bisect
+
 tempFile = '/tmp/acme_test'
 def toform(c):
     if c==0:
@@ -35,10 +37,15 @@ def gen(n,m):
 
     output+='\n\n'
     for i in range(0,m):
+        pickprob = random.random()
         output+=chr(ord('a')+i)+'\n'
         for j in range(0,n):
+            chosen = random.randint(0,n)
             for k in range(0,n):
-                output += toform(random.randint(0,1)) + ' '
+                if k==chosen:
+                    output += str(1) + ' '
+                else:
+                    output += toform(bisect.bisect([pickprob,1],random.random())) + ' '
             output+='\n'
         output+='\n'
     return output
@@ -49,9 +56,6 @@ if args.a:
 else:
     fr=args.n
 
-x1=None
-x2=None
-
 for i in range(fr,args.n+1):
     f = open(tempFile,'w')
     f.write(gen(i,args.m))
@@ -61,19 +65,13 @@ for i in range(fr,args.n+1):
                          stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     (acme_out,time_out)=s.communicate()
     print 'Acme++ took ' + time_out
-    m=re.match(r".*(\d+).*",time_out)
-    if m:
-        x1=m.group(0)
+    x1=time_out.replace('"','').strip()
     s = subprocess.Popen(['time','-f "%U"','./'+args.acme2,'-mma',tempFile,'-silent'],
                          stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     (acme_out,time_out)=s.communicate()
     print 'AcmeML took ' + time_out
     print acme_out
-    m=re.match(r".*(\d+).*",time_out)
-    if m:
-        x2=m.group(0)
-    if(args.output and x1 and x2):
-        out.write(x1+' '+x2+'\n')
-        x1=None
-        x2=None
+    x2=time_out.replace('"','').strip()
+    if(args.output):
+        out.write(str(i)+' '+x1+' '+x2+'\n')
 out.close()
