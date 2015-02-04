@@ -41,6 +41,9 @@ public:
 	ExplicitMatrix& operator=(const ExplicitMatrix & other);
 	ExplicitMatrix(const ExplicitMatrix & other);
 
+	// Printing
+	virtual void print(std::ostream& os = std::cout) const;
+
 	// Free a useless explicit matrix
 	~ExplicitMatrix();
 };

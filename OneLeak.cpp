@@ -20,6 +20,7 @@ int main(int argc, char **argv)
 
 	cout << "Acme++ rules" << endl;
 
+
 	while (true)
 	{
 		int stateNb = 5;
@@ -47,18 +48,18 @@ int main(int argc, char **argv)
 		monoid.addLetter('b', *b);
 //		monoid.addLetter('c', *c);
 
+		cout << "#################################################################" << endl;
+		cout << "Matrix a" << endl;
+		a->print();
+		cout << "Matrix b" << endl;
+		b->print();
+
 		monoid.ComputeMonoid();
-
-
 
 		int ln = monoid.maxLeakNb().first;
 
 		cout << endl << stateNb << " states and " <<  monoid.expr_to_mat.size() << " elements and " << monoid.rewriteRules.size() << " rewrite rules and ";
 		cout << " max leak number " << ln << endl;
-		if (ln > 0)
-		{
-//			monoid.print();
-		}
 
 		delete a;
 		delete b;
