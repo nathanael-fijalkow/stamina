@@ -11,5 +11,6 @@ set (SOURCES
 	VectorInt.cpp
 	MultiMonoid.cpp
 	Parser.cpp
+	Automata.cpp
 	)
 
