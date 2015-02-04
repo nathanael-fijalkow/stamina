@@ -83,5 +83,5 @@ for i in range(fr,args.n+1):
             x2=time_out.replace('"','').strip()
             print 'AcmeML took ' + x2
         if(args.output):
-            out.write(str(i)+' '+monsize+''+x1+' '+x2+'\n')
+            out.write(str(i)+' '+monsize+' '+x1+' '+x2+'\n')
 out.close()
