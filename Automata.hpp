@@ -4,6 +4,8 @@
 #include "Matrix.hpp"
 
 
+class ClassicEpsAut;
+
 class ClassicAut
 {
 public:
@@ -31,5 +33,25 @@ protected:
 	void init(char nbletters, uint nbstates);
 
 };
+
+
+//Classic automata with Epsilon-transition, in particular Subset Automata are of this type
+class ClassicEpsAut : public ClassicAut
+{
+public:
+
+	// Constructor
+	ClassicEpsAut(char Nletters, uint Nstates);
+
+	//matrix for epsilon-transitions
+	bool** trans_eps;
+	
+	//deterministic transition table (if we know letters are deterministic, to avoid useless loops)
+	uint** transdet;
+};
+
+
+//turn a deterministic automaton into a subset automaton with epsilon-transitions
+ClassicEpsAut* toSubsetAut(ClassicAut *aut);
 
 #endif
