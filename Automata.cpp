@@ -1,5 +1,6 @@
 #include "Automata.hpp"
 
+
 using namespace std;
 
 //Classical Automata
@@ -45,8 +46,34 @@ trans_eps=(bool**)malloc(Nstates*sizeof(bool *));
 transdet=(uint**)malloc(Nletters*sizeof(uint *));
 		for(char a=0;a<Nletters;a++){
 			transdet[a]=(uint*)malloc(Nstates*sizeof(uint));
-			memset(transdet[a], 0, Nstates);
+			memset(transdet[a], Nstates, Nstates); //initialize with Nstates, meaning "no transition"
 		}
+initial=0;
+}
+
+//We assume letters are deterministic
+void ClassicEpsAut::print(){
+	for(char a=0;a<NbLetters;a++){
+		printf("Letter %d\n",a);
+		for(uint i=0;i<NbStates;i++){
+			for(uint j=0;j<NbStates;j++){
+				if (j==transdet[a][i]) printf("%d ",1); else printf("_ ");
+			}
+			printf("\n");
+		}
+		printf("\n");
+	}
+	
+		printf("Epsilon\n");
+		for(uint i=0;i<NbStates;i++){
+			for(uint j=0;j<NbStates;j++){
+				printf("%d ",trans_eps[i][j]);
+			}
+			printf("\n");
+		}
+		printf("\n");
+	
+	
 }
 
 //compute x^p
@@ -76,22 +103,25 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	ClassicEpsAut* Subaut=new ClassicEpsAut(aut->NbLetters,nspow);
 	//each new state is a subset of Q, represented by the binary representation of uint 0,1,2,..., nspow-1
 	
-	//the only initial new state is {i} where i initial. The function works if there are several initial states
+	//the only initial new state is {i:  i initial}. The function works if there are several initial states
+	Subaut->initial=0;
 	for(uint i=0;i<n;i++){
-		if(aut->initialstate[i]) Subaut->initialstate[myPow(2,i-1)]=true;
+		if(aut->initialstate[i]) {Subaut->initial+=TwoPow(i);}
 	}
+	printf("Initial state created:%d\n",Subaut->initial);
 	
 	//final states are subsets where all states are final state. This is because we actually powerset the automaton for the complement.
+	uint k;
 	for(uint i=0;i<nspow;i++){
-		uint k=0;
+		k=0;
 		bool fin=true;
 		while(k<n and fin) {
 			fin=aut->finalstate[bit(i,k)];
+			k++;
 		}
 		Subaut->finalstate[i]=fin;
 	}
-	
-	
+	printf("Final states created:%d\n");
 	
 	//transitions are as usually in powerset
 	
@@ -122,7 +152,7 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	//we add epsilon-transitions witnessing the inclusion relation: P->Q if P is contained in Q
 	for(uint i=0;i<nspow;i++){
 		for(uint j=0;j<nspow;j++){
-			if(i|j == j) Subaut->trans_eps[i][j]=true; //test for bitwise inclusion
+			Subaut->trans_eps[i][j]=( (i|j) == j);  //test for bitwise inclusion
 		}
 	}
 		
@@ -130,6 +160,87 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	
 }
 
+
+//Minimization of subset automata
+ClassicEpsAut* SubMin(ClassicEpsAut *aut){
+	uint N=aut->NbStates;
+	uint *part=(uint *)malloc(N*sizeof(uint)); //array containing the number of the partition.
+	
+	VectorUInt::SetSize(aut->NbLetters+N);
+	
+	std::vector<uint> data(VectorUInt::GetStateNb()); //vector for merging, of size Nletters+Nstates, giving the partition of p---a-->? and then p|q=?
+
+
+	//initially, two partitions: 0 for rejecting and 1 for accepting
+	for(uint i=0;i<N;i++){
+		part[i]=(aut->finalstate[i])?1:0;
+	}
+
+	std::unordered_set<VectorUInt> vectors;
+	
+	uint *original=(uint *)malloc(N*sizeof(uint));// to go from representant to one original state.
+		
+	uint nbpart=0;
+	uint new_nbpart=2;
+	
+	
+	while(nbpart!=new_nbpart){
+		vectors.clear();
+		nbpart=new_nbpart;
+		new_nbpart=0;
+		//printf("nbpart:%d\n",nbpart);
+		
+		for(uint i=0;i<N;i++){
+			for(char a=0;a<aut->NbLetters;a++){		
+				data[a]=part[aut->transdet[a][i]]; //store the partitions of destinations in data
+			}
+			for(uint j=0;j<N;j++){		
+				data[aut->NbLetters+j]=part[i|j]; //store the partitions of unions in data
+			}
+			
+			auto it = vectors.emplace(data,i);
+			
+			//if vector is new, we increase new_nb_part
+			if(it.second){
+				 part[i]=new_nbpart; //take the current identifier
+				 original[new_nbpart]=i;// memorize an original state of this identifier
+				 new_nbpart++;
+			 } else {
+			 part[i]=part[it.first->id]; //point to same representant as existing one 
+			}	
+			//maybe replace this with monotonicity instead of equality later... 
+			
+		}		
+		
+	}
+	
+	//after stabilization, compute new transition table.
+	
+	ClassicEpsAut *MinAut=new ClassicEpsAut(aut->NbLetters,nbpart);
+	
+	//initial and final states
+	MinAut->initial=part[aut->initial];
+	
+	for(uint i=0;i<nbpart;i++){
+		MinAut->finalstate[i]=aut->finalstate[original[i]];
+	}
+	
+	//det transitions
+	for(char a=0;a<aut->NbLetters;a++){
+		for(uint n=0;n<nbpart;n++){
+			MinAut->transdet[a][n]=part[aut->transdet[a][original[n]]];
+		}
+	}
+	
+	//epsilon transitions
+	for(uint i=0;i<nbpart;i++){
+		for(uint j=0;j<nbpart;j++){
+			MinAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
+		}
+	}
+	
+	return MinAut;
+}
 
 
 //Multi-counter Automata
@@ -178,6 +289,21 @@ MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
 	
 }
 
+//print B-automaton
+void MultiCounterAut::print(){
+	for(char a=0;a<NbLetters;a++){
+		printf("Letter %d\n",a);
+		for(uint i=0;i<NbStates;i++){
+			for(uint j=0;j<NbStates;j++){
+				printf("%d ",trans[a][i][j])	;
+			}
+			printf("\n");
+		}
+		printf("\n");
+	}
+	
+}
+
 //product of matrices. No need to optimize as in the monoid because this won't be done too many times.
 char** MultiCounterAut::prod_mat(char** mat1, char **mat2){
 	char best_act;
@@ -204,11 +330,11 @@ char** MultiCounterAut::prod_det_mat(uint *det_state, char *det_act, char** mat2
 	uint act;
 	for(uint i=0;i<NbStates;i++){
 		res[i]=(char *)malloc(NbStates*sizeof(char));
-		for(uint j=0;j<this->NbStates;j++){
+		for(uint j=0;j<NbStates;j++){
 			//compute res[i][j]
 			k=det_state[i];
 			act=det_act[i];
-			res[i][j]=act_prod[act][mat2[k][j]];
+			if (k<NbStates) res[i][j]=act_prod[act][mat2[k][j]]; //if k=NbStates it means no transition
 		}
 	}
 	return res;
@@ -227,7 +353,7 @@ trans_eps=(char**)malloc(Nstates*sizeof(char *));
 transdet_state=(uint**)malloc(Nletters*sizeof(uint *));
 		for(char a=0;a<Nletters;a++){
 			transdet_state[a]=(uint*)malloc(Nstates*sizeof(uint));
-			memset(transdet_state[a], 0, Nstates);
+			memset(transdet_state[a], Nstates, Nstates); //initialize with Nstates, meaning "no transition"
 		}
 
 transdet_action=(char**)malloc(Nletters*sizeof(char *));
@@ -257,7 +383,7 @@ bool equal_mat(char ** mat1,char ** mat2, uint N){
  
 //Epsilon removal in MultiCounter Automata
 //We assume each state has an espilon-transtion to itself
-//We assume letters are deterministic in espaut
+//We assume letters are deterministic in epsaut
 MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
 	uint ns=epsaut->NbStates;
 	char nl=epsaut->NbLetters;
