@@ -2,7 +2,7 @@
 #define AUTOMATA_HPP
 
 #include "Matrix.hpp"
-
+#include "VectorUInt.hpp"
 
 
 class ClassicAut
@@ -46,13 +46,21 @@ public:
 	bool** trans_eps;
 	
 	//deterministic transition table (if we know letters are deterministic, to avoid useless loops)
+	//if no transition, goes to state N+1.
 	uint** transdet;
+	
+	//unique initial state
+	uint initial;
+	
+	void print();
 };
 
 
 //turn a deterministic automaton into a subset automaton with epsilon-transitions
 ClassicEpsAut* toSubsetAut(ClassicAut *aut);
 
+//Minimisation of subset automata
+ClassicEpsAut* SubMin(ClassicEpsAut *aut);
 
 class MultiCounterAut
 {
@@ -90,6 +98,8 @@ public:
 	
 	// This matrix act_prod is of size (2N+3)*(2N+3), it is computed once and for all.
 	char ** act_prod;
+	
+	void print();
 
 };
 
@@ -106,12 +116,14 @@ public:
 	char** trans_eps;
 	
 	//deterministic transition table (if we know letters are deterministic, to avoid useless loops)
-	//not used for now
+	//if no transition, goes to state N+1.
 	uint** transdet_state;
 	char** transdet_action;
 	
 };
 
 MultiCounterAut* EpsRemoval(MultiCounterEpsAut *aut);
+
+uint myPow(uint x, uint p);
 
 #endif

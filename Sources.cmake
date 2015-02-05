@@ -12,5 +12,7 @@ set (SOURCES
 	MultiMonoid.cpp
 	Parser.cpp
 	Automata.cpp
+	StarHeight.cpp
+	VectorUInt.cpp
 	)
 
