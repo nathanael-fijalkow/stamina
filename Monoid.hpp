@@ -56,7 +56,8 @@ class UnstableMonoid : public Monoid
 {
 public:
 
-	UnstableMonoid(uint dim);
+	//Constructor. By defaut the constructor clears existing vectors list.
+	UnstableMonoid(uint dim, bool clear_vectors = true);
 	~UnstableMonoid();
 
 	// Adds a new letter

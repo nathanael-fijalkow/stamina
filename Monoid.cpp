@@ -468,9 +468,10 @@ Monoid::~Monoid()
 }
 
 // Constructor
-UnstableMonoid::UnstableMonoid(uint dim)
+UnstableMonoid::UnstableMonoid(uint dim, bool clear_vectors)
 {
-	Matrix::vectors.clear();
+	if (clear_vectors)
+		Matrix::vectors.clear();
 	Vector::SetSize(dim);
 	_sharp_height = 0;
 	cnt = 0;

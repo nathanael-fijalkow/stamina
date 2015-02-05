@@ -251,7 +251,7 @@ int main(int argc, char **argv)
 
 	int opt,verbose=0;
 	ifstream ifs; 
-
+#ifndef WIN32
 	while((opt = getopt(argc,argv, "vh")) != -1) {
 	  switch(opt) {
 	  case 'h':
@@ -269,6 +269,8 @@ int main(int argc, char **argv)
 	}
 	
 	ifs.open(argv[optind],ifstream::in);
+#endif
+
 	UnstableMarkovMonoid* m = dynamic_cast<UnstableMarkovMonoid *>(Parser::parseFile(ifs));
 	m->ComputeMonoid();
 	

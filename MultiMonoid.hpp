@@ -4,12 +4,16 @@
 
 #include "Monoid.hpp"
 #include "MultiCounterMatrix.hpp"
+#include "Automata.hpp"
 
 class UnstableMultiMonoid : public UnstableMonoid
 {
 public:
-	// Creates zero vector
+	// Constructor (Creates zero vector)
 	UnstableMultiMonoid(uint dim, uint counter_number);
+
+	//Constructor from automa
+	UnstableMultiMonoid(const MultiCounterAut & automata);
 
 	// The set containing the known small matrices
 	unordered_set <MultiCounterMatrix> matrices;

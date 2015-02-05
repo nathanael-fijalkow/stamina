@@ -1,5 +1,5 @@
 #include "Automata.hpp"
-
+#include <algorithm>
 
 using namespace std;
 
