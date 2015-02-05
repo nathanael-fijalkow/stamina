@@ -79,9 +79,17 @@ public:
 	//transition table: one char matrix for each letter
 	char*** trans;
 
-protected:
+	//matrix product
+	char** prod_mat(char **mat1, char **mat2);
+	
+	//det-matrix product
+	char** prod_det_mat(uint *det_state, char *det_act, char** mat2 );
+
 	//initialization
 	void init(char nbletters, uint nbstates, char nbcounters);
+	
+	// This matrix act_prod is of size (2N+3)*(2N+3), it is computed once and for all.
+	char ** act_prod;
 
 };
 
@@ -98,6 +106,7 @@ public:
 	char** trans_eps;
 	
 	//deterministic transition table (if we know letters are deterministic, to avoid useless loops)
+	//not used for now
 	uint** transdet_state;
 	char** transdet_action;
 	

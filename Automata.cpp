@@ -153,6 +153,23 @@ void MultiCounterAut::init(char Nletters,uint Nstates, char Ncounters){
 			memset(trans[a][i], 2*Ncounters+2, Nstates);
 		}
 	}
+	
+	char N=Ncounters;
+	act_prod = (char **)malloc((2 * N + 3)  *  sizeof(char*));
+	for (uint i = 0; i < (2 * N + 3); i++){
+		act_prod[i] = (char *)malloc((2 * N + 3)  *  sizeof(char));
+		for (uint j = 0; j < (2 * N + 3); j++){
+			act_prod[i][j] =
+				(i == 2 * N + 2 || j == 2 * N + 2) ? 2 * N + 2
+				: (i == 2 * N + 1 || j == 2 * N + 1) ? 2 * N + 1
+				: ((i <= N & j <= N) || (N < i & N < j)) ? ( i< j ? i : j)
+				: (i <= N & N < j & i < j - N) ? i
+				: (i <= N & N < j & i >= j - N) ? j
+				: (j <= N & N < i & j < i - N) ? j
+				: /*(j <= N & N < i & j > i - N) ?*/ i;
+		}
+	}
+	
 }
 
 //Constructor
@@ -161,8 +178,41 @@ MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
 	
 }
 
+//product of matrices. No need to optimize as in the monoid because this won't be done too many times.
+char** MultiCounterAut::prod_mat(char** mat1, char **mat2){
+	char best_act;
+	char **res=(char **)malloc(NbStates*sizeof(char *));
+	for(uint i=0;i<NbStates;i++){
+		res[i]=(char *)malloc(NbStates*sizeof(char));
+		for(uint j=0;j<this->NbStates;j++){
+			//compute res[i][j]
+			best_act=2*NbCounters+2;
+			for(uint k=0;k<NbStates;k++){
+				best_act=min(best_act, act_prod[mat1[i][k]][mat2[k][j]]);
+			}
+			res[i][j]=best_act;
+		}
+	}
+	return res;
+}
 
 
+//product of a deterministic transition table with a matrix 
+char** MultiCounterAut::prod_det_mat(uint *det_state, char *det_act, char** mat2 ){
+	char **res=(char **)malloc(NbStates*sizeof(char *));
+	uint k;
+	uint act;
+	for(uint i=0;i<NbStates;i++){
+		res[i]=(char *)malloc(NbStates*sizeof(char));
+		for(uint j=0;j<this->NbStates;j++){
+			//compute res[i][j]
+			k=det_state[i];
+			act=det_act[i];
+			res[i][j]=act_prod[act][mat2[k][j]];
+		}
+	}
+	return res;
+}
 
 //classical Automata with Epsilon-transitions
 MultiCounterEpsAut::MultiCounterEpsAut(char Nletters,uint Nstates, char Ncounters) : MultiCounterAut(Nletters,Nstates,Ncounters)
@@ -189,8 +239,25 @@ transdet_action=(char**)malloc(Nletters*sizeof(char *));
 			
 }
 
+//equality of matrices
+bool equal_mat(char ** mat1,char ** mat2, uint N){
+	bool eq=true;
+	uint i=0;
+	while(eq && i<N){
+		uint j=0;
+		while(eq && j<N){
+			eq=(mat1[i][j]==mat2[i][j]);
+			j++;
+			}
+		i++;
+	}
+	return eq;
+ }
+
+ 
 //Epsilon removal in MultiCounter Automata
-//We assume the letters are deterministic in epsaut
+//We assume each state has an espilon-transtion to itself
+//We assume letters are deterministic in espaut
 MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
 	uint ns=epsaut->NbStates;
 	char nl=epsaut->NbLetters;
@@ -198,7 +265,25 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
 	
 	MultiCounterAut *aut=new MultiCounterAut(nl,ns,nc);
 	
-	//TODO
+	//copy initial states and final states
+	aut->initialstate=epsaut->initialstate;
+	aut->finalstate=epsaut->finalstate;
+	
+	//stabilize epsilon-transitions 
+	char **eps=epsaut->trans_eps;
+	char** new_eps=epsaut->prod_mat(eps,eps);
+	char** prev_eps=eps;
+	while (!equal_mat(new_eps,prev_eps,ns)){
+		prev_eps=new_eps;
+		new_eps=epsaut->prod_mat(new_eps,eps);
+	}
+	
+	//update matrices of each letter : new_a=e*ae*
+	char ** ae;
+	for(char a=0;a<nl;a++){
+		ae=epsaut->prod_det_mat(epsaut->transdet_state[a],epsaut->transdet_action[a],new_eps);
+		aut->trans[a]=epsaut->prod_mat(new_eps,ae);
+	}
 	
 	return aut;
 }

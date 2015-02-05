@@ -2,6 +2,8 @@
 import random
 import subprocess
 import re
+import bisect
+
 tempFile = '/tmp/acme_test'
 def toform(c):
     if c==0:
@@ -17,6 +19,8 @@ parser.add_argument('-m', help='size of the alphabet',
                     type=int,required=True)
 parser.add_argument('-o','--output',help='output to file')
 parser.add_argument('-a',help='accumulative generation',action='store_true')
+parser.add_argument('-r','--repeat',help='repeat the experiment x times',
+                     type=int, default=1)
 parser.add_argument('acme1', help='path to the Acme++ executable')
 parser.add_argument('acme2', help='path to the AcmeML executable')
 args = parser.parse_args()
@@ -35,10 +39,15 @@ def gen(n,m):
 
     output+='\n\n'
     for i in range(0,m):
+        pickprob = random.random()
         output+=chr(ord('a')+i)+'\n'
         for j in range(0,n):
+            chosen = random.randint(0,n)
             for k in range(0,n):
-                output += toform(random.randint(0,1)) + ' '
+                if k==chosen:
+                    output += str(1) + ' '
+                else:
+                    output += toform(bisect.bisect([pickprob,1],random.random())) + ' '
             output+='\n'
         output+='\n'
     return output
@@ -49,31 +58,30 @@ if args.a:
 else:
     fr=args.n
 
-x1=None
-x2=None
-
 for i in range(fr,args.n+1):
-    f = open(tempFile,'w')
-    f.write(gen(i,args.m))
-    f.close()
+    for x in range(0,args.repeat):
+        f = open(tempFile,'w')
+        f.write(gen(i,args.m))
+        f.close()
 
-    s = subprocess.Popen(['time','-f "%U"','./'+args.acme1,tempFile],
-                         stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    (acme_out,time_out)=s.communicate()
-    print 'Acme++ took ' + time_out
-    m=re.match(r".*(\d+).*",time_out)
-    if m:
-        x1=m.group(0)
-    s = subprocess.Popen(['time','-f "%U"','./'+args.acme2,'-mma',tempFile,'-silent'],
-                         stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    (acme_out,time_out)=s.communicate()
-    print 'AcmeML took ' + time_out
-    print acme_out
-    m=re.match(r".*(\d+).*",time_out)
-    if m:
-        x2=m.group(0)
-    if(args.output and x1 and x2):
-        out.write(x1+' '+x2+'\n')
-        x1=None
-        x2=None
+        s = subprocess.Popen(['time','-f "%U"','./'+args.acme1,tempFile],
+                             stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        (acme_out,time_out)=s.communicate()
+        monsize = re.search(r'has (\d+)',acme_out).group(1)
+        
+        print 'We picked a monoid of size ' + monsize
+        x1=time_out.replace('"','').strip()
+        print 'Acme++ took ' + x1
+    
+        s = subprocess.Popen(['time','-f "%U"','./'+args.acme2,'-mma',tempFile,'-silent'],
+                             stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        (acme_out,time_out)=s.communicate()
+        if time_out.find('Stack_overflow')!=-1:     
+            print 'AcmeML had a stack overflow'
+            x2=str(-1)
+        else:
+            x2=time_out.replace('"','').strip()
+            print 'AcmeML took ' + x2
+        if(args.output):
+            out.write(str(i)+' '+monsize+' '+x1+' '+x2+'\n')
 out.close()
