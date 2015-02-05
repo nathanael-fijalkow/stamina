@@ -85,7 +85,7 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	for(uint i=0;i<nspow;i++){
 		uint k=0;
 		bool fin=true;
-		while(k<n and fin) {
+		while(k<n && fin) {
 			fin=aut->finalstate[bit(i,k)];
 		}
 		Subaut->finalstate[i]=fin;
