@@ -61,7 +61,54 @@ The dedicated webpage where the tool ACME++ can be downloaded is
 
 \section{Introduction}
 
-ACME++ rules!
+Acme++ is a tool for deciding properties of some algebraic structures called stabilization monoids,
+with two motivations in mind:
+1) provide an effective tool to solve the starheight problem
+2) provide a tool to solve the value 1 problem for probabilistic automata.
+
+
+
+*The starheight problem*
+
+An excellent introduction about the starhieght probelm is given in [Kirsten],
+which mentions some of the important industrial applications as
+speech recognition [38], database theory [8], and image compression [4, 20].
+This problem was considered as the most difficult problem in the theory of recognizable languages
+and it took 25 yers before being solved.
+Implementing Hashiguchi algorithm is hopeless: the algorithm proceeds by enumeration of certain expressions
+and has a terrible complexity [Lombardy + Sakarovitch].
+It took another 22 years before an algorithm with a better algrithmic complexity was gievn by Kirsten.
+
+Acme++ aims at solving the starhiehgt  problem for practical applications,
+albeit the doubly exponential space complexity of Kirsten algoithm is a challenge to tackle.
+
+* The vaue 1 problem*
+Probabilistic automata are a versatile tool widely used in speech recognition as well as a modelling tool 
+for the control of systems with prtial observation (actually no observation).
+Probabilistic automata are natural extension on automata on finte words,
+with probabilstic transitions.
+The value 1 problem is natural when  probabilistic automata are used as models
+of systems controlled by a blind controller, who is in charge of choosing the
+sequence of input letters in order to maximize the acceptance
+probability, see [LICS] for an introduction.
+
+Stabilization semigroups are the key mathematical object needed to solve the two questions we are interested in.
+The starheight problem is related to the limitedness problem of distance atomata.
+A seminal paper by Simon "On semigroups of matrices over the tropical seimrings"
+gives a clean easy to read proof 
+Then Kirsten showed how monoids could be used to solve the starheight problem using algebraic structures,
+giving an alternate proof to th every comple proof of Hashigushi, based on nested distance desert automata.
+Desert automata are automata with ranked counters that can be either incremented and reset,
+with the extra condition that if a counter is reset all counters of lower rank are reset as well.
+Colcombet extended further the work of Kirsten introducing stabilization monoids in order to handle
+general counter automata, without rank.
+The techniques of Simon were adapted to solve the value 1 problem for probabilistic automata.
+
+
+Acme++ is a set of software tools to handle stabilization monoids, they can generate a stabilization monoid from its generators and test properties of these monoids, in particular the limitedness and the existance of value 1 witnesses.
+
+Our results:
+provide a description of experimental results.
 
 \section{Stabilization Monoids for $B$- and Probabilistic Automata}
 
