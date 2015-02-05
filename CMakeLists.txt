@@ -86,3 +86,6 @@ target_link_libraries (OneLeakTest ${EXTRA_LIBS})
 
 add_executable (Statistics ${ALL_SOURCES} ${ALL_HEADERS} Statistics.cpp)
 target_link_libraries (Statistics ${EXTRA_LIBS})
+
+add_executable (TestAut ${ALL_SOURCES} ${ALL_HEADERS} TestAut.cpp)
+target_link_libraries (TestAut ${EXTRA_LIBS})
