@@ -30,18 +30,21 @@ void pusage(char* s)
 int main(int argc, char **argv)
 {
 	//3 letters 3 states
-	ClassicAut *aut=new ClassicAut(3,3);
+	ClassicAut *aut=new ClassicAut(3,4);
 	
 	aut->trans[0][0][1]=true;
 	aut->trans[1][1][0]=true;
 	aut->trans[2][0][2]=true;
 	aut->trans[2][2][0]=true;
 	
-	//printf("OK so far...\n");
+	aut->initialstate[0]=true;
+	aut->finalstate[0]=true;
 	
-	MultiCounterAut *Baut=toNestedBaut(aut, 0);
+	printf("Automaton created\n");
 	
-	Baut->print();
+	MultiCounterAut *Baut=toNestedBaut(aut, 1);
+	
+	//Baut->print();
 	
     std::cout << "End of Computation\n";
     //std::cin.get();
