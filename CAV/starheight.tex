@@ -1,7 +1,7 @@
 \newcommand{\cB}{\mathcal B}
 % \newcommand{\trans}[1]{\stackrel{#1}{\longrightarrow}}
 
-\section{The Star-Height algorithm}
+\section{The Star-height algorithm}
 
 The latest algorithm in the literature for computing star-height is designed for tree automata \cite{CL08sh}, but we will use it here in the special case of words. The main improvement over the previous algorithm from \cite{Kirsten05} is the identification of the structure of Subset Automata, which allows minimization.
 
@@ -21,7 +21,7 @@ Any language can be recognized by a subset automaton, obtained by a powerset con
 
 \subsection{Reduction to limitedness}
 
-Let $\A=\perm{A,Q,q_0,F_\A,\Delta_\A}$ be a subset automaton for a language $L$, and $k\in \mathbb N$. We recall that there are $\epsilon$-transitions, so $\Delta_\A\subseteq Q\times (A\cup\{epsilon\})\times Q$.
+Let $\A=\perm{A,Q,q_0,F_\A,\Delta_\A}$ be a subset automaton for a language $L$, and $k\in \mathbb N$. We recall that there are $\epsilon$-transitions, so $\Delta_\A\subseteq Q\times (A\cup\{\epsilon\})\times Q$.
 
 We build a $B$-automaton $\cB$ with $k+1$ counters $\gamma_0,\gamma_1,\dots,\gamma_k$, and states $Q_\cB=\bigcup_{i=1}^{k+1} Q^i$ that we view as a subset of $Q^*$.
 
@@ -46,4 +46,17 @@ The automaton $\cB$ is limited if and only if $L$ is expressible with a regular 
 
 Therefore, for any fixed $k$, we can decide in EXPSPACE whether a regular language has star-height $k$, if its is given via a nondeterministic automaton for the complement (or via a deterministic automaton).
 
-The algorithm is as follow: build a subset automaton $\mathcal A$ via a powerset construction (exponential space), minimize it, then build the automaton $\cB$ as above, and finally test for limitedness of $\cB$ by building its stabilization monoid and looking for an unlimitedness witness.
+The algorithm is as follow, minimize it, then , and finally test for limitedness of $\cB$ by building its stabilization monoid and looking for an unlimitedness witness.
+\begin{framed}
+We are given as input an integer $k$ and the dual of the non-deterministic automaton for $A^*\setminus L$. In particular a deterministic automaton for $L$ works.
+\begin{enumerate}
+	\item Build a subset automaton $\A$ via a powerset construction (exponential space),
+	\item compute the minimal subset automaton $\A_m$ of $L$ from $\A$,
+	\item build the automaton $\cB$ as above,
+	\item check $\cB$ for limitedness using the stabilization monoid algorithm.
+\end{enumerate}
+\end{framed}
+
+Let $n$ be the size of the input automaton.
+The automaton $\cB$ is of size $O(2^{nk})$, and moreover the stabilization monoid is exponential in the size of $\cB$.
+Therefore, our algorithm runs in space $O(2^{2^{nk}})$. However, the limitedness step could be performed in PSPACE using on-the-fly computation on the monoid, so the theoretical complexity of the problem is EXPSPACE for an input of this shape. Kirsten's algorithm uses doubly exponential space because it takes a non-deterministic automaton for $L$ as input.
