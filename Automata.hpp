@@ -4,6 +4,8 @@
 #include "Matrix.hpp"
 #include "VectorUInt.hpp"
 
+#define VERBOSE_AUTOMATA_COMPUTATION 0
+
 
 class ClassicAut
 {

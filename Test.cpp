@@ -58,6 +58,14 @@ Monoid* toMonoid(ExplicitAutomaton* aut) {
 
 int main(int argc, char **argv)
 {
+	ExplicitMatrix mata(1);
+	mata.coefficients[0] = INC;
+	UnstableMultiMonoid monoid(1,1);
+	monoid.addLetter('a',mata);
+	monoid.ComputeMonoid();
+	
+
+
   //cout << "Acme++ rules" << endl;
 	
 	// ExplicitMatrix mata(3);

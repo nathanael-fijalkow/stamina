@@ -6,33 +6,32 @@
 		
 
 MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
-	
 	//We start by computing the subset automaton of aut
 	//It has deterministic letters
 	ClassicEpsAut* Subsetaut=toSubsetAut(aut);
 	
-	
-
-	
 	uint ns=Subsetaut->NbStates;
 	char nl=Subsetaut->NbLetters;
 	
+#if VERBOSE_AUTOMATA_COMPUTATION
 	printf("Subset Automaton Builded, %d states\n\n",ns);
 	Subsetaut->print();
-	
+#endif	
 	
 	Subsetaut=SubMin(Subsetaut);
 	
 	ns=Subsetaut->NbStates;
 	
-	printf("Minimized Subset Automaton Computed, %d states\n\n",ns);
+#if VERBOSE_AUTOMATA_COMPUTATION
+	printf("Minimized Subset Automaton Computed, %d states\n\n", ns);
 	Subsetaut->print();
-	
+#endif
+
 	//states of the resulting automaton are words of Q* of length in [1,k+1]
 	//there are n+n^2+...+n^(k+1)=(n^(k+2)-n)/(n-1)
 	//there are k+1 counters
 	
-	uint N=(myPow(ns,k+2)-ns)/(ns-1);
+	uint N= (ns > 1) ? (myPow(ns,k+2)-ns)/(ns-1) : k+1;
 	MultiCounterEpsAut* EpsBaut=new MultiCounterEpsAut(nl,N,k+1);
 	
 

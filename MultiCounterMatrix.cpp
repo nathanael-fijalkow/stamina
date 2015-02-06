@@ -30,12 +30,14 @@ void MultiCounterMatrix::init_act_prod(char N)
 				: /*(j <= N & N < i & j > i - N) ?*/ i;
 		}
 	}
-	for (uint i = 0; i < (2 * N + 3); i++){
+
+/*	for (uint i = 0; i < (2 * N + 3); i++){
 		for (uint j = 0; j < (2 * N + 3); j++){
 			cout << (int)  act_prod[i][j] << " ";
 		}
 		cout << endl;
 	}
+	*/
 
 
 }
@@ -144,16 +146,19 @@ bool MultiCounterMatrix::isIdempotent() const
 
 bool MultiCounterMatrix::isUnlimitedWitness(const vector<int> & initial_states, const vector<int> & final_states) const
 {
+	bool found = false;
 	for (auto ini : initial_states)
 	{
 		auto row = rows[ini];
 		for (auto fin : final_states)
 		{
-			if (row->coefs[fin] == 2*N+1)
-				return true;
+			if (row->coefs[fin] < 2 * N + 1)
+				return false;
+			if (row->coefs[fin] == 2 * N + 1)
+				found = true;
 		}
 	}
-	return false;
+	return found;
 }
 
 //works only on idempotents

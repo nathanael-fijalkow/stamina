@@ -148,7 +148,7 @@ public:
 	};
 
 	// Print
-	virtual void print(std::ostream& os) const;
+	virtual void print(std::ostream& os = std::cout) const;
 
 	// Function that computes the hash, using the formula used in the Boost library
 	void update_hash()

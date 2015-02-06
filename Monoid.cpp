@@ -148,7 +148,7 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 			if (concatExpressions.find(new_expr) != concatExpressions.end())
 			{
 #if VERBOSE_MONOID_COMPUTATION
-				cout << "Expression "; new_expr.print(); cout << " is already known, nothing to do" << endl;
+				cout << "Expression " << new_expr<< " is already known, nothing to do" << endl;
 #endif
 				return NULL;
 			}

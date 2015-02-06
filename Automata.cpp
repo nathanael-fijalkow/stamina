@@ -108,8 +108,10 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	for(uint i=0;i<n;i++){
 		if(aut->initialstate[i]) {Subaut->initial+=TwoPow(i);}
 	}
+#if VERBOSE_AUTOMATA_COMPUTATION
 	printf("Initial state created:%d\n",Subaut->initial);
-	
+#endif
+
 	//final states are subsets where all states are final state. This is because we actually powerset the automaton for the complement.
 	uint k;
 	for(uint i=0;i<nspow;i++){
@@ -121,8 +123,11 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 		}
 		Subaut->finalstate[i]=fin;
 	}
+
+#if VERBOSE_AUTOMATA_COMPUTATION
 	printf("Final states created:%d\n");
-	
+#endif
+
 	//transitions are as usually in powerset
 	
 	bool* tabj=(bool *)malloc(n*sizeof(bool));
@@ -399,7 +404,9 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
 	char **eps=epsaut->trans_eps;
 	char** new_eps=epsaut->prod_mat(eps,eps);
 	char** prev_eps=eps;
+	int steps = 0;
 	while (!equal_mat(new_eps,prev_eps,ns)){
+		cout << "Removing eps transitions step " << ++steps <<  endl;
 		prev_eps=new_eps;
 		new_eps=epsaut->prod_mat(new_eps,eps);
 	}

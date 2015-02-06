@@ -89,3 +89,6 @@ target_link_libraries (Statistics ${EXTRA_LIBS})
 
 add_executable (TestAut ${ALL_SOURCES} ${ALL_HEADERS} TestAut.cpp)
 target_link_libraries (TestAut ${EXTRA_LIBS})
+
+add_executable (TestStarHeight ${ALL_SOURCES} ${ALL_HEADERS} TestStarHeight.cpp)
+target_link_libraries (TestStarHeight ${EXTRA_LIBS})
