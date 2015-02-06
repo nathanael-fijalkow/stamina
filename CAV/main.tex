@@ -29,7 +29,7 @@
 
 \def\mynote#1{{\sf $\dagger$ #1 $\dagger$}}
 
-\title{ACME++: Harder, Better, Faster!}
+\title{ACME++: Optimizing Stabilization Monoids Computations for Probabilistic Automata and the Star-Height Problem}
 
 \author{Nathana\"el Fijalkow\inst{1,2} \and Hugo Gimbert\inst{3} \and Edon Kelmendi\inst{3} \and Denis Kuperberg\inst{4}}
 \institute{LIAFA, Paris 7, France \and University of Warsaw, Poland \and LaBRI, Bordeaux, France \and Onera, Toulouse, France}
@@ -39,19 +39,20 @@
 \maketitle
 \begin{abstract}
 We present ACME++, 
-%a tool implementing part of the theory of regular cost functions
-%over finite words.
-%This theory is a quantitative extension of the classical theory of regular languages,
-%which allows to express boundedness properties.
+a tool implementing part of the theory of regular cost functions
+over finite words. 
+This theory is a quantitative extension of the classical theory of regular languages,
+which allows to express boundedness properties. 
 %Our tool manipulates a special form of automata with counters called $B$-automata,
 %and the two main features are to check whether a $B$-automaton is bounded 
 %and whether two $B$-automata are equivalent.
 %As an algorithmic back-end we rely on stabilization monoids.
 %
-%We provide two applications: first to the classical theory of regular languages,
-%by solving the finite power problem,
-%and second to probabilistic automata,
-%by implementing the Markov Monoid Algorithm.
+We provide two applications: first to the classical theory of regular languages,
+by solving the star-height problem,
+and second to probabilistic automata,
+by implementing the Markov Monoid Algorithm. 
+This tool is a follow-up to a prveious version, with optimized algorithms, we present a comparative study of their performances.
 \end{abstract}
 
 The dedicated webpage where the tool ACME++ can be downloaded is
@@ -63,12 +64,12 @@ The dedicated webpage where the tool ACME++ can be downloaded is
 
 Acme++ is a tool for deciding properties of some algebraic structures called stabilization monoids,
 with two motivations in mind:
-1) provide an effective tool to solve the starheight problem
-2) provide a tool to solve the value 1 problem for probabilistic automata.
+\begin{itemize}
+\item provide an effective tool to solve the starheight problem
+\item provide a tool to solve the value 1 problem for probabilistic automata.
+\end{itemize}
 
-
-
-*The starheight problem*
+\textbf{The starheight problem}
 
 An excellent introduction about the starhieght probelm is given in [Kirsten],
 which mentions some of the important industrial applications as
@@ -77,12 +78,16 @@ This problem was considered as the most difficult problem in the theory of recog
 and it took 25 yers before being solved.
 Implementing Hashiguchi algorithm is hopeless: the algorithm proceeds by enumeration of certain expressions
 and has a terrible complexity [Lombardy + Sakarovitch].
-It took another 22 years before an algorithm with a better algrithmic complexity was gievn by Kirsten.
+It took another 22 years before an algorithm with a better algrithmic complexity was given by Kirsten.
 
-Acme++ aims at solving the starhiehgt  problem for practical applications,
+Acme++ aims at solving the starheight  problem for practical applications,
 albeit the doubly exponential space complexity of Kirsten algoithm is a challenge to tackle.
 
-* The vaue 1 problem*
+We use an optimization pointed out by Thomas Colcombet \cite{CL08sh}: the structure of Subset Automata, whose algebraic properties allow minimization.
+\smallskip
+
+\textbf{The value 1 problem}
+
 Probabilistic automata are a versatile tool widely used in speech recognition as well as a modelling tool 
 for the control of systems with prtial observation (actually no observation).
 Probabilistic automata are natural extension on automata on finte words,
