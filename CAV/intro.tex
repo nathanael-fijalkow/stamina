@@ -3,13 +3,14 @@
 Acme++ is a tool for deciding properties of some algebraic structures called stabilization monoids,
 with two motivations in mind:
 \begin{itemize}
-\item provide an effective tool to solve the starheight problem
+\item provide an effective tool to solve the Star-height problem
 \item provide a tool to solve the value 1 problem for probabilistic automata.
 \end{itemize}
 
-\textbf{The Star-Height problem}
+\textbf{The Star-height problem}
 
-An excellent introduction about the Star-Height problem is given in \cite{Kirsten05},
+The Star-height problem is the following: given a regular language $L$ and an integer $k$, is there a regular expression for $L$ with at most $k$ nesting of the Kleene star?
+An excellent introduction about the Star-height problem is given in \cite{Kirsten05},
 which mentions some of the important industrial applications as
 speech recognition \cite{Mohri97}, database theory \cite{GT01}, and image compression \cite{CK93,KMT04}.
 This problem was considered as one of the most difficult problems in the theory of recognizable languages
@@ -19,8 +20,8 @@ and has a terrible complexity \cite{LS02}.
 It took another 22 years before an algorithm with a better algorithmic complexity was given by Kirsten in \cite{Kirsten05}.
 This approach using weighted automata was generalized and inspired the rich theory of regular cost functions \cite{Colcombet09}, which allows to solve other problems reducible to boundedness of automata with counters \cite{CL08sh,CL08b,CKLB13}.
 
-Acme++ aims at solving the Star-Height  problem for practical applications,
-albeit the doubly exponential space complexity of Kirsten algorithm is a challenge to tackle.
+Acme++ aims at solving the Star-height problem for practical applications,
+albeit the doubly exponential space complexity (simply exponential for fixed $k$) of Kirsten's algorithm is a challenge to tackle.
 
 We use an optimization from \cite{CL08sh}: the structure of Subset Automata, whose algebraic properties allow minimization.
 \smallskip
@@ -40,13 +41,13 @@ probability, see \cite{FGO12} for an introduction.
 \textbf{Stabilization monoids}
 
 Stabilization monoids are the key mathematical object needed to solve the two questions we are interested in.
-The Star-Height problem is related to the limitedness problem of nested distance automata.
+The Star-height problem is related to the limitedness problem of nested distance automata.
 A seminal paper by Simon \cite{Sim94} unifies several results using monoids of matrices, providing in particular a combinatorial tool called the forest factorization theorem. 
-Then Kirsten showed how monoids could be used to solve the Star-Height problem using nested distance desert automata,
+Then Kirsten showed how monoids could be used to solve the Star-height problem using nested distance desert automata,
 giving an alternate proof to the very intricate proof of Hashigushi.
 Desert automata are automata with ranked counters that can be either incremented and reset,
 with the extra condition that if a counter is reset all counters of lower rank are reset as well.
-Colcombet extended further the work of Kirsten introducing stabilization monoids and generalizing regular language theory into cost function theory, including algebraic and logical characterizations \cite{Colcombet09,CKL10,Kup14}. The theory of regular cost functions can also be used to solve the Star-Height problem on finite trees \cite{CL08sh}, as well as others problems related to regular languages.
+Colcombet extended further the work of Kirsten introducing stabilization monoids and generalizing regular language theory into cost function theory, including algebraic and logical characterizations \cite{Colcombet09,CKL10,Kup14}. The theory of regular cost functions can also be used to solve the Star-height problem on finite trees \cite{CL08sh}, as well as others problems related to regular languages.
 The techniques of Simon were adapted to solve the value 1 problem for probabilistic automata \cite{FGO12}.
 
 
