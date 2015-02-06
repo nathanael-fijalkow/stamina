@@ -24,7 +24,7 @@
 \newcommand{\New}{\mathbf{New}}
 
 
-
+\newcommand{\trans}[1]{\stackrel{\longrightarrow}{#1}}
 \newcommand{\PSPACE}{\mathrm{PSPACE}}
 
 \def\mynote#1{{\sf $\dagger$ #1 $\dagger$}}
@@ -79,25 +79,29 @@ and it took 25 years before being solved by Hashiguchi \cite{Hashiguchi88}.
 Implementing Hashiguchi algorithm is hopeless: the algorithm proceeds by enumeration of certain expressions
 and has a terrible complexity \cite{LS02}.
 It took another 22 years before an algorithm with a better algorithmic complexity was given by Kirsten in \cite{Kirsten05}.
+This approach using weighted automata was generalized and inspired the rich theory of regular cost functions \cite{Colcombet09}, which allows to solve other problems reducible to boundedness of automata with counters \cite{CL08sh,CL08b,CKLB13}.
 
 Acme++ aims at solving the starheight  problem for practical applications,
 albeit the doubly exponential space complexity of Kirsten algorithm is a challenge to tackle.
 
-We use an optimization pointed out by Thomas Colcombet \cite{CL08sh}: the structure of Subset Automata, whose algebraic properties allow minimization.
+We use an optimization from \cite{CL08sh}: the structure of Subset Automata, whose algebraic properties allow minimization.
 \smallskip
 
 \textbf{The value 1 problem}
 
 Probabilistic automata are a versatile tool widely used in speech recognition as well as a modelling tool 
-for the control of systems with prtial observation (actually no observation).
-Probabilistic automata are natural extension on automata on finte words,
-with probabilstic transitions.
-The value 1 problem is natural when  probabilistic automata are used as models
+for the control of systems with partial observation or no observation.
+Probabilistic automata are a natural extension on automata on finite words,
+with probabilistic transitions, see \cite{Rabin63} for an introduction.
+The value 1 problem is natural when probabilistic automata are used as models
 of systems controlled by a blind controller, who is in charge of choosing the
 sequence of input letters in order to maximize the acceptance
-probability, see [LICS] for an introduction.
+probability, see \cite{FGO12} for an introduction.
+\smallskip
 
-Stabilization semigroups are the key mathematical object needed to solve the two questions we are interested in.
+\textbf{Stabilization monoids}
+
+Stabilization monoids are the key mathematical object needed to solve the two questions we are interested in.
 The starheight problem is related to the limitedness problem of distance atomata.
 A seminal paper by Simon "On semigroups of matrices over the tropical seimrings"
 gives a clean easy to read proof 
@@ -105,9 +109,8 @@ Then Kirsten showed how monoids could be used to solve the starheight problem us
 giving an alternate proof to th every comple proof of Hashigushi, based on nested distance desert automata.
 Desert automata are automata with ranked counters that can be either incremented and reset,
 with the extra condition that if a counter is reset all counters of lower rank are reset as well.
-Colcombet extended further the work of Kirsten introducing stabilization monoids in order to handle
-general counter automata, without rank.
-The techniques of Simon were adapted to solve the value 1 problem for probabilistic automata.
+Colcombet extended further the work of Kirsten introducing stabilization monoids and generalizing regular language theory into cost function theory, including algebraic and logical characterizations \cite{Colcombet09,CKL10,Kup14}.
+The techniques of Simon were adapted to solve the value 1 problem for probabilistic automata \cite{FGO12}.
 
 
 Acme++ is a set of software tools to handle stabilization monoids, they can generate a stabilization monoid from its generators and test properties of these monoids, in particular the limitedness and the existance of value 1 witnesses.
@@ -290,6 +293,8 @@ $\New = S$ and $R = \emptyset$ set of rewriting rules\;
 \caption{\label{algo}Computing the stabilization monoid}
 \end{algorithm}
 \end{framed}
+
+\input{starheight}
 
 \bibliographystyle{alpha}
 \bibliography{bib}
