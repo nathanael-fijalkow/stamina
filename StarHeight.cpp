@@ -10,6 +10,9 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	//It has deterministic letters
 	ClassicEpsAut* Subsetaut=toSubsetAut(aut);
 	
+	cout << "Subsetaut" << endl;
+	Subsetaut->print();
+
 	uint ns=Subsetaut->NbStates;
 	char nl=Subsetaut->NbLetters;
 	
@@ -34,6 +37,8 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	uint N= (ns > 1) ? (myPow(ns,k+2)-ns)/(ns-1) : k+1;
 	MultiCounterEpsAut* EpsBaut=new MultiCounterEpsAut(nl,N,k+1);
 	
+	cout << "MultiCounterEpsAut " << endl;
+	EpsBaut->print();
 
 	//the last state on the pile is the reminder modulo ns
 
@@ -78,5 +83,10 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	}
 	
 
-	return EpsRemoval(EpsBaut);
+	auto epsremoved = EpsRemoval(EpsBaut);
+
+	cout << "Epsilon removed" << endl;
+	epsremoved->print();
+
+	return epsremoved;
 }
