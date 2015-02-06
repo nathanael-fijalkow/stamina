@@ -25,7 +25,7 @@ Let $\A=\perm{A,Q,q_0,F_\A,\Delta_\A}$ be a subset automaton for a language $L$,
 
 We build a $B$-automaton $\cB$ with $k+1$ counters $\gamma_0,\gamma_1,\dots,\gamma_k$, and states $Q_\cB=\bigcup_{i=1}^{k+1} Q^i$ that we view as a subset of $Q^*$.
 
-Let $j\in[0,k]$, we will note $R_j$ the counter action performing $\re$ on counters $\gamma_p$ with $p\geq j$ and $\e$ on counters $\gamma_p$ with $p<j$. Simlarly, we will note $I_j$ the counter action performing $\re$ on counters $\gamma_p$ with $p> j$, $\i$ on counter $\gamma_j$, and $\e$ on counters $\gamma_p$ with $p<j$. We finally note $\e$ the action performing $\e$ on all counters.
+Let $j\in[0,k]$, we will note $R_j$ the counter action performing $\re$ on counters $\gamma_p$ with $p\geq j$ and $\e$ on counters $\gamma_p$ with $p<j$. Simlarly, we will note $I_j$ the counter action performing $\re$ on counters $\gamma_p$ with $p> j$, $\ic$ on counter $\gamma_j$, and $\e$ on counters $\gamma_p$ with $p<j$. We finally note $\e$ the action performing $\e$ on all counters.
 These particular counter actions are called \emph{hierarchical}, they correspond to the nested distance automata from \cite{Kirsten05}. Their advantage over general actions on multiple counters is that there is a total order or preference, namely $R_0\leq R_1\leq\dots R_k\leq \e\leq I_0\leq\ I_1\leq\dots\leq I_k$. 
 
 The automaton $\cB$ is defined as follows:
