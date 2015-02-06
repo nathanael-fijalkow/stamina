@@ -48,11 +48,27 @@ which allows to express boundedness properties.
 %and whether two $B$-automata are equivalent.
 %As an algorithmic back-end we rely on stabilization monoids.
 %
-We provide two applications: first to the classical theory of regular languages,
-by solving the Star-height problem,
-and second to probabilistic automata,
-by implementing the Markov Monoid Algorithm. 
-This tool is a follow-up to a previous version, with optimized algorithms, we present a comparative study of their performances.
+
+Acme++ can solve two fundamental algorithmic problems.
+First, compute the star height of regular language, 
+i.e. the minimal number of nested Kleene stars needed for 
+expressing the language with a complement-free regular expression.
+Second, decide whether a probabilistic automaton has value 1,
+i.e. whether a probabilistic automaton accept words with probability arbitrarily close to 1.
+
+Both problems reduce to the computation of the saturation monoid associated with an automaton,
+which is a challenge since the monoid is exponentially larger than the automaton.
+The compact data structures used in Acme++ allow this program to handle automata with
+several hundreds of states. This radically improves upon the performance of AcmeML,
+a previous version of the tool.
+
+%In both cases, the key is the computation of a stabilization monoid
+%and the search for particular elements of the monoid:
+%Kirsten established that the starheight of a language can be computed by checking existence of
+%unbounded witnesses in the stabilization monoid of an associated nested counter automata,
+%and it was established recently that for leaktight automata the value $1$ problem can be decided
+%by cheking existence of leak witnesses in the Markov monoid of the automaton.
+
 \end{abstract}
 
 The dedicated webpage where the tool ACME++ can be downloaded is
