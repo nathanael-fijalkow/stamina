@@ -21,9 +21,10 @@ It took another 22 years before an algorithm with a better algorithmic complexit
 This approach using weighted automata was generalized and inspired the rich theory of regular cost functions \cite{Colcombet09}, which allows to solve other problems reducible to boundedness of automata with counters \cite{CL08sh,CL08b,CKLB13}.
 
 Acme++ aims at solving the Star-height problem for practical applications,
-albeit the doubly exponential space complexity (simply exponential for fixed $k$) of Kirsten's algorithm is a challenge to tackle.
+albeit the doubly exponential space complexity of Kirsten's algorithm is a challenge to tackle.
 
 We use an optimization from \cite{CL08sh}: the structure of Subset Automata, whose algebraic properties allow minimization.
+We also reduce the complexity to simply exponential by taking as input either a deterministic automaton, or a non-deterministic automaton for the complement language (dualized for uniformity of the input).
 \smallskip
 
 \textbf{The value 1 problem}
