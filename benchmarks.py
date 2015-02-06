@@ -7,6 +7,7 @@ import datetime
 import time
 import sys
 import os
+import signal
 tempFile = '/tmp/acme_test'
 def toform(c):
     if c==0:
