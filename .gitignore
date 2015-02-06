@@ -216,3 +216,6 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 /Sandbox/Expressions.hpp.gch
+/CAV/main.synctex.gz
+/CAV/*.aux
+/CAV/*.pdf

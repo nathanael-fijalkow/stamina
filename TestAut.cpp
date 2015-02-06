@@ -44,10 +44,27 @@ int main(int argc, char **argv)
 	
 	MultiCounterAut *Baut=toNestedBaut(aut, 1);
 	
+//	Baut->print();
+
+	UnstableMultiMonoid monoid(*Baut);
+
+//	monoid.print_letters();
+
+	auto expr = monoid.containsUnlimitedWitness();
+	if (expr)
+	{
+		cout << "An unlimited witness: " << endl;
+		cout << *expr << endl;
+	}
+	else
+	{
+		cout << " The automaton is limited " << endl;
+	}
+	monoid.print_summary();
 	//Baut->print();
 	
     std::cout << "End of Computation\n";
-    //std::cin.get();
+    std::cin.get();
     
     return 0; 
 }

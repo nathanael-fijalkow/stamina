@@ -11,6 +11,28 @@ void Monoid::print() const
 	cout << *this;
 }
 
+void Monoid::print_letters() const
+{
+	for (auto & letter : letterExpressions)
+	{
+		letter.print();
+		cout << endl;
+		expr_to_mat.at((const ExtendedExpression *) &letter)->print();
+	}
+}
+
+void Monoid::print_summary() const
+{
+	if (expr_to_mat.size() == 0)
+		cout << "Empty monoid" << endl;
+	else
+	{
+		cout << "Dimension " << Vector::GetStateNb() << endl;
+		cout << expr_to_mat.size() << " elements" << endl;
+		cout << rewriteRules.size() << " rewrite rules whose " << canonicalRewriteRules.size() << " are canonical." << endl;
+	}
+}
+
 ostream& operator<<(ostream& st, const Monoid & monoid)
 {
 
@@ -93,13 +115,18 @@ void UnstableMonoid::addRewriteRule(const ExtendedExpression * pattern, const Ex
 	rewriteRules[pattern] = rewritten;
 }
 
+void UnstableMonoid::setWitnessTest(bool(*test)(const Matrix *))
+{
+	this->test = test;
+}
+
 // The main subfunction for ClosureProduct: process an expression
 /* if uv is not reducible
 	then compute the matrix M,
 		if M exists already, 
 		then add a rewriting rule,
 		else add a new element */
-void UnstableMonoid::process_expression(const ExtendedExpression * elt_left, const ExtendedExpression * elt_right)
+const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpression * elt_left, const ExtendedExpression * elt_right)
 {
 #if VERBOSE_MONOID_COMPUTATION
 			cout << endl << endl << "***************************************" << endl << "Processing: " ;
@@ -123,7 +150,7 @@ void UnstableMonoid::process_expression(const ExtendedExpression * elt_left, con
 #if VERBOSE_MONOID_COMPUTATION
 				cout << "Expression "; new_expr.print(); cout << " is already known, nothing to do" << endl;
 #endif
-				return;
+				return NULL;
 			}
 
 			/* We check canonical rewrite rules */
@@ -162,7 +189,7 @@ void UnstableMonoid::process_expression(const ExtendedExpression * elt_left, con
 				const ConcatExpr * new_expr = &*concatExpressions.emplace(elt_left, elt_right).first;
 				addRewriteRule(new_expr, canonical_rewrites);
 				canonicalRewriteRules.insert(new_expr);
-				return;
+				return NULL;
 			}
 
 
@@ -251,6 +278,10 @@ void UnstableMonoid::process_expression(const ExtendedExpression * elt_left, con
 
 			new_elements.push_back(new_expr);
 			to_be_sharpified.push_back(new_expr);
+
+			/* check witness */
+			if (test && test(new_mat))
+				return new_expr;
 		}
 		else
 		{
@@ -263,13 +294,15 @@ void UnstableMonoid::process_expression(const ExtendedExpression * elt_left, con
 
 		}
 	}
+	return NULL;
 }
-void UnstableMonoid::CloseByProduct()
+
+const ExtendedExpression * UnstableMonoid::CloseByProduct()
 {
 	/* Iterating over all elements
-	 *  For every element u,
-	 * 		For every element v,
-	 * 			process(u,v)
+	*  For every element u,
+	* 		For every element v,
+	* 			process(u,v)
 	*/
 
 	size_t i = 0;
@@ -283,20 +316,23 @@ void UnstableMonoid::CloseByProduct()
 		while (j < new_elements.size())
 		{
 			const ExtendedExpression * expr_right = new_elements[j];
-			process_expression(expr_left,expr_right);
-			process_expression(expr_right,expr_left);
+			auto witness = process_expression(expr_left, expr_right);
+			if (witness)
+				return witness;
+			witness = process_expression(expr_right, expr_left);
+			if (witness)
+				return witness;
 			if (--cnt == 0)
 			{
 				cout << "Scanning known elts: ";
 				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i - 1) + new_elements.size()* new_elements.size());
 			}
-			
 			j++;
 		}
-		i++;		
+		i++;
 	}
 
-	
+
 	i = 0;
 
 	while (i < new_elements.size())
@@ -307,19 +343,46 @@ void UnstableMonoid::CloseByProduct()
 		while (j < new_elements.size())
 		{
 			const ExtendedExpression * expr_right = new_elements[j];
-			process_expression(expr_left,expr_right);
+			auto witness = process_expression(expr_left, expr_right);
+			if (witness)
+				return witness;
 			if (--cnt == 0)
 			{
 				cout << "Scanning new elts: ";
-				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i -1));
+				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i - 1));
 			}
-			
+
 			j++;
 		}
-		i++;			
+		i++;
 	}
-	
+	return NULL;
 }
+
+const ExtendedExpression * UnstableMonoid::CloseByStabilization()
+{
+	size_t cur_index = 0;
+
+	while (cur_index < to_be_sharpified.size())
+	{
+		const ExtendedExpression *expr = to_be_sharpified[cur_index];
+		auto witness = sharpify_expression(expr);
+		if (witness)
+			return witness;
+
+		cur_index++;
+		if (--cnt == 0)
+		{
+			cout << expr_to_mat.size() << " elements and " << rewriteRules.size();
+			cout << " rewrite_rules and " << to_be_sharpified.size() - cur_index << " elements to sharpify" << endl;
+			if (to_be_sharpified.size() > MAX_MONOID_SIZE)
+				throw std::runtime_error("Monoid too large");
+			cnt = MAX_MONOID_SIZE / 100;
+		}
+	}
+	return NULL;
+}
+
 
 // Takes an expression, computes its stabilization if it is idempotent,
 // and either add a rewrite rule if the stabilization already exists, or a new element if it does not
@@ -347,7 +410,7 @@ bool UnstableMonoid::is_idempotent(const Matrix * mat)
 
 }
 
-void UnstableMonoid::sharpify_expression(const ExtendedExpression * elt){
+const ExtendedExpression * UnstableMonoid::sharpify_expression(const ExtendedExpression * elt){
 
 	const Matrix * mat_e = expr_to_mat[elt];
 
@@ -359,44 +422,23 @@ void UnstableMonoid::sharpify_expression(const ExtendedExpression * elt){
 		// DO WE ACTUALLY NEED SHARPEXPRESSIONS (UNORDERED SET)????
 		const SharpedExpr * new_expr = &*it;
 		if (result.second){
-			expr_to_mat[new_expr] = &(*result.first);
+			auto mat = &(*result.first);
+			expr_to_mat[new_expr] = mat;
 			mat_to_expr[&(*result.first)] = new_expr;
 			new_elements.push_back(new_expr);
-
-/*			cout << "added: " ;
-			(*new_expr).print() ;
-			cout << endl ; */
-
+			if (test != NULL && test(mat))
+				return new_expr;
 		}
 		else {
 			const ExtendedExpression * rewritten = mat_to_expr[&(*result.first)];
 			addRewriteRule(new_expr, rewritten);
 		}
 	}
+	return NULL;
 }
 
-// Goes through all the new elements and sharpify them
-void UnstableMonoid::CloseByStabilization()
-{
-	size_t cur_index = 0;
 
-	while (cur_index < to_be_sharpified.size())
-	{
-		const ExtendedExpression *expr = to_be_sharpified[cur_index];
-		sharpify_expression(expr);
-		cur_index++;
-		if (--cnt == 0)
-		{
-			cout << expr_to_mat.size() << " elements and " << rewriteRules.size();
-			cout << " rewrite_rules and " << to_be_sharpified.size() - cur_index << " elements to sharpify" << endl;
-			if (to_be_sharpified.size() > MAX_MONOID_SIZE)
-				throw std::runtime_error("Monoid too large");
-			cnt = MAX_MONOID_SIZE / 100;
-		}
-	}
-}
-
-void UnstableMonoid::ComputeMonoid()
+const ExtendedExpression * UnstableMonoid::ComputeMonoid()
 {
 	cnt = MAX_MONOID_SIZE / 100;
 
@@ -409,12 +451,11 @@ void UnstableMonoid::ComputeMonoid()
 	}
 	_sharp_height = 0;
 
-	auto monoid = this;
 	size_t cur_index = 0;
-	while (cur_index < monoid->elements.size())
+	while (cur_index < elements.size())
 	{
-		new_elements.push_back(monoid->elements[cur_index]);
-		to_be_sharpified.push_back(monoid->elements[cur_index]);
+		new_elements.push_back(elements[cur_index]);
+		to_be_sharpified.push_back(elements[cur_index]);
 		cur_index++;
 	}
 
@@ -429,7 +470,7 @@ void UnstableMonoid::ComputeMonoid()
 		cout << endl << "------> Closure by product" << endl ;
 #endif
 //		cout << "Concatenation" << endl;
-		CloseByProduct();
+		auto witness = CloseByProduct();
 
 		cur_index = 0;
 		while (cur_index < to_be_sharpified.size())
@@ -440,16 +481,23 @@ void UnstableMonoid::ComputeMonoid()
 
 		new_elements.clear();	
 
+		if (witness != NULL)
+			return witness;
+
 #if VERBOSE_MONOID_COMPUTATION
 		cout << "------> Closure by stabilization" << endl << endl;
 #endif
 //		cout << "Stabilization" << endl;
-		CloseByStabilization();
+		witness = CloseByStabilization();
 		_sharp_height++;
+
+		if (witness != NULL)
+			return witness;
+
 		to_be_sharpified.clear();
 		i++;
 	} while (new_elements.size() != 0);
-
+	return NULL;
 }
 
 Monoid::Monoid()
@@ -468,7 +516,7 @@ Monoid::~Monoid()
 }
 
 // Constructor
-UnstableMonoid::UnstableMonoid(uint dim, bool clear_vectors)
+UnstableMonoid::UnstableMonoid(uint dim, bool clear_vectors) : test(NULL)
 {
 	if (clear_vectors)
 		Matrix::vectors.clear();

@@ -29,7 +29,6 @@ public:
 
 //	bool contains(size_t n) const { return  ( bits[n / (sizeof(uint) * 8)] & (1 << (n % (sizeof(uint) * 8)) ) ) != 0; };
 
-
 	// Construct new vector, size is fixed by set_size
 	VectorInt();
 

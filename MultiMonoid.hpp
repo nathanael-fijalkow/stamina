@@ -18,11 +18,20 @@ public:
 	// The set containing the known small matrices
 	unordered_set <MultiCounterMatrix> matrices;
 
+	//Returns null if no witness, otherwise a witness
+	const ExtendedExpression * containsUnlimitedWitness();
+
+	static bool IsUnlimitedWitness(const Matrix * matrix);
+
 protected:
 	pair <Matrix *, bool> addMatrix(Matrix * mat);
 
 	/* converts an explicit matrix */
 	Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
+
+	/* inital states of the automaton used for construction */
+	static vector<int> initial_states;
+	static vector<int> final_states;
 };
 
 

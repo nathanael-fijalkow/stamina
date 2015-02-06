@@ -79,7 +79,7 @@ public:
 	bool operator == (const LetterExpr & exp) const { return exp.letter == letter; };
 
 	// Print
-	virtual void print(std::ostream& os) const;
+	virtual void print(std::ostream& os = std::cout) const;
 
 };
 

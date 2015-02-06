@@ -24,6 +24,11 @@ class Monoid
 {
 public:
 
+	// Three sets containing the known expressions
+	unordered_set<SharpedExpr> sharpExpressions;
+	unordered_set<ConcatExpr> concatExpressions;
+	unordered_set<LetterExpr> letterExpressions;
+
 	// the two maps are inverses of one another
 	map <const ExtendedExpression *, const Matrix *> expr_to_mat;
 	map <const Matrix *, const ExtendedExpression *> mat_to_expr;
@@ -33,6 +38,8 @@ public:
 	
 	// Print
 	void print() const;
+	void print_summary() const;
+	void print_letters() const;
 	string toString() const;
 
 	//the set of canonical rewrite rules
@@ -66,11 +73,6 @@ public:
 	// Adds a rewrite rule
 	void addRewriteRule(const ExtendedExpression *, const ExtendedExpression *);
 
-	// Three sets containing the known expressions
-	unordered_set<SharpedExpr> sharpExpressions;
-	unordered_set<ConcatExpr> concatExpressions;
-	unordered_set<LetterExpr> letterExpressions;
-
 	// The vector of known elements
 	vector<const ExtendedExpression *> elements;
 
@@ -81,19 +83,28 @@ public:
 	vector<const ExtendedExpression *> to_be_sharpified;
 
 	// Function closing the current monoid by concatenating all elements
-	void CloseByProduct();
+	// stops the computation and returns a non NULL witness if found
+	const ExtendedExpression * CloseByProduct();
 
 	// Function closing the current monoid by stabilizing all idempotents elements
-	void CloseByStabilization();
+	// stops the computation and returns a non NULL witness if found
+	const ExtendedExpression * CloseByStabilization();
 
 	// Function computing the smallest Markov Monoid containing a given unstable Markov Monoid
-	void ComputeMonoid();
+	// stops the computation and returns a non NULL witness if found
+	const ExtendedExpression * ComputeMonoid();
+
+	//Sets the witness test which will interrupt computation as soon a matrix matching the condition is found
+	void setWitnessTest(bool(*test)(const Matrix *));
 
 	int sharp_height(){
 		return _sharp_height;
 	};
 
 protected:
+
+	/* the witness test */
+	bool(*test)(const Matrix *);
 
 	/* returns a pair with the Matrix inserted or an already known matrix and a bool indicating whether the matrix was already known */
 	virtual pair <Matrix *, bool> addMatrix(Matrix * mat) = 0;
@@ -103,11 +114,11 @@ protected:
 
 	UnstableMonoid() : _sharp_height(0), cnt(0){};
 
-	// Function processing an expression, computing products
-	void process_expression(const ExtendedExpression * elt_left,const ExtendedExpression * elt_right);
+	// Function processing an expression, computing products, and returning witness if one is found.
+	const ExtendedExpression * process_expression(const ExtendedExpression * elt_left, const ExtendedExpression * elt_right);
 
-	// Function processing an expression, computing stabilization
-	void sharpify_expression(const ExtendedExpression *);
+	// Function processing an expression, computing stabilization, and returning witness if one is found.
+	const ExtendedExpression * sharpify_expression(const ExtendedExpression *);
 
 	//check idempotence
 	bool is_idempotent(const Matrix * mat);

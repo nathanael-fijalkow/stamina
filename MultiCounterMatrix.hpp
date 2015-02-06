@@ -83,6 +83,8 @@ public:
 			_hash ^= std::hash_value((size_t)*p) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 	};
 
+	bool isUnlimitedWitness(const vector<int> & inital_states, const vector<int> & final_states) const;
+
 protected:
 	// C-style arrays of size VectorInt::GetStateNb() containing all rows
 	const VectorInt ** rows;

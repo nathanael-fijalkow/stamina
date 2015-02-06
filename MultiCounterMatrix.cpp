@@ -105,7 +105,7 @@ bool MultiCounterMatrix::operator==(const MultiCounterMatrix & mat) const
 const VectorInt * MultiCounterMatrix::sub_prod_int(const VectorInt * vec, const VectorInt ** mat_cols)
 {
 	char * new_vec = (char *)malloc(VectorInt::GetStateNb() * sizeof(char));
-	memset(new_vec, 0, (char)(VectorInt::GetStateNb() * sizeof(char)));
+	memset(new_vec, 0, (VectorInt::GetStateNb() * sizeof(char)));
 
 	for (int j = VectorInt::GetStateNb() - 1; j >= 0; j--)
 	{
@@ -141,6 +141,20 @@ bool MultiCounterMatrix::isIdempotent() const
 {
 	return (*this == *(MultiCounterMatrix *)(this->MultiCounterMatrix::prod(this)));
 };
+
+bool MultiCounterMatrix::isUnlimitedWitness(const vector<int> & initial_states, const vector<int> & final_states) const
+{
+	for (auto ini : initial_states)
+	{
+		auto row = rows[ini];
+		for (auto fin : final_states)
+		{
+			if (row->coefs[fin] == 2*N+1)
+				return true;
+		}
+	}
+	return false;
+}
 
 //works only on idempotents
 Matrix * MultiCounterMatrix::stab() const
