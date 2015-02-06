@@ -71,17 +71,17 @@ with two motivations in mind:
 
 \textbf{The starheight problem}
 
-An excellent introduction about the starhieght probelm is given in [Kirsten],
+An excellent introduction about the starheight problem is given in \cite{Kirsten05},
 which mentions some of the important industrial applications as
-speech recognition [38], database theory [8], and image compression [4, 20].
-This problem was considered as the most difficult problem in the theory of recognizable languages
-and it took 25 yers before being solved.
+speech recognition \cite{Mohri97}, database theory \cite{GT01}, and image compression \cite{CK93,KMT04}.
+This problem was considered as one of the most difficult problems in the theory of recognizable languages
+and it took 25 years before being solved by Hashiguchi \cite{Hashiguchi88}.
 Implementing Hashiguchi algorithm is hopeless: the algorithm proceeds by enumeration of certain expressions
-and has a terrible complexity [Lombardy + Sakarovitch].
-It took another 22 years before an algorithm with a better algrithmic complexity was given by Kirsten.
+and has a terrible complexity \cite{LS02}.
+It took another 22 years before an algorithm with a better algorithmic complexity was given by Kirsten in \cite{Kirsten05}.
 
 Acme++ aims at solving the starheight  problem for practical applications,
-albeit the doubly exponential space complexity of Kirsten algoithm is a challenge to tackle.
+albeit the doubly exponential space complexity of Kirsten algorithm is a challenge to tackle.
 
 We use an optimization pointed out by Thomas Colcombet \cite{CL08sh}: the structure of Subset Automata, whose algebraic properties allow minimization.
 \smallskip
