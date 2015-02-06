@@ -67,12 +67,19 @@ int main(int argc, char **argv)
 
 	printf("Automaton created\n");
 	
+	
 	int h = 0;
 	while (true)
 	{
 		cout << "******************************" << endl << "Testing starheight " << h << endl <<  "*****************************************" << endl;
 		MultiCounterAut *Baut = toNestedBaut(aut, h);
+		
+		
+		cout << "The nested automaton " << endl;
+		Baut->print();
+
 		UnstableMultiMonoid monoid(*Baut);
+
 
 		auto expr = monoid.containsUnlimitedWitness();
 		if (expr)
@@ -85,6 +92,7 @@ int main(int argc, char **argv)
 			cout << " The automaton is limited " << endl;
 		}
 		monoid.print_summary();
+		monoid.print();
 		delete Baut;
 		h++;
 	}
