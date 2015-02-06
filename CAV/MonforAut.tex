@@ -39,14 +39,16 @@ We say that a $B$-automaton $\A$ is \emph{limited} if there exists $N$ such that
 \vskip1em
 One way to solve the limitedness problem is by computing the stabilization monoid.
 It is a monoid of matrices over the semiring of sets of counter actions $\set{\ic,\e,\re,\omega}^\Gamma$.
-There are two operations on matrices: a binary composition called product, giving the monoid structure,
-and a unary operation called stabilization.
+There are two operations on matrices: a binary composition called product and a unary operation called stabilization.
+
 The stabilization monoid of a $B$-automaton is the set of matrices containing the matrices corresponding to each letter,
 and closed under the two operations, product and stabilization.
 As shown in~\cite{Colcombet09,Colcombet13}, the stabilization monoid of a $B$-automaton $\A$ contains an unlimited witness
 if and only if it is not limited,
 implying a conceptually simple solution to the limitedness problem: compute the stabilization monoid
 and check for the existence of unlimited witnesses.
+
+The notion of stabilization monoid can be abstracted, and any set equipped with these two laws (product and stabilization) and verifying certain axioms can be considered as a stabilization monoid, and can be used to recognize a cost function. In particular stabilization monoids can be minimized, which allows equivalence testing of regular cost functions.
 
 %Following the celebrated success for the star-height problem, whose decidability has been established by
 %reducing it to the limitedness problem of $B$-automata~\cite{Hashiguchi88,Kirsten05}, 
@@ -74,4 +76,4 @@ is the set of matrices containing the matrices corresponding to each letter,
 and closed under the two operations, product and stabilization.
 
 Note that the main point is that both the products and the stabilizations depend on which type of automata is considered,
-$B$-automata or probabilistic automata.
+$B$-automata or probabilistic automata. In particular the two frameworks do not seem to be reducible to each other at the level of automata, i.e. there is no encoding of probabilities in counter (or vice-versa) which preserves the stabilization monoid associated with the automaton.
