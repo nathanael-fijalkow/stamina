@@ -10,6 +10,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	//It has deterministic letters
 	ClassicEpsAut* Subsetaut=toSubsetAut(aut);
 	
+
 	uint ns=Subsetaut->NbStates;
 	char nl=Subsetaut->NbLetters;
 	
@@ -18,6 +19,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	Subsetaut->print();
 #endif	
 	
+	/*
 	Subsetaut=SubMin(Subsetaut);
 	
 	ns=Subsetaut->NbStates;
@@ -26,6 +28,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	printf("Minimized Subset Automaton Computed, %d states\n\n", ns);
 	Subsetaut->print();
 #endif
+	*/
 
 	//states of the resulting automaton are words of Q* of length in [1,k+1]
 	//there are n+n^2+...+n^(k+1)=(n^(k+2)-n)/(n-1)
@@ -34,6 +37,10 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	uint N= (ns > 1) ? (myPow(ns,k+2)-ns)/(ns-1) : k+1;
 	MultiCounterEpsAut* EpsBaut=new MultiCounterEpsAut(nl,N,k+1);
 	
+#if VERBOSE_AUTOMATA_COMPUTATION
+	cout << "MultiCounterEpsAut " << endl;
+	EpsBaut->print();
+#endif
 
 	//the last state on the pile is the reminder modulo ns
 
@@ -70,13 +77,30 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 			if(Subsetaut->trans_eps[p][q]) EpsBaut->trans_eps[i][w+q]=k+1; //we can put action epsilon on epsilon-transitions			
 		}
 		
+		/*
 		//epsilon-transition wp->wpp with reset of level l (notice that operation 0 i.e. all reset is never performed)
 		if(l<k+1) EpsBaut->trans_eps[i][i*ns+p]=l;
 		
 		//epsilon-transition wqp->wp with reset of level l-1
 		if(l>1) EpsBaut->trans_eps[i][(w/ns)+p]=l-1;
+		*/
+
+		//epsilon-transition wp->wpp with reset of level l (notice that operation 0 i.e. all reset is never performed)
+		int nouv = (ns>1) ? i*ns + p : i + 1;
+		if (l<k + 1) EpsBaut->trans_eps[i][nouv] = l;
+
+		//epsilon-transition wqp->wp with reset of level l-1
+		nouv = (ns>1) ? (w / ns) - ((w / ns) % ns) + p : i - 1;
+		if (l>1) EpsBaut->trans_eps[i][nouv] = l - 1;
 	}
 	
 
-	return EpsRemoval(EpsBaut);
+	auto epsremoved = EpsRemoval(EpsBaut);
+
+#if VERBOSE_AUTOMATA_COMPUTATION
+	cout << "Epsilon removed" << endl;
+	epsremoved->print();
+#endif
+
+	return epsremoved;
 }
