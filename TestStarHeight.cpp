@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 	aut->finalstate[0]=true;
 	*/
 
-	/*
+	
 	//2 letters 3 states
 	ClassicAut *aut=new ClassicAut(2,3);
 
@@ -55,8 +55,9 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-	*/
+	
 
+	/*
 	//1 letters 1 state
 	ClassicAut *aut=new ClassicAut(1,1);
 
@@ -64,6 +65,7 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
+	*/
 
 	printf("Automaton created\n");
 	

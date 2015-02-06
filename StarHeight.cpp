@@ -10,8 +10,6 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	//It has deterministic letters
 	ClassicEpsAut* Subsetaut=toSubsetAut(aut);
 	
-	cout << "Subsetaut" << endl;
-	Subsetaut->print();
 
 	uint ns=Subsetaut->NbStates;
 	char nl=Subsetaut->NbLetters;
@@ -21,6 +19,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	Subsetaut->print();
 #endif	
 	
+	/*
 	Subsetaut=SubMin(Subsetaut);
 	
 	ns=Subsetaut->NbStates;
@@ -29,6 +28,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	printf("Minimized Subset Automaton Computed, %d states\n\n", ns);
 	Subsetaut->print();
 #endif
+	*/
 
 	//states of the resulting automaton are words of Q* of length in [1,k+1]
 	//there are n+n^2+...+n^(k+1)=(n^(k+2)-n)/(n-1)
@@ -37,8 +37,10 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	uint N= (ns > 1) ? (myPow(ns,k+2)-ns)/(ns-1) : k+1;
 	MultiCounterEpsAut* EpsBaut=new MultiCounterEpsAut(nl,N,k+1);
 	
+#if VERBOSE_AUTOMATA_COMPUTATION
 	cout << "MultiCounterEpsAut " << endl;
 	EpsBaut->print();
+#endif
 
 	//the last state on the pile is the reminder modulo ns
 
@@ -95,8 +97,10 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 
 	auto epsremoved = EpsRemoval(EpsBaut);
 
+#if VERBOSE_AUTOMATA_COMPUTATION
 	cout << "Epsilon removed" << endl;
 	epsremoved->print();
+#endif
 
 	return epsremoved;
 }
