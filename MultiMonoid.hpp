@@ -9,7 +9,7 @@
 class UnstableMultiMonoid : public UnstableMonoid
 {
 public:
-	// Constructor (Creates zero vector)
+	// Constructor
 	UnstableMultiMonoid(uint dim, uint counter_number);
 
 	//Constructor from automa
