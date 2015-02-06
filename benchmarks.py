@@ -21,6 +21,7 @@ parser.add_argument('-o','--output',help='output to file')
 parser.add_argument('-a',help='accumulative generation',action='store_true')
 parser.add_argument('-r','--repeat',help='repeat the experiment x times',
                      type=int, default=1)
+parser.add_argument('-d','--density',help='pick density',type=float,default=0)
 parser.add_argument('acme1', help='path to the Acme++ executable')
 parser.add_argument('acme2', help='path to the AcmeML executable')
 args = parser.parse_args()
@@ -39,7 +40,7 @@ def gen(n,m):
 
     output+='\n\n'
     for i in range(0,m):
-        pickprob = random.random()
+        pickprob = random.uniform(args.density,1)
         output+=chr(ord('a')+i)+'\n'
         for j in range(0,n):
             chosen = random.randint(0,n)
@@ -51,6 +52,7 @@ def gen(n,m):
             output+='\n'
         output+='\n'
     return output
+
 if(args.output):
     out = open(args.output,'w')
 if args.a:

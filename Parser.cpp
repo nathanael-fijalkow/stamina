@@ -1,5 +1,4 @@
 #include "Parser.hpp"
-#include "MarkovMonoid.hpp"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -30,9 +29,10 @@ int lttoi(string s)
     cerr << "Syntax error at line: " << linenumber << endl;
     exit(-1);
   }
+  return res;
 }
 
-Monoid* Parser::parseFile(std::istream &file) 
+ExplicitAutomaton* Parser::parseFile(std::istream &file) 
 {
   string line;
   
@@ -42,30 +42,35 @@ Monoid* Parser::parseFile(std::istream &file)
   int type;
   getline(file,line);
   if(!line.compare("p"))
-    type=0;
-  else
-    type=stoi(line);
+    type=PROB;
+  else {
+    if (!line.compare("c"))
+      type=CLASSICAL;
+    else
+      type=stoi(line);
+  }
   
   string alphabet;
   getfline(file,alphabet);
 
-  int initialState;
-  getfline(file,line);
-  initialState = stoi(line);
+  ExplicitAutomaton* ret = new ExplicitAutomaton(size,alphabet.length());
+  ret->type = type;
+  ret->alphabet = alphabet;
 
-  int * finalStates = (int *) malloc(sizeof(int) * size);
+  getfline(file,line);
+  ret->initialState = stoi(line);
+
   getfline(file,line);
   istringstream iss(line);
   for(int i=0;i<size;i++){
     getfline(iss,line,' ');
     if(!line.empty())
-      finalStates[i]=stoi(line);
+      ret->finalStates[i]=stoi(line);
     i++;
   }
 
-  ExplicitMatrix mat(size);
-  UnstableMarkovMonoid* monoid = new UnstableMarkovMonoid(size);
   for(int i=0;i<alphabet.length();i++) {
+    ExplicitMatrix* mat = new ExplicitMatrix(size);
     string lt;
     getfline(file,lt);
     for(int j=0;j<size;j++) {
@@ -73,12 +78,11 @@ Monoid* Parser::parseFile(std::istream &file)
       istringstream iss2(line);
       for(int k=0;k<size;k++) {
 	getfline(iss2,line,' ');
-	mat.coefficients[j*size+k]=lttoi(line);
+	mat->coefficients[j*size+k]=lttoi(line);
       }
     }
-    monoid->addLetter(lt[0],mat);
+    ret->matrices[i]=mat;
   }
 
-  delete finalStates;
-  return monoid;
+  return ret;
 }

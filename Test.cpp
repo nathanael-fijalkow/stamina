@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "MarkovMonoid.hpp"
+#include "ExplicitAutomaton.hpp"
 //#include "StabilisationMonoid.hpp"
 #include "MultiMonoid.hpp"
 #include "Parser.hpp"
@@ -23,6 +24,23 @@ void pusage(char* s)
 {
   cerr << "Usage: " << s << " [-v] file" << endl;
   exit(-1);
+}
+
+Monoid* toMonoid(ExplicitAutomaton* aut) {
+  if(aut->type==PROB) {
+    UnstableMarkovMonoid* ret = new UnstableMarkovMonoid(aut->size);
+    for(int i=0;i<aut->alphabet.length();i++)
+      ret->addLetter(aut->alphabet[i],*(aut->matrices[i]));
+    return ret;
+  }
+  if (aut->type==CLASSICAL) {
+    // Do something with classical automaton
+  }
+  if (aut->type >= 1) {
+    // Do something with automata with counters
+  }
+  return NULL;
+  
 }
 
 int main(int argc, char **argv)
@@ -271,7 +289,9 @@ int main(int argc, char **argv)
 	ifs.open(argv[optind],ifstream::in);
 #endif
 
-	UnstableMarkovMonoid* m = dynamic_cast<UnstableMarkovMonoid *>(Parser::parseFile(ifs));
+
+
+	UnstableMarkovMonoid* m = dynamic_cast<UnstableMarkovMonoid *>(toMonoid(Parser::parseFile(ifs)));
 	m->ComputeMonoid();
 	
 	pair<int, const ExtendedExpression*> r = m->maxLeakNb();

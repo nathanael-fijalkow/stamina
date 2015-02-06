@@ -14,5 +14,6 @@ set (SOURCES
 	Automata.cpp
 	StarHeight.cpp
 	VectorUInt.cpp
+	ExplicitAutomaton.cpp
 	)
 
