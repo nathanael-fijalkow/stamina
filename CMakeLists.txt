@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (Acme++)
 
+
 option(MSVC "Compile for Visual Studio" OFF)
 if(MSVC)
 	option(MSVC_SHARED_RT "Used shared runtime libraries" OFF)
