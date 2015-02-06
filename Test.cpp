@@ -27,26 +27,56 @@ void pusage(char* s)
   exit(-1);
 }
 
-Monoid* toMonoid(ExplicitAutomaton* aut) {
+int *finalStates;
+int initialState;
+int size; 
+
+bool not_final(int s) 
+{
+  for(int i=0;i<size;i++)
+    if(finalStates[i]==s)
+      return false;
+  return true;
+}
+
+bool test_witness(const ProbMatrix* m) 
+{
+    const Vector & ones = *(m->row_ones[initialState]);
+    for (int i = 0; i < Vector::GetStateNb(); i++)
+      if(ones.contains(i)&&not_final(i))
+	return false;
+    return true;
+  
+}
+
+Monoid* toMonoid(ExplicitAutomaton* aut) 
+{
   if(aut->type==PROB) {
+    finalStates = aut->finalStates;
+    initialState = aut->initialState;
+    size = aut->size;
     UnstableMarkovMonoid* ret = new UnstableMarkovMonoid(aut->size);
+    ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
     for(int i=0;i<aut->alphabet.length();i++)
       ret->addLetter(aut->alphabet[i],*(aut->matrices[i]));
     return ret;
   }
   if (aut->type==CLASSICAL) {
-    // Do something with classical automaton
     ClassicAut* a = new ClassicAut(aut->size,aut->alphabet.length());
+
     for(int i=0;i<aut->alphabet.length();i++)
       for(int j=0;i<aut->size;i++)
 	for(int k=0;k<aut->size;k++)
 	  if(aut->matrices[i]->coefficients[j*aut->size+k]>0)
 	    a->trans[i][j][k]=true;
+
     a->initialstate[aut->initialState]=true;
     for(int i=0;aut->finalStates[i]!=-1 && i<aut->size;i++)
       a->finalstate[aut->finalStates[i]]=true;
+
     MultiCounterAut *Baut=toNestedBaut(a, 1);
     UnstableMultiMonoid* monoid = new UnstableMultiMonoid(*Baut);
+
     return monoid;
   }
   if (aut->type >= 1) {
@@ -313,11 +343,16 @@ int main(int argc, char **argv)
 	ExplicitAutomaton* expa = Parser::parseFile(ifs);
 	if(expa->type==PROB) {
 	  UnstableMarkovMonoid* m = dynamic_cast<UnstableMarkovMonoid*>(toMonoid(expa));
-	  m->ComputeMonoid();
-	
+	  auto expr = m->ComputeMonoid();
+	  
 	  pair<int, const ExtendedExpression*> r = m->maxLeakNb();
 	  cout << r.first << " leak(s) found" << endl;
 	  cout << "The monoid has " << m->expr_to_mat.size() << " elements" << endl;
+	  cout << "The automaton has value 1: ";
+	  if (expr)
+	    cout << "Yes" << endl;
+	  else
+	    cout << "No" << endl;
 	  if(verbose)
 	    m->print();
 	}
