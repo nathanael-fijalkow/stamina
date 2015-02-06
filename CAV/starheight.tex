@@ -1,0 +1,10 @@
+\section{The Star-Height algorithm}
+
+The latest algorithm in the literature for computing star-height is designed for tree automata \cite{CL08sh}, but we will use it here in the special case of words. The main improvement over the previous algorithm from \cite{Kirsten05} is the identification of the structure of Subset Automata, which allows minimization.
+
+We describe here briefly the ideas of the algorithm.
+
+\begin{definition}
+A subset automaton $\A$ is a deterministic automaton with additional $\epsilon$-transition, such that $\epsilon$-transition encode a lattice structure on the set space of $\A$. More precisely, $\epsilon$-transitions define a partial order on states, and for all states $p,q$, there are states $x,y$ such that $x\trans{\epsilon}p, x\trans{\epsilon}q, p\trans{\epsilon}y$ and $q\trans{\epsilon}y$.
+\end{definition}
+
