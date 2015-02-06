@@ -75,11 +75,21 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 			if(Subsetaut->trans_eps[p][q]) EpsBaut->trans_eps[i][w+q]=k+1; //we can put action epsilon on epsilon-transitions			
 		}
 		
+		/*
 		//epsilon-transition wp->wpp with reset of level l (notice that operation 0 i.e. all reset is never performed)
 		if(l<k+1) EpsBaut->trans_eps[i][i*ns+p]=l;
 		
 		//epsilon-transition wqp->wp with reset of level l-1
 		if(l>1) EpsBaut->trans_eps[i][(w/ns)+p]=l-1;
+		*/
+
+		//epsilon-transition wp->wpp with reset of level l (notice that operation 0 i.e. all reset is never performed)
+		int nouv = (ns>1) ? i*ns + p : i + 1;
+		if (l<k + 1) EpsBaut->trans_eps[i][nouv] = l;
+
+		//epsilon-transition wqp->wp with reset of level l-1
+		nouv = (ns>1) ? (w / ns) - ((w / ns) % ns) + p : i - 1;
+		if (l>1) EpsBaut->trans_eps[i][nouv] = l - 1;
 	}
 	
 
