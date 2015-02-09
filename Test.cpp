@@ -24,7 +24,7 @@ using namespace std;
 
 void pusage(char* s)
 {
-	cerr << "Usage: " << s << " [-v] file" << endl;
+	cerr << "Usage: " << s << " [-v] [-o dot_output_file]  input_file" << endl;
 	exit(-1);
 }
 
