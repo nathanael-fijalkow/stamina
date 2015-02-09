@@ -59,6 +59,8 @@ public:
 	// Print
 	virtual void print(std::ostream& os = std::cout) const = 0;
 
+        virtual ExplicitMatrix* toExplicitMatrix() const = 0;
+
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns
 	//The caller is in charge of deleting the returned object

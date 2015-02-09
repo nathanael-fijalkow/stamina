@@ -110,6 +110,17 @@ void OneCounterMatrix::print(std::ostream & os) const
 	}
 }
 
+ExplicitMatrix* OneCounterMatrix::toExplicitMatrix() const
+{
+  string actions = "REIO_";
+  ExplicitMatrix* ret = new ExplicitMatrix(Vector::GetStateNb());
+  for (uint i = 0; i < Vector::GetStateNb(); i++){
+		for (uint j = 0; j < Vector::GetStateNb(); j++)
+		  ret->coefficients[i*Vector::GetStateNb()+j]=actions[get(i, j)];
+  }
+}
+
+
 bool OneCounterLargeMatrix::operator==(const OneCounterLargeMatrix & mat) const
 {
 	//only on rows

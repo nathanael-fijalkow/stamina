@@ -5,8 +5,6 @@
 #include "ProbMatrix.hpp"
 #include "Monoid.hpp"
 
-
-
 class UnstableMarkovMonoid : public UnstableMonoid
 {
 public:

@@ -19,6 +19,8 @@ public:
 	// Print
 	void print(std::ostream& os = std::cout) const;
 
+        ExplicitMatrix* toExplicitMatrix() const;
+
 };
 
 /* Matrices of dimension less than sizeof(uint) */

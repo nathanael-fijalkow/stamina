@@ -53,6 +53,8 @@ public:
 	// Print
 	void print(std::ostream& os = std::cout) const;
 
+        ExplicitMatrix* toExplicitMatrix() const;
+
 	// Constructor
 	MultiCounterMatrix();
 

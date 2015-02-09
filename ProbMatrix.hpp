@@ -13,6 +13,9 @@ public:
 	// Print
 	void print(std::ostream& os = std::cout) const;
 
+        ExplicitMatrix* toExplicitMatrix() const;
+
+
 	// Equality operator
 	bool operator == (const ProbMatrix & mat) const;
 
@@ -41,15 +44,18 @@ public:
 
 	// Function checking whether a matrix is idempotent
 	bool isIdempotent() const;
+        
+        const Vector *const *const getRowOnes() const;
+	const Vector *const *const getRowPluses() const;
 
-
+protected:
 
 	// Four C-style matrices of size Vector::GetStateNb() containing all rows and cols, state per state
 	const Vector ** row_pluses;
 	const Vector ** row_ones;
 	const Vector ** col_pluses;
 	const Vector ** col_ones;
-protected:
+
 	void update_hash()
 	{
 		_hash = 0;

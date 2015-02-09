@@ -91,7 +91,15 @@ void MultiCounterMatrix::print(std::ostream & os) const
 		os << endl;
 	}
 }
+ExplicitMatrix* MultiCounterMatrix::toExplicitMatrix() const
+{
+        ExplicitMatrix* ret = new ExplicitMatrix(VectorInt::GetStateNb());
+	for (uint i = 0; i < VectorInt::GetStateNb(); i++){
+		for (uint j = 0; j < VectorInt::GetStateNb(); j++)
+		  ret->coefficients[i*VectorInt::GetStateNb()+j]=rows[i]->coefs[j];
+	}
 
+}
 bool MultiCounterMatrix::operator==(const MultiCounterMatrix & mat) const
 {
 	//only on rows

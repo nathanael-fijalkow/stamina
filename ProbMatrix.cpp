@@ -11,6 +11,14 @@ void ProbMatrix::allocate()
 	col_ones = (const Vector **)malloc(Vector::GetStateNb() * sizeof(void *));
 }
 
+const Vector *const *const ProbMatrix::getRowOnes() const
+{
+  return this->row_ones;
+}
+const Vector *const *const ProbMatrix::getRowPluses() const
+{
+  return this->row_pluses;
+}
 
 // Convert an explicit matrix into a matrix
 ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix)
@@ -107,6 +115,22 @@ void ProbMatrix::print(std::ostream & os) const
 	*/
 }
 
+ExplicitMatrix* ProbMatrix::toExplicitMatrix() const 
+{
+        ExplicitMatrix* ret = new ExplicitMatrix(Vector::GetStateNb());
+	for (uint i = 0; i < Vector::GetStateNb(); i++)
+	{
+	        const Vector & ones = *row_ones[i];
+		const Vector & pluses = *row_pluses[i];
+
+		for (uint j = 0; j < Vector::GetStateNb(); j++)
+		  (ones.contains(j) ? 
+		   ret->coefficients[i*Vector::GetStateNb()+j]='1' : 
+		   pluses.contains(j) ? 
+		   ret->coefficients[i*Vector::GetStateNb()+j]='+' : 
+		   ret->coefficients[i*Vector::GetStateNb()+j]='_');
+	}
+}
 
 bool ProbMatrix::operator==(const ProbMatrix & mat) const
 {
