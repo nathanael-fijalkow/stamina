@@ -94,10 +94,12 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat){
 		//cout << "Equal " << (ok ? 1 : 0) << endl;
 		new_vec[j / (8 * sizeof(uint))] = (new_vec[j / (8 * sizeof(uint)) ] << 1) | (ok ? 1 : 0);
 	}
-		auto it = vectors.emplace(new_vec, Vector::GetStateNb()).first;
-		free(new_vec);
-		//cout << "Final result "; (*it).print(); cout << endl;
-		return &(*it);
+	if (!(*new_vec))
+		return Matrix::zero_vector;
+	auto it = vectors.emplace(new_vec, Vector::GetStateNb()).first;
+	free(new_vec);
+	//cout << "Final result "; (*it).print(); cout << endl;
+	return &(*it);
 }
 
 // Create a new vector, keep only coordinates of v that are true in tab
