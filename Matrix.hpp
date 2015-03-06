@@ -84,7 +84,7 @@ public:
 	static const Vector * zero_vector;
 
 	// True if it is unecessary to use centralized vector storage
-	static bool UseCentralizedVectorStorage(){ return Vector::GetBitSize() > 1; }
+	static bool UseCentralizedVectorStorage(){ return true; /* Vector::GetBitSize() > 1;*/ }
 
 protected:
 

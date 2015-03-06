@@ -130,6 +130,7 @@ ExplicitMatrix* ProbMatrix::toExplicitMatrix() const
 		   ret->coefficients[i*Vector::GetStateNb()+j]='+' : 
 		   ret->coefficients[i*Vector::GetStateNb()+j]='_');
 	}
+	return ret;
 }
 
 bool ProbMatrix::operator==(const ProbMatrix & mat) const

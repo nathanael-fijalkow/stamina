@@ -118,6 +118,7 @@ ExplicitMatrix* OneCounterMatrix::toExplicitMatrix() const
 		for (uint j = 0; j < Vector::GetStateNb(); j++)
 		  ret->coefficients[i*Vector::GetStateNb()+j]=actions[get(i, j)];
   }
+  return ret;
 }
 
 

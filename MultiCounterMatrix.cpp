@@ -98,7 +98,7 @@ ExplicitMatrix* MultiCounterMatrix::toExplicitMatrix() const
 		for (uint j = 0; j < VectorInt::GetStateNb(); j++)
 		  ret->coefficients[i*VectorInt::GetStateNb()+j]=rows[i]->coefs[j];
 	}
-
+	return ret;
 }
 bool MultiCounterMatrix::operator==(const MultiCounterMatrix & mat) const
 {
