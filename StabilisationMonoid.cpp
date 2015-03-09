@@ -36,5 +36,5 @@ pair <Matrix *, bool> UnstableStabMonoid::addMatrix(Matrix * mat)
 }
 
 
-#define VERBOSE_MONOID_COMPUTATION 0
+#define MONOID_COMPUTATION_VERBOSITY 0
 

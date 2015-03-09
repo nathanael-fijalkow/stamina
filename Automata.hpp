@@ -5,7 +5,7 @@
 #include "VectorUInt.hpp"
 #include <map>
 
-#define VERBOSE_AUTOMATA_COMPUTATION 1
+#define VERBOSE_AUTOMATA_COMPUTATION 0
 
 
 class ClassicAut

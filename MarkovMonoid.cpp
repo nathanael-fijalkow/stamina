@@ -3,7 +3,7 @@
 
 #include "MarkovMonoid.hpp"
 
-#define VERBOSE_MONOID_COMPUTATION 0
+#define MONOID_COMPUTATION_VERBOSITY 0
 
 
 //Computes the maximum number of leaks of all sharped expression
@@ -21,7 +21,7 @@ pair<int, const ExtendedExpression *> UnstableMarkovMonoid::maxLeakNb()
 				result.first = cl;
 				result.second = gexpr_mat.first;
 			}
-#if VERBOSE_MONOID_COMPUTATION
+#if MONOID_COMPUTATION_VERBOSITY
 			cout << "Checking whether "; expr_mat.first->print(); cout << " has a leak" << endl;
 			if (cl > 0)
 				cout << "Found " << cl << " leaks." << endl;

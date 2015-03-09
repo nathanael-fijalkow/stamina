@@ -216,7 +216,7 @@ uint ProbMatrix::countLeaks(const Vector * classes) const
 				if (i != j && classes->contains(j) && row_pluses[i]->contains(j))
 				{
 					answer++;
-#if VERBOSE_MONOID_COMPUTATION
+#if MONOID_COMPUTATION_VERBOSITY
 					cout << "Found leak from class " << i << " to class " << j << endl;
 #endif
 					//				print();

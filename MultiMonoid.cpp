@@ -83,5 +83,5 @@ ostream& operator<<(ostream& st, const UnstableMultiMonoid & monoid)
 	return st;
 }
 
-#define VERBOSE_MONOID_COMPUTATION 0
+#define MONOID_COMPUTATION_VERBOSITY 0
 

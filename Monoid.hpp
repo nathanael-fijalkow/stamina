@@ -16,7 +16,7 @@
 
 using namespace std;
 
-#define MAX_MONOID_SIZE 10000000
+#define MAX_MONOID_SIZE 1000000
 
 /* CLASS DEFINITIONS */
 // This class describes a Markov Monoid

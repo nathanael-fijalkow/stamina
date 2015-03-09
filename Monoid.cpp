@@ -3,7 +3,8 @@
 #include <sstream>
 #include "ProbMatrix.hpp"
 
-#define VERBOSE_MONOID_COMPUTATION 0
+//level 0 no verbosity 1 main steps 2 details
+#define MONOID_COMPUTATION_VERBOSITY 0
 
 // Print
 void Monoid::print() const
@@ -105,7 +106,7 @@ const Matrix * UnstableMonoid::addLetter(char a, ExplicitMatrix & mat)
 // Adds a rewrite rule
 void UnstableMonoid::addRewriteRule(const ExtendedExpression * pattern, const ExtendedExpression * rewritten)
 {
-#if VERBOSE_MONOID_COMPUTATION
+#if MONOID_COMPUTATION_VERBOSITY
 	cout << "Adding rewrite rule ";
 	pattern->print();
 	cout << " -> ";
@@ -128,8 +129,8 @@ void UnstableMonoid::setWitnessTest(bool(*test)(const Matrix *))
 		else add a new element */
 const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpression * elt_left, const ExtendedExpression * elt_right)
 {
-#if VERBOSE_MONOID_COMPUTATION
-			cout << endl << endl << "***************************************" << endl << "Processing: " ;
+#if MONOID_COMPUTATION_VERBOSITY
+			cout << "Processing: " ;
 			(*elt_left).print();
 			cout << " and " ;
 			(*elt_right).print();
@@ -147,7 +148,7 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 			//if the expression is already known, we are done
 			if (concatExpressions.find(new_expr) != concatExpressions.end())
 			{
-#if VERBOSE_MONOID_COMPUTATION
+#if MONOID_COMPUTATION_VERBOSITY
 				cout << "Expression " << new_expr<< " is already known, nothing to do" << endl;
 #endif
 				return NULL;
@@ -160,7 +161,7 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 			const SharpedExpr * sh_right = isSharpedExpr(elt_right);
 			if (sh_right != NULL && sh_right->son == elt_left)
 			{
-#if VERBOSE_MONOID_COMPUTATION
+#if MONOID_COMPUTATION_VERBOSITY
 				cout << "Adding canonical rewrite rule uu# -> u# for u="; new_expr.print(); cout << endl;
 #endif
 				canonical_rewrites = sh_right;
@@ -170,7 +171,7 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 			const SharpedExpr * sh_left = isSharpedExpr(elt_left);
 			if (sh_left != NULL && sh_left->son == elt_right)
 			{
-#if VERBOSE_MONOID_COMPUTATION
+#if MONOID_COMPUTATION_VERBOSITY
 				cout << "Adding canonical rewrite rule u#u -> u# for u="; new_expr.print(); cout << endl;
 #endif
 				canonical_rewrites = sh_left;
@@ -178,7 +179,7 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 
 			if (sh_left != NULL && sh_left == sh_right)
 			{
-#if VERBOSE_MONOID_COMPUTATION
+#if MONOID_COMPUTATION_VERBOSITY
 				cout << "Adding canonical rewrite rule u#u# -> u# for u="; new_expr.print(); cout << endl;
 #endif
 				canonical_rewrites = sh_left;
@@ -223,26 +224,23 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 
 			/* if the expression is already known and rewrites, we set rewrite_rule to true*/
 			auto expr = concatExpressions.find(new_expr);
-#if VERBOSE_MONOID_COMPUTATION
-			cout << "Checking for rewrite rule for infix [ " << (subtrees_nb - left_idx) << " : " << (subtrees_nb - right_idx) << " ]"; new_expr.print();
-			cout << " of "; new_expr.print(); cout << endl;
+#if MONOID_COMPUTATION_VERBOSITY
+			if (MONOID_COMPUTATION_VERBOSITY >= 2)
+			{
+				cout << "Checking for rewrite rule for infix [ " << (subtrees_nb - left_idx) << " : " << (subtrees_nb - right_idx) << " ]"; new_expr.print();
+				cout << " of "; new_expr.print(); cout << endl;
+			}
 #endif
 			if (expr != concatExpressions.end())
 			{
 				if (rewriteRules.find(&*expr) != rewriteRules.end())
 				{
-#if VERBOSE_MONOID_COMPUTATION
+#if MONOID_COMPUTATION_VERBOSITY
 					cout << ": found rewrite rule "; rewriteRules.find(&*expr)->first->print(); cout << endl;
 #endif
 					rewrite_rule_found = true;
 					break;
 				}
-#if VERBOSE_MONOID_COMPUTATION
-				else
-				{
-					cout << ": none" << endl;
-				}
-#endif
 			}
 		}
 		if (rewrite_rule_found) break;
@@ -266,11 +264,11 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 		const Matrix *  new_mat = result.first;
 		if (result.second)
 		{
-#if VERBOSE_MONOID_COMPUTATION
+#if MONOID_COMPUTATION_VERBOSITY
 			/* if the matrix was not known before, we create a new association between expression and its matrix */
 			cout << "Add element: "; new_expr->print();	 cout << endl;
 			cout << "with matrix adress #" << new_mat << " hash h" << new_mat->hash() << endl;
-			new_mat->print();
+			//new_mat->print();
 			cout << endl;
 #endif
 			expr_to_mat[new_expr] = new_mat;
@@ -326,6 +324,7 @@ const ExtendedExpression * UnstableMonoid::CloseByProduct()
 			{
 				cout << "Scanning known elts: ";
 				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i - 1) + new_elements.size()* new_elements.size());
+				cnt = MAX_MONOID_SIZE / 100;
 			}
 			j++;
 		}
@@ -462,10 +461,13 @@ const ExtendedExpression * UnstableMonoid::ComputeMonoid()
 	int i = 1 ;
 	do
 	{
-#if VERBOSE_MONOID_COMPUTATION
-		cout << endl << "The current monoid is: " << endl << endl ;
+#if MONOID_COMPUTATION_VERBOSITY
 
-		print() ;
+		if (MONOID_COMPUTATION_VERBOSITY >= 2)
+		{
+			cout << endl << "The current monoid is: " << endl << endl;
+			print();
+		}
 		cout << endl << "Starting iteration " << i << endl << endl ;
 		cout << endl << "------> Closure by product" << endl ;
 #endif
@@ -484,7 +486,7 @@ const ExtendedExpression * UnstableMonoid::ComputeMonoid()
 		if (witness != NULL)
 			return witness;
 
-#if VERBOSE_MONOID_COMPUTATION
+#if MONOID_COMPUTATION_VERBOSITY
 		cout << "------> Closure by stabilization" << endl << endl;
 #endif
 //		cout << "Stabilization" << endl;

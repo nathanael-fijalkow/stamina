@@ -78,18 +78,21 @@ int main(int argc, char **argv)
 		ofstream output("monoid " + to_string(h) + ".txt");
 
 		cout << "******************************" << endl << "Testing starheight " << h << endl <<  "*****************************************" << endl;
+
+		cout << "Computing the nested automaton..." << endl;
 		MultiCounterAut *Baut = toNestedBaut(aut, h);
 		
-		
+		/*
 		cout << "The nested automaton " << endl;
 		Baut->print();
-
+		*/
 		UnstableMultiMonoid monoid(*Baut);
 
-
+		cout << "Checking witness existence on the fly..." << endl;
 		auto expr = monoid.containsUnlimitedWitness();
 		monoid.print_summary();
-		output << monoid;
+		if (monoid.expr_to_mat.size() < 5000)
+			output << monoid;
 
 		delete Baut;
 

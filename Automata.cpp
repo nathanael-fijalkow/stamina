@@ -118,7 +118,8 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	//the only initial new state is {i:  i initial}. The function works if there are several initial states
 	Subaut->initial=0;
 	for(uint i=0;i<n;i++){
-		if(aut->initialstate[i]) {Subaut->initial+=TwoPow(i);}
+		if(aut->initialstate[i])
+		Subaut->initial+=TwoPow(i);
 	}
 #if VERBOSE_AUTOMATA_COMPUTATION
 	printf("Initial state created:%d\n",Subaut->initial);
@@ -130,7 +131,8 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 		k=0;
 		bool fin=true;
 		while(k<n && fin) {
-			fin=aut->finalstate[bit(i,k)];
+			if (bit(i, k)) fin = aut->finalstate[k];
+			//fin=aut->finalstate[bit(i,k)];
 			k++;
 		}
 		Subaut->finalstate[i]=fin;

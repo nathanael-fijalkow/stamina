@@ -6,6 +6,8 @@
 		
 
 MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
+
+	cout << "Computing the subset automaton..." << endl;
 	//We start by computing the subset automaton of aut
 	//It has deterministic letters
 	ClassicEpsAut* Subsetaut=toSubsetAut(aut);
@@ -34,7 +36,8 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	//there are n+n^2+...+n^(k+1)=(n^(k+2)-n)/(n-1)
 	//there are k+1 counters
 	
-	uint N= (ns > 1) ? (myPow(ns,k+2)-ns)/(ns-1) : k+1;
+	cout << "Computing the multicounter epsilon automaton..." << endl;
+	uint N = (ns > 1) ? (myPow(ns, k + 2) - ns) / (ns - 1) : k + 1;
 	MultiCounterEpsAut* EpsBaut=new MultiCounterEpsAut(nl,N,k+1);
 	
 
@@ -53,6 +56,8 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	
 	//TRANSITION table
 	
+	cout << "Removing epsilon transitions..." << endl;
+
 
 	uint l,bound;
 
