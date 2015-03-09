@@ -37,10 +37,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	uint N= (ns > 1) ? (myPow(ns,k+2)-ns)/(ns-1) : k+1;
 	MultiCounterEpsAut* EpsBaut=new MultiCounterEpsAut(nl,N,k+1);
 	
-#if VERBOSE_AUTOMATA_COMPUTATION
-	cout << "MultiCounterEpsAut " << endl;
-	EpsBaut->print();
-#endif
+
 
 	//the last state on the pile is the reminder modulo ns
 
@@ -93,12 +90,17 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 		nouv = (ns>1) ? (w / ns) - ((w / ns) % ns) + p : i - 1;
 		if (l>1) EpsBaut->trans_eps[i][nouv] = l - 1;
 	}
+
+#if VERBOSE_AUTOMATA_COMPUTATION
+	cout << "****************************************" << endl << "MultiCounterEpsAut " << endl << "****************************************" << endl;
+	EpsBaut->print();
+#endif
 	
 
 	auto epsremoved = EpsRemoval(EpsBaut);
 
 #if VERBOSE_AUTOMATA_COMPUTATION
-	cout << "Epsilon removed" << endl;
+	cout << "****************************************" << endl << "Epsilon removed " << endl << "****************************************" << endl;
 	epsremoved->print();
 #endif
 

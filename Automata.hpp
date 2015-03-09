@@ -3,6 +3,7 @@
 
 #include "Matrix.hpp"
 #include "VectorUInt.hpp"
+#include <map>
 
 #define VERBOSE_AUTOMATA_COMPUTATION 1
 
@@ -21,13 +22,13 @@ public:
 	uint NbStates;
 
 	//initial states
-	bool* initialstate;
+	vector<bool> initialstate;
 	
 	//final states
-	bool* finalstate;
+	vector<bool> finalstate;
 	
 	//transition table: one boolean matrix for each letter
-	bool*** trans;
+	map<char, vector<vector<bool>>> trans;
 
 	virtual void print();
 
@@ -104,7 +105,7 @@ public:
 	// This matrix act_prod is of size (2N+3)*(2N+3), it is computed once and for all.
 	char ** act_prod;
 	
-	void print();
+	virtual void print();
 	string elementToString(char element);
 
 };
@@ -125,7 +126,9 @@ public:
 	//if no transition, goes to state N+1.
 	uint** transdet_state;
 	char** transdet_action;
-	
+
+	virtual void print();
+
 };
 
 MultiCounterAut* EpsRemoval(MultiCounterEpsAut *aut);
