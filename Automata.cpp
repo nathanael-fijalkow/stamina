@@ -125,7 +125,7 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	}
 
 #if VERBOSE_AUTOMATA_COMPUTATION
-	printf("Final states created:%d\n");
+	printf("Final states created\n");
 #endif
 
 	//transitions are as usually in powerset
@@ -300,8 +300,8 @@ MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
 string MultiCounterAut::elementToString(char element)
 {
 	char N = NbCounters;
-	if (element == 2 * N + 2) return "oo";
-	if (element == 2 * N + 1) return "w ";
+	if (element == 2 * N + 2) return "w ";
+	if (element == 2 * N + 1) return "oo";
 	if (element <= N) return "r" + to_string(element);
 	return "i" + to_string(element);
 }

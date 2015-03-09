@@ -72,6 +72,7 @@ int main(int argc, char **argv)
 	int h = 0;
 	while (true)
 	{
+		
 		cout << "******************************" << endl << "Testing starheight " << h << endl <<  "*****************************************" << endl;
 		MultiCounterAut *Baut = toNestedBaut(aut, h);
 		
