@@ -68,9 +68,9 @@ void ClassicAut::print(){
 		if (initialstate[i])
 			cout << i << " ";
 	cout << endl;
-	cout << "Finall states: ";
+	cout << "Final states: ";
 	for (uint i = 0; i < NbStates; i++)
-		if (initialstate[i])
+		if (finalstate[i])
 			cout << i << " ";
 	cout << endl;
 
@@ -330,9 +330,9 @@ void MultiCounterAut::print(){
 		if (initialstate[i])
 			cout << i << " ";
 	cout << endl;
-	cout << "Finall states: ";
+	cout << "Final states: ";
 	for (uint i = 0; i < NbStates; i++)
-		if (initialstate[i])
+		if (finalstate[i])
 			cout << i << " ";
 	cout << endl;
 
