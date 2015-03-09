@@ -300,10 +300,14 @@ MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
 string MultiCounterAut::elementToString(char element)
 {
 	char N = NbCounters;
-	if (element == 2 * N + 2) return "! ";
-	if (element == 2 * N + 1) return "om";
-	if (element <= N) return "r" + to_string(element);
-	return "i" + to_string(element);
+	string result = "";
+	if (element == 2 * N + 2) result.push_back(193);
+	else if (element == 2 * N + 1) result = "O";
+	else if (element == N) result = "E";
+	else if (element < N) result = "R" + to_string(element);
+	else result = "I" + to_string(element - N - 1);
+	if (result.size() <= 1) result.push_back(' ');
+	return result;
 }
 
 //print B-automaton

@@ -85,8 +85,16 @@ void MultiCounterMatrix::print(std::ostream & os) const
 		os << i << ":" << " ";
 		for (uint j = 0; j < VectorInt::GetStateNb(); j++)
 		{
-
-			os << " " << (int)((rows[i]->coefs[j] == 6) ? 6 : rows[i]->coefs[j]);
+//			os << " " << (int)((rows[i]->coefs[j] == 6) ? 6 : rows[i]->coefs[j]);
+				string result = "";
+				auto element = rows[i]->coefs[j];
+				if (element == 2 * N + 2) result.push_back(193);
+				else if (element == 2 * N + 1) result = "O";
+				else if (element == N) result = "E";
+				else if (element < N) result = "R" + to_string(element);
+				else result = "I" + to_string(element - N - 1);
+				if (result.size() <= 1) result.push_back(' ');
+				os << result << " ";
 		}
 		os << endl;
 	}
