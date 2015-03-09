@@ -88,7 +88,7 @@ void MultiCounterMatrix::print(std::ostream & os) const
 //			os << " " << (int)((rows[i]->coefs[j] == 6) ? 6 : rows[i]->coefs[j]);
 				string result = "";
 				auto element = rows[i]->coefs[j];
-				if (element == 2 * N + 2) result.push_back(193);
+				if (element == 2 * N + 2) result = "_";
 				else if (element == 2 * N + 1) result = "O";
 				else if (element == N) result = "E";
 				else if (element < N) result = "R" + to_string(element);

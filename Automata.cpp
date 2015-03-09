@@ -76,6 +76,20 @@ void ClassicEpsAut::print(){
 	
 }
 
+void ClassicAut::print(){
+	for (char a = 0; a<NbLetters; a++){
+		printf("Letter %d\n", a);
+		for (uint i = 0; i<NbStates; i++){
+			for (uint j = 0; j<NbStates; j++){
+				if (trans[a][i][j]) cout << "1"; else cout << "_";
+			}
+			printf("\n");
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
 //compute x^p
 uint myPow(uint x, uint p)
 {
@@ -301,7 +315,7 @@ string MultiCounterAut::elementToString(char element)
 {
 	char N = NbCounters;
 	string result = "";
-	if (element == 2 * N + 2) result.push_back(193);
+	if (element == 2 * N + 2) result = "_";
 	else if (element == 2 * N + 1) result = "O";
 	else if (element == N) result = "E";
 	else if (element < N) result = "R" + to_string(element);

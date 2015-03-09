@@ -6,6 +6,7 @@
 #include "MultiCounterMatrix.hpp"
 #include "Automata.hpp"
 
+
 class UnstableMultiMonoid : public UnstableMonoid
 {
 public:
@@ -23,16 +24,20 @@ public:
 
 	static bool IsUnlimitedWitness(const Matrix * matrix);
 
+	/* inital states of the automaton used for construction */
+	static vector<int> initial_states;
+	static vector<int> final_states;
+
 protected:
 	pair <Matrix *, bool> addMatrix(Matrix * mat);
 
 	/* converts an explicit matrix */
 	Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
 
-	/* inital states of the automaton used for construction */
-	static vector<int> initial_states;
-	static vector<int> final_states;
 };
+
+/* for printing to a file */
+ostream& operator<<(ostream& os, const UnstableMultiMonoid & monoid);
 
 
 #endif

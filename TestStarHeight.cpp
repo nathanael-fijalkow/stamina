@@ -47,10 +47,11 @@ int main(int argc, char **argv)
 	ClassicAut *aut=new ClassicAut(2,3);
 
 	aut->trans[0][0][0] = true;
-	aut->trans[1][0][1] = true;
-	aut->trans[1][1][1] = true;
 	aut->trans[0][1][2] = true;
 	aut->trans[0][2][2] = true;
+
+	aut->trans[1][0][1] = true;
+	aut->trans[1][1][1] = true;
 	aut->trans[1][2][0] = true;
 
 	aut->initialstate[0]=true;
@@ -68,11 +69,14 @@ int main(int argc, char **argv)
 
 	printf("Automaton created\n");
 	
-	
+	aut->print();
+
+
 	int h = 0;
 	while (true)
 	{
-		
+		ofstream output("monoid " + to_string(h) + ".txt");
+
 		cout << "******************************" << endl << "Testing starheight " << h << endl <<  "*****************************************" << endl;
 		MultiCounterAut *Baut = toNestedBaut(aut, h);
 		
@@ -85,7 +89,8 @@ int main(int argc, char **argv)
 
 		auto expr = monoid.containsUnlimitedWitness();
 		monoid.print_summary();
-		monoid.print();
+		output << monoid;
+
 		delete Baut;
 
 		if (expr)

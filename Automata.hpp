@@ -29,6 +29,8 @@ public:
 	//transition table: one boolean matrix for each letter
 	bool*** trans;
 
+	virtual void print();
+
 protected:
 	//initialization
 	void init(char nbletters, uint nbstates);
@@ -54,7 +56,8 @@ public:
 	//unique initial state
 	uint initial;
 	
-	void print();
+	virtual void print();
+
 };
 
 

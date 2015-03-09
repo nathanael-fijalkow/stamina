@@ -63,5 +63,25 @@ pair <Matrix *, bool> UnstableMultiMonoid::addMatrix(Matrix * mat)
 	return pair<Matrix *, bool>((Matrix *)&(*it.first), it.second);
 }
 
+ostream& operator<<(ostream& st, const UnstableMultiMonoid & monoid)
+{
+	st << "***************************************" << endl;
+	st << "Initial states (" << monoid.initial_states.size() << ")"<< endl;
+	st << "***************************************" << endl;
+	for (auto i : monoid.initial_states)
+		st << i << " ";
+	st << endl;
+
+	st << "***************************************" << endl;
+	st << "Final states (" << monoid.final_states.size() << ")" << endl;
+	st << "***************************************" << endl;
+	for (auto i : monoid.final_states)
+		st << i << " ";
+	st << endl;
+
+	st << *(const Monoid *)(&monoid);
+	return st;
+}
+
 #define VERBOSE_MONOID_COMPUTATION 0
 
