@@ -195,7 +195,7 @@ Matrix * MultiCounterMatrix::stab() const
 	//cout << " act:" << (int)act << "\n";
 	for (uint i = 0; i <n; i++){
 			cd=rows[i]->coefs[i];
-			diags[i] = (cd <= n) ? cd :((cd <= 2*N+1) ? 2*N+1 : 2*N+2);
+			diags[i] = (cd <= N) ? cd :((cd <= 2*N+1) ? 2*N+1 : 2*N+2);
 			
 	}
 	//system("pause");

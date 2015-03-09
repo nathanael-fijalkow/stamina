@@ -44,7 +44,6 @@ int main(int argc, char **argv)
 
 	
 	//2 letters 3 states
-	/*
 	ClassicAut *aut=new ClassicAut(2,3);
 
 	aut->trans[0][0][0] = true;
@@ -56,15 +55,16 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-	*/
 
 	//1 letters 1 state
+	/*
 	ClassicAut *aut=new ClassicAut(1,1);
 
 	aut->trans[0][0][0] = true;
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
+	*/
 
 	printf("Automaton created\n");
 	
@@ -84,18 +84,20 @@ int main(int argc, char **argv)
 
 
 		auto expr = monoid.containsUnlimitedWitness();
+		monoid.print_summary();
+		monoid.print();
+		delete Baut;
+
 		if (expr)
 		{
-			cout << "An unlimited witness: " << endl;
+			cout << "An unlimited witness for h=" << h << endl;
 			cout << *expr << endl;
 		}
 		else
 		{
-			cout << " The automaton is limited " << endl;
+			cout << " The automaton is limited, sharpheight is " << h << endl;
+			break;
 		}
-		monoid.print_summary();
-		monoid.print();
-		delete Baut;
 		h++;
 	}
     std::cout << "End of Computation\n";
