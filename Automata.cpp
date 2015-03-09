@@ -300,8 +300,8 @@ MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
 string MultiCounterAut::elementToString(char element)
 {
 	char N = NbCounters;
-	if (element == 2 * N + 2) return "w ";
-	if (element == 2 * N + 1) return "oo";
+	if (element == 2 * N + 2) return "! ";
+	if (element == 2 * N + 1) return "om";
 	if (element <= N) return "r" + to_string(element);
 	return "i" + to_string(element);
 }
