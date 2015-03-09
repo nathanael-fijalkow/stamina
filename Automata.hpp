@@ -102,6 +102,7 @@ public:
 	char ** act_prod;
 	
 	void print();
+	string elementToString(char element);
 
 };
 

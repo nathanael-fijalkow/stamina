@@ -276,9 +276,12 @@ void MultiCounterAut::init(char Nletters,uint Nstates, char Ncounters){
 		act_prod[i] = (char *)malloc((2 * N + 3)  *  sizeof(char));
 		for (uint j = 0; j < (2 * N + 3); j++){
 			act_prod[i][j] =
+				/* rule for infinite */
 				(i == 2 * N + 2 || j == 2 * N + 2) ? 2 * N + 2
+				/* rule for unbounded */
 				: (i == 2 * N + 1 || j == 2 * N + 1) ? 2 * N + 1
-				: ((i <= N & j <= N) || (N < i & N < j)) ? ( i< j ? i : j)
+				/* rule for unbounded */
+				: ((i <= N & j <= N) || (N < i & N < j)) ? (i< j ? i : j)
 				: (i <= N & N < j & i < j - N) ? i
 				: (i <= N & N < j & i >= j - N) ? j
 				: (j <= N & N < i & j < i - N) ? j
@@ -294,17 +297,26 @@ MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
 	
 }
 
+string MultiCounterAut::elementToString(char element)
+{
+	char N = NbCounters;
+	if (element == 2 * N + 2) return "oo";
+	if (element == 2 * N + 1) return "w ";
+	if (element <= N) return "r" + to_string(element);
+	return "i" + to_string(element);
+}
+
 //print B-automaton
 void MultiCounterAut::print(){
 	for(char a=0;a<NbLetters;a++){
 		printf("Letter %d\n",a);
 		for(uint i=0;i<NbStates;i++){
 			for(uint j=0;j<NbStates;j++){
-				printf("%d ",trans[a][i][j])	;
+				cout << elementToString(trans[a][i][j]) << " ";
 			}
-			printf("\n");
+			cout << endl;
 		}
-		printf("\n");
+		cout << endl;
 	}
 	
 }
