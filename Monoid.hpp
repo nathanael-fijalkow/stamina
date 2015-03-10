@@ -37,7 +37,7 @@ public:
 	map <const ExtendedExpression *, const ExtendedExpression *> rewriteRules;
 	
 	// Print
-	void print() const;
+	void print(ostream& st = cout) const;
 	void print_summary() const;
 	void print_letters() const;
 	string toString() const;

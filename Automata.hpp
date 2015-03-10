@@ -6,6 +6,7 @@
 #include <map>
 
 #define VERBOSE_AUTOMATA_COMPUTATION 0
+#define LOG_COMPUTATION_TO_FILE 1
 
 
 class ClassicAut
@@ -30,7 +31,7 @@ public:
 	//transition table: one boolean matrix for each letter
 	map<char, vector<vector<bool>>> trans;
 
-	virtual void print();
+	virtual void print(ostream& st = cout);
 
 protected:
 	//initialization
@@ -57,7 +58,7 @@ public:
 	//unique initial state
 	uint initial;
 	
-	virtual void print();
+	virtual void print(ostream& st = cout);
 
 };
 
@@ -105,7 +106,7 @@ public:
 	// This matrix act_prod is of size (2N+3)*(2N+3), it is computed once and for all.
 	char ** act_prod;
 	
-	virtual void print();
+	virtual void print(ostream& st = cout);
 	string elementToString(char element);
 
 };
@@ -127,7 +128,7 @@ public:
 	uint** transdet_state;
 	char** transdet_action;
 
-	virtual void print();
+	virtual void print(ostream& st = cout);
 
 };
 

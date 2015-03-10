@@ -77,7 +77,9 @@ int main(int argc, char **argv)
 	{
 		ofstream output("monoid " + to_string(h) + ".txt");
 
-		cout << "******************************" << endl << "Testing starheight " << h << endl <<  "*****************************************" << endl;
+		cout << "******************************" << endl;
+		cout << "Testing starheight " << h << endl;
+		cout << "*****************************************" << endl;
 
 		cout << "Computing the nested automaton..." << endl;
 		MultiCounterAut *Baut = toNestedBaut(aut, h);

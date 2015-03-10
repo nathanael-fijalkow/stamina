@@ -7,9 +7,9 @@
 #define MONOID_COMPUTATION_VERBOSITY 0
 
 // Print
-void Monoid::print() const
+void Monoid::print(ostream& st) const
 {
-	cout << *this;
+	st << *this;
 }
 
 void Monoid::print_letters() const

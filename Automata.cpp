@@ -46,46 +46,43 @@ initial=0;
 }
 
 //We assume letters are deterministic
-void ClassicEpsAut::print(){
-	ClassicAut::print();
-	
-		printf("Epsilon\n");
+void ClassicEpsAut::print(ostream& st){
+	ClassicAut::print(st);
+		st << "Epsilon" <<endl;
 		for(uint i=0;i<NbStates;i++){
 			for(uint j=0;j<NbStates;j++){
-				printf("%d ",trans_eps[i][j]);
+				st << (int) trans_eps[i][j] << " ";
 			}
-			printf("\n");
+			st << endl;
 		}
-		printf("\n");
-	
-	
+		st << endl;
 }
 
-void ClassicAut::print(){
-	cout << (int) NbStates << " states " << (int) NbLetters << " letters" << endl;
-	cout << "Initial states: ";
+void ClassicAut::print(ostream& st){
+	st << (int) NbStates << " states " << (int) NbLetters << " letters" << endl;
+	st << "Initial states: ";
 	for (uint i = 0; i < NbStates; i++)
 		if (initialstate[i])
-			cout << i << " ";
-	cout << endl;
-	cout << "Final states: ";
+			st << i << " ";
+	st << endl;
+	st << "Final states: ";
 	for (uint i = 0; i < NbStates; i++)
 		if (finalstate[i])
-			cout << i << " ";
-	cout << endl;
+			st << i << " ";
+	st << endl;
 
 
 	for (char a = 0; a<NbLetters; a++){
-		printf("Letter %d\n", a);
+		st << "Letter " << (int) a <<  endl;
 		for (uint i = 0; i<NbStates; i++){
 			for (uint j = 0; j<NbStates; j++){
-				if (trans[a][i][j]) cout << "1"; else cout << "_";
+				st << ((trans[a][i][j]) ? "1" : "_");
 			}
-			printf("\n");
+			st << endl;
 		}
-		printf("\n");
+		st << endl;
 	}
-	printf("\n");
+	st << endl;
 }
 
 //compute x^p
@@ -176,7 +173,6 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	}
 		
 	return Subaut;
-	
 }
 
 
@@ -325,45 +321,42 @@ string MultiCounterAut::elementToString(char element)
 }
 
 //print B-automaton
-void MultiCounterAut::print(){
-	cout << (int)NbStates << " states " << (int)NbLetters << " letters" << endl;
-	cout << "Initial states: ";
+void MultiCounterAut::print(ostream& st){
+	st << (int)NbStates << " states " << (int)NbLetters << " letters" << endl;
+	st << "Initial states: ";
 	for (uint i = 0; i < NbStates; i++)
 		if (initialstate[i])
-			cout << i << " ";
-	cout << endl;
-	cout << "Final states: ";
+			st << i << " ";
+	st << endl;
+	st << "Final states: ";
 	for (uint i = 0; i < NbStates; i++)
 		if (finalstate[i])
-			cout << i << " ";
-	cout << endl;
+			st << i << " ";
+	st << endl;
 
 	for(char a=0;a<NbLetters;a++){
-		printf("Letter %d\n",a);
+		st << "Letter " << (int) a << endl;
 		for(uint i=0;i<NbStates;i++){
 			for(uint j=0;j<NbStates;j++){
-				cout << elementToString(trans[a][i][j]) << " ";
+				st << elementToString(trans[a][i][j]) << " ";
 			}
-			cout << endl;
+			st << endl;
 		}
-		cout << endl;
+		st << endl;
 	}
-	
 }
 
-void MultiCounterEpsAut::print(){
+void MultiCounterEpsAut::print(ostream& st){
 
-	MultiCounterAut::print();
+	MultiCounterAut::print(st);
 
-	printf("Epsilon\n");
-	for (uint i = 0; i<NbStates; i++){
-		for (uint j = 0; j<NbStates; j++){
-			printf("%d ", trans_eps[i][j]);
-		}
-		printf("\n");
+	st << "Epsilon" << endl;
+	for (uint i = 0; i<NbStates; i++)
+	{
+		for (uint j = 0; j<NbStates; j++)
+			st << (int) trans_eps[i][j] << " ";
+		st << endl;
 	}
-
-
 }
 
 //product of matrices. No need to optimize as in the monoid because this won't be done too many times.

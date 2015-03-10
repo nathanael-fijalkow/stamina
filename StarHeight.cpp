@@ -1,5 +1,5 @@
 #include "StarHeight.hpp"
-
+#include <fstream>
 
 
 
@@ -20,6 +20,12 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	printf("Subset Automaton Builded, %d states\n\n",ns);
 	Subsetaut->print();
 #endif	
+#if LOG_COMPUTATION_TO_FILE
+	{
+		ofstream file("subset_automaton.txt");
+		Subsetaut->print(file);
+	}
+#endif
 	
 	/*
 	Subsetaut=SubMin(Subsetaut);
@@ -100,6 +106,13 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	cout << "****************************************" << endl << "MultiCounterEpsAut " << endl << "****************************************" << endl;
 	EpsBaut->print();
 #endif
+#if LOG_COMPUTATION_TO_FILE
+	{
+		ofstream file("multicountereps_automaton.txt");
+		EpsBaut->print(file);
+	}
+#endif
+
 	
 
 	auto epsremoved = EpsRemoval(EpsBaut);
@@ -107,6 +120,12 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 #if VERBOSE_AUTOMATA_COMPUTATION
 	cout << "****************************************" << endl << "Epsilon removed " << endl << "****************************************" << endl;
 	epsremoved->print();
+#endif
+#if LOG_COMPUTATION_TO_FILE
+	{
+		ofstream file("epsremoved_automaton.txt");
+		epsremoved->print(file);
+	}
 #endif
 
 	return epsremoved;
