@@ -47,8 +47,31 @@ initial=0;
 
 //We assume letters are deterministic
 void ClassicEpsAut::print(ostream& st){
-	ClassicAut::print(st);
-		st << "Epsilon" <<endl;
+	st << (int)NbStates << " states " << (int)NbLetters << " letters" << endl;
+	st << "Initial states: ";
+	for (uint i = 0; i < NbStates; i++)
+		if (initialstate[i])
+			st << i << " ";
+	st << endl;
+	st << "Final states: ";
+	for (uint i = 0; i < NbStates; i++)
+		if (finalstate[i])
+			st << i << " ";
+	st << endl;
+
+
+	for (char a = 0; a<NbLetters; a++){
+		st << "Letter " << (int)a << endl;
+		for (uint i = 0; i<NbStates; i++){
+				st << transdet[a][i];
+			st << endl;
+		}
+		st << endl;
+	}
+	st << endl;
+	
+	
+	st << "Epsilon" << endl;
 		for(uint i=0;i<NbStates;i++){
 			for(uint j=0;j<NbStates;j++){
 				st << (int) trans_eps[i][j] << " ";
@@ -348,13 +371,34 @@ void MultiCounterAut::print(ostream& st){
 
 void MultiCounterEpsAut::print(ostream& st){
 
-	MultiCounterAut::print(st);
+	st << (int)NbStates << " states " << (int)NbLetters << " letters" << endl;
+	st << "Initial states: ";
+	for (uint i = 0; i < NbStates; i++)
+		if (initialstate[i])
+			st << i << " ";
+	st << endl;
+	st << "Final states: ";
+	for (uint i = 0; i < NbStates; i++)
+		if (finalstate[i])
+			st << i << " ";
+	st << endl;
+
+/*	uint** transdet_state;
+	char** transdet_action;*/
+
+	for (char a = 0; a<NbLetters; a++){
+		st << "Letter " << (int)a << endl;
+		for (uint i = 0; i<NbStates; i++){
+			st << "(" << i << "," << elementToString(transdet_action[a][i]) << "," << transdet_state[a][i] << ") ";
+		}
+		st << endl;
+	}
 
 	st << "Epsilon" << endl;
 	for (uint i = 0; i<NbStates; i++)
 	{
 		for (uint j = 0; j<NbStates; j++)
-			st << (int) trans_eps[i][j] << " ";
+			st << elementToString(trans_eps[i][j]) << " ";
 		st << endl;
 	}
 }

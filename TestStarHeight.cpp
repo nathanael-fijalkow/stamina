@@ -55,7 +55,8 @@ int main(int argc, char **argv)
 	*/
 
 	
-	//(b*ab*a)*	
+	
+	//b*(b*ab*a)*	
 	ClassicAut *aut=new ClassicAut(2,2);
 
 	aut->trans[0][0][1]=true;
@@ -65,8 +66,6 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-	
-
 
 	/*
 	//(a*b*c)*
@@ -87,11 +86,14 @@ int main(int argc, char **argv)
 	aut->trans[2][2][0] = true;
 	aut->trans[2][3][3] = true;
 
-
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-	
 	*/
+
+	//(aa(ab)*bb(ab*))*
+
+
+
 
 	
 	//2 letters 3 states
