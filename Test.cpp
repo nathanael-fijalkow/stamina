@@ -69,7 +69,7 @@ Monoid* toMonoid(ExplicitAutomaton* aut)
 		for(int i=0;i<aut->alphabet.length();i++)
 			for(int j=0;i<aut->size;i++)
 				for(int k=0;k<aut->size;k++)
-					if(aut->matrices[i]->coefficients[j*aut->size+k]>0)
+					if(aut->matrices[i]->coefficients[j][k]>0)
 						a->trans[i][j][k]=true;
 
 		a->initialstate[aut->initialState]=true;
@@ -92,7 +92,7 @@ Monoid* toMonoid(ExplicitAutomaton* aut)
 int main(int argc, char **argv)
 {
 	ExplicitMatrix mata(1);
-	mata.coefficients[0] = INC;
+	mata.coefficients[0][0] = INC;
 	UnstableMultiMonoid monoid(1,1);
 	monoid.addLetter('a',mata);
 	monoid.ComputeMonoid();

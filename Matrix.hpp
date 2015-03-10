@@ -27,10 +27,9 @@ public:
 	// Number of states of the matrix
 	uint stateNb;
 
-	// coefficients is a C-style array
-	// the coefficient i,j is stored at position  i * n + j
+	// the coefficients
 	// 0 means 0, 1 means +, 2 means 1
-	char * coefficients;
+	vector<vector<char>> coefficients;
 
 	// Constructor 
 	ExplicitMatrix(uint stateNb);
@@ -38,14 +37,8 @@ public:
 	//Random matrix
 	static ExplicitMatrix  * random(uint stateNb);
 
-	ExplicitMatrix& operator=(const ExplicitMatrix & other);
-	ExplicitMatrix(const ExplicitMatrix & other);
-
 	// Printing
 	virtual void print(std::ostream& os = std::cout) const;
-
-	// Free a useless explicit matrix
-	~ExplicitMatrix();
 };
 
 

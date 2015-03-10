@@ -42,8 +42,8 @@ OneCounterLargeMatrix::OneCounterLargeMatrix(const ExplicitMatrix & explMatrix)
 
 			for (uint j = 0; j < Vector::GetStateNb(); j++)
 			{
-				char c1 = explMatrix.coefficients[i * Vector::GetStateNb() + j];
-				char c2 = explMatrix.coefficients[j * Vector::GetStateNb() + i];
+				char c1 = explMatrix.coefficients[i][j];
+				char c2 = explMatrix.coefficients[j][i];
 				row[j] = (c1 <= act);
 				col[j] = (c2 <= act);
 			}
@@ -66,8 +66,8 @@ OneCounterSmallMatrix::OneCounterSmallMatrix(const ExplicitMatrix & explMatrix)
 		{
 			for (int j = Vector::GetStateNb() - 1; j >= 0; j--)
 			{
-				char c1 = explMatrix.coefficients[i * Vector::GetStateNb() + j];
-				char c2 = explMatrix.coefficients[j * Vector::GetStateNb() + i];
+				char c1 = explMatrix.coefficients[i][j];
+				char c2 = explMatrix.coefficients[j][i];
 				rows[act][i] = (rows[act][i] << 1) | ( (c1 <= act) ? 1 : 0);
 				cols[act][i] = (cols[act][i] << 1) | ((c2 <= act) ? 1 : 0);
 			}
@@ -116,7 +116,7 @@ ExplicitMatrix* OneCounterMatrix::toExplicitMatrix() const
   ExplicitMatrix* ret = new ExplicitMatrix(Vector::GetStateNb());
   for (uint i = 0; i < Vector::GetStateNb(); i++){
 		for (uint j = 0; j < Vector::GetStateNb(); j++)
-		  ret->coefficients[i*Vector::GetStateNb()+j]=actions[get(i, j)];
+		  ret->coefficients[i][j]=actions[get(i, j)];
   }
   return ret;
 }

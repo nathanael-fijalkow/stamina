@@ -55,8 +55,8 @@ MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N
 
 		for (uint j = 0; j < VectorInt::GetStateNb(); j++)
 		{
-			row[j] = explMatrix.coefficients[i * VectorInt::GetStateNb() + j];
-			col[j] = explMatrix.coefficients[j * VectorInt::GetStateNb() + i];
+			row[j] = explMatrix.coefficients[i][j];
+			col[j] = explMatrix.coefficients[j][i];
 		}
 		auto it1 = int_vectors.emplace(row);
 		auto it = it1.first;
@@ -104,7 +104,7 @@ ExplicitMatrix* MultiCounterMatrix::toExplicitMatrix() const
         ExplicitMatrix* ret = new ExplicitMatrix(VectorInt::GetStateNb());
 	for (uint i = 0; i < VectorInt::GetStateNb(); i++){
 		for (uint j = 0; j < VectorInt::GetStateNb(); j++)
-		  ret->coefficients[i*VectorInt::GetStateNb()+j]=rows[i]->coefs[j];
+		  ret->coefficients[i][j]=rows[i]->coefs[j];
 	}
 	return ret;
 }

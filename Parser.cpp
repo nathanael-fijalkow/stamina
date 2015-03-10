@@ -78,7 +78,7 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
       istringstream iss2(line);
       for(int k=0;k<size;k++) {
 	getfline(iss2,line,' ');
-	mat->coefficients[j*size+k]=lttoi(line);
+	mat->coefficients[j][k]=lttoi(line);
       }
     }
     ret->matrices[i]=mat;

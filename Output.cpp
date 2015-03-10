@@ -70,16 +70,10 @@ string Dot::toDot(const ExplicitAutomaton* a)
 	ret += "label=\"Automaton\"\n";
 	ret += giveStyles();
 	for(int i=0;i<a->alphabet.length();i++)
-	{
 		for(int j=0;j<size;j++)
-		{
 			for(int k=0;k<size;k++)
-			{
-				if(a->matrices[i]->coefficients[j*size +k]==2)
+				if( a->matrices[i]->coefficients[j][k] == 2 )
 					ret+=std::to_string(j) + " -> " + std::to_string(k) + " [label = \""+a->alphabet[i]+"\"];\n";
-			}
-		}
-	}
 	ret+="}\n";
 	return ret;
 }

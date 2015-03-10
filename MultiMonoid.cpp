@@ -27,8 +27,7 @@ UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata) : Uns
 	for (char letter = 0; letter < automata.NbLetters; letter++)
 	{
 		ExplicitMatrix mat(automata.NbStates);
-		for (int i = 0; i < automata.NbStates; i++)
-			memcpy(mat.coefficients + i * automata.NbStates, automata.trans[letter][i], automata.NbStates  * sizeof(char));
+		mat.coefficients = automata.trans.at(letter);
 		addLetter('a' + letter, mat);
 	}
 

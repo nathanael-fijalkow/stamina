@@ -34,11 +34,11 @@ ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix)
 
 		for (uint j = 0; j < Vector::GetStateNb(); j++)
 		{
-			char c1 = explMatrix.coefficients[i * Vector::GetStateNb() + j];
+			char c1 = explMatrix.coefficients[i][j];
 			r_pluses[j] = (c1 >= 1);
 			r_ones[j] = (c1 >= 2);
 
-			char c2 = explMatrix.coefficients[j * Vector::GetStateNb() + i];
+			char c2 = explMatrix.coefficients[j][i];
 			c_pluses[j] = (c2 >= 1);
 			c_ones[j] = (c2 == 2);
 		}
@@ -125,10 +125,10 @@ ExplicitMatrix* ProbMatrix::toExplicitMatrix() const
 
 		for (uint j = 0; j < Vector::GetStateNb(); j++)
 		  (ones.contains(j) ? 
-		   ret->coefficients[i*Vector::GetStateNb()+j]='1' : 
+		   ret->coefficients[i][j]='1' : 
 		   pluses.contains(j) ? 
-		   ret->coefficients[i*Vector::GetStateNb()+j]='+' : 
-		   ret->coefficients[i*Vector::GetStateNb()+j]='_');
+		   ret->coefficients[i][j]='+' : 
+		   ret->coefficients[i][j]='_');
 	}
 	return ret;
 }

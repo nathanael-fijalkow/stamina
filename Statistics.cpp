@@ -55,26 +55,26 @@ int main(int argc, char **argv)
 				for (int j = 0; j < n; j++)
 				{
 					if (rand() < da / 2)
-						m1.coefficients[n*i + j] = BOT;
+						m1.coefficients[i][j] = BOT;
 					else if (rand() < da)
-						m1.coefficients[n*i + j] = INC;
+						m1.coefficients[i][j] = INC;
 					else if (rand() < 2.5 * da)
-						m1.coefficients[n*i + j] = EPS;
+						m1.coefficients[i][j] = EPS;
 					else
-						m1.coefficients[n*i + j] = RESET;
+						m1.coefficients[i][j] = RESET;
 
 					if (rand() < db / 2)
-						m2.coefficients[n*i + j] = BOT;
+						m2.coefficients[i][j] = BOT;
 					else if (rand() < db)
-						m2.coefficients[n*i + j] = INC;
+						m2.coefficients[i][j] = INC;
 					else if (rand() < 2.5 * db)
-						m2.coefficients[n*i + j] = EPS;
+						m2.coefficients[i][j] = EPS;
 					else
-						m2.coefficients[n*i + j] = RESET;
+						m2.coefficients[i][j] = RESET;
 
 				}
-				m1.coefficients[n * i + rand() % n] = 2;
-				m2.coefficients[n * i + rand() % n] = 2;
+				m1.coefficients[i][rand() % n] = 2;
+				m2.coefficients[i][rand() % n] = 2;
 			}
 
 			auto a = monoid.addLetter('a', m1);
