@@ -79,10 +79,10 @@ const VectorInt * MultiCounterMatrix::zero_int_vector = NULL;
 
 
 //Print MultiCounterMatrix
-void MultiCounterMatrix::print(std::ostream & os) const
+void MultiCounterMatrix::print(std::ostream & os, vector<string> state_names) const
 {
 	for (uint i = 0; i < VectorInt::GetStateNb(); i++){
-		os << i << ":" << " ";
+		os << ( state_names.size() > i ? state_names[i] : to_string(i)) << ":" << " ";
 		for (uint j = 0; j < VectorInt::GetStateNb(); j++)
 		{
 //			os << " " << (int)((rows[i]->coefs[j] == 6) ? 6 : rows[i]->coefs[j]);

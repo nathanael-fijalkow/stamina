@@ -17,7 +17,7 @@ public:
 	virtual char get(int i, int j) const = 0;
 
 	// Print
-	void print(std::ostream& os = std::cout) const;
+	void print(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const;
 
         ExplicitMatrix* toExplicitMatrix() const;
 

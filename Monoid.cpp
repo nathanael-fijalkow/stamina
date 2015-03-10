@@ -44,7 +44,7 @@ ostream& operator<<(ostream& st, const Monoid & monoid)
 	{
 			it->first->print(st);
 			st << endl;
-			it->second->print(st);
+			it->second->print(st, monoid.state_names);
 			st << endl;
 	}
 

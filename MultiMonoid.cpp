@@ -39,6 +39,11 @@ UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata) : Uns
 	for (int i = 0; i < automata.NbStates; i++)
 		if (automata.finalstate[i])
 			final_states.push_back(i);
+
+	state_names.resize(automata.NbStates);
+	for (int i = 0; i < automata.NbStates; i++)
+		state_names[i] = state_index_to_tuple(i, automata.NbStates);
+
 }
 
 const ExtendedExpression * UnstableMultiMonoid::containsUnlimitedWitness()
@@ -72,18 +77,19 @@ pair <Matrix *, bool> UnstableMultiMonoid::addMatrix(Matrix * mat)
 
 ostream& operator<<(ostream& st, const UnstableMultiMonoid & monoid)
 {
+	auto & names = monoid.state_names;
 	st << "***************************************" << endl;
 	st << "Initial states (" << monoid.initial_states.size() << ")"<< endl;
 	st << "***************************************" << endl;
 	for (auto i : monoid.initial_states)
-		st << i << " ";
+		st << (names.size() > i ? names[i] : to_string(i)) << " ";
 	st << endl;
 
 	st << "***************************************" << endl;
 	st << "Final states (" << monoid.final_states.size() << ")" << endl;
 	st << "***************************************" << endl;
 	for (auto i : monoid.final_states)
-		st << i << " ";
+		st << (names.size() > i ? names[i] : to_string(i)) << " ";
 	st << endl;
 
 	st << *(const Monoid *)(&monoid);

@@ -103,6 +103,22 @@ public:
 	//initialization
 	void init(char nbletters, uint nbstates, char nbcounters);
 	
+	/* encoding of coefficients as integers */
+	char inc(char counter){ return counter + NbCounters + 1; }
+	char reset(char counter){ return counter; }
+	char epsilon() { return NbCounters;}
+	char omega() { return 2 * NbCounters + 1; }
+	char bottom() { return 2 * NbCounters + 2; }
+
+	/* returns -1 if code is not an increment and the corrsponding counter otherwise*/
+	bool is_inc(char code) { return (code > NbStates && code < 2 * NbStates) ; }
+	bool is_reset(char code){ return code < NbStates; }
+	char get_inc_counter(char code) { return  is_inc(code) ?  code - NbStates - 1 : -1; }
+	char get_reset_counter(char code){ return is_reset(code) ?  code : -1; }
+	bool is_epsilon(char code){ return code == NbCounters; }
+	bool is_omega(char code){ return code == 2 * NbCounters + 1; }
+	bool is_bottom(char code){ return code == 2 * NbCounters + 2; }
+
 	// This matrix act_prod is of size (2N+3)*(2N+3), it is computed once and for all.
 	char ** act_prod;
 	
@@ -113,6 +129,8 @@ protected:
 	string state_index_to_string(int index);
 
 };
+
+string state_index_to_tuple(int index, int Nbstates);
 
 
 //Classic automata with Epsilon-transition, in particular Subset Automata are of this type

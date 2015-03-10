@@ -77,7 +77,7 @@ OneCounterSmallMatrix::OneCounterSmallMatrix(const ExplicitMatrix & explMatrix)
 }
 
 //Print OneCounterMatrix
-void OneCounterMatrix::print(std::ostream & os) const
+void OneCounterMatrix::print(std::ostream & os, vector<string> state_names) const
 {
 	// CAUTION: sparse matrix not implemented
 	string actions = "REIO_";

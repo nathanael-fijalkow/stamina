@@ -1,8 +1,6 @@
 #include "StarHeight.hpp"
 #include <fstream>
 
-
-
 		
 
 MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
@@ -73,6 +71,30 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 		if(i==bound){l++; bound=bound*ns+ns;}
 		p = i % ns;//current state
 		w = i-p;
+
+		/* NEW DEBUG , better labels for edges */
+
+		int x = (i - w) / ns - 1;  //état parent
+		char action;
+
+		//si state de la forme upp
+		if (l>1 && (x%ns == i))
+		{ //alors reset
+			action = EpsBaut->reset(l);
+		}
+		else{ //sinon increment
+			action = EpsBaut->inc(l);
+		}
+
+		for (char a = 0; a < nl; a++)
+		{
+			if (Subsetaut->transdet[a][p] < ns) EpsBaut->transdet_state[a][i] = w + Subsetaut->transdet[a][p]; else EpsBaut->transdet_state[a][i] = N;
+			EpsBaut->transdet_action[a][i] = action;
+		}
+		for (uint q = 0; q < ns; q++)
+			EpsBaut->trans_eps[i][w + q] = action;
+
+		/*
 		//Deterministic Letter transitions in the same component
 		for(char a=0;a<nl;a++){
 			
@@ -81,10 +103,10 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 			EpsBaut->transdet_action[a][i]=k+1+l;
 		}
 		//epsilon transitions in the same component
-		for(uint q=0;q<ns;q++){
-			if(Subsetaut->trans_eps[p][q]) EpsBaut->trans_eps[i][w+q]=k+1; //we can put action epsilon on epsilon-transitions			
-		}
-		
+		for(uint q=0;q<ns;q++)
+			if(Subsetaut->trans_eps[p][q])
+				EpsBaut->trans_eps[i][w+q]=k+1; //we can put action epsilon on epsilon-transitions			
+		*/
 		/*
 		//epsilon-transition wp->wpp with reset of level l (notice that operation 0 i.e. all reset is never performed)
 		if(l<k+1) EpsBaut->trans_eps[i][i*ns+p]=l;
@@ -99,16 +121,19 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 		if (l<k + 1) EpsBaut->trans_eps[i][nouv] = l;
 		*/
 		int nouv = (ns > 1) ? (i + 1) * ns + p : i + 1;
-		if (l < k + 1) EpsBaut->trans_eps[i][nouv] = /*k + 1 +*/ l;
+		if (l < k + 1) EpsBaut->trans_eps[i][nouv] = /*k + 1 +*/ EpsBaut->reset(l);
 
 		//epsilon-transition wqp->wp with reset of level l-1
 		/* BUGGY code
 		nouv = (ns>1) ? (w / ns) - ((w / ns) % ns) + p : i - 1;
 		if (l>1) EpsBaut->trans_eps[i][nouv] = l - 1;
+
 		*/
-		int x = (w / ns) - 1;
+		x = (w / ns) - 1;
 		nouv = (ns > 1) ? x - (x % ns) + p : i - 1;
-		if (l > 1) EpsBaut->trans_eps[i][nouv] = l - 1;
+		//creates a reset 
+		if (l > 1)
+			EpsBaut->trans_eps[i][nouv] = l - 1;
 
 	}
 

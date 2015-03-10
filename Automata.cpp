@@ -313,11 +313,11 @@ void MultiCounterAut::init(char Nletters,uint Nstates, char Ncounters){
 		for (uint j = 0; j < (2 * N + 3); j++){
 			act_prod[i][j] =
 				/* rule for infinite */
-				(i == 2 * N + 2 || j == 2 * N + 2) ? 2 * N + 2
+				(is_bottom(i) || is_bottom(j)) ? bottom()
 				/* rule for unbounded */
-				: (i == 2 * N + 1 || j == 2 * N + 1) ? 2 * N + 1
+				: (is_omega(i) || is_omega(j)) ? omega()
 				/* rule for unbounded */
-				: ((i <= N && j <= N) || (N < i && N < j)) ? (i < j ? i : j)
+				: ((is_reset(i) && is_reset(j)) || (is_inc(i) && is_inc(j))) ? (i < j ? i : j)
 				: (i <= N && N < j && i < j - N) ? i
 				: (i <= N && N < j && i >= j - N) ? j
 				: (j <= N && N < i && j < i - N) ? j
@@ -347,7 +347,7 @@ string MultiCounterAut::elementToString(char element)
 	return result;
 }
 
-string MultiCounterAut::state_index_to_string(int index)
+string state_index_to_tuple(int index, int NbStates)
 {
 	int N = (int)sqrt(NbStates);
 	string res = "";
@@ -360,6 +360,11 @@ string MultiCounterAut::state_index_to_string(int index)
 	}
 	res.resize(7, ' ');
 	return res;
+}
+
+string MultiCounterAut::state_index_to_string(int index)
+{
+	return state_index_to_tuple(index, NbStates);
 }
 
 //print B-automaton

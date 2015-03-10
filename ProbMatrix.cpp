@@ -59,12 +59,12 @@ ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix)
 }
 
 // Print
-void ProbMatrix::print(std::ostream & os) const
+void ProbMatrix::print(std::ostream & os, vector<string> state_names) const
 {
 	//cout << "Row description " << endl;
 	for (uint i = 0; i < Vector::GetStateNb(); i++)
 	{
-		os << i << ":" << " ";
+		os << (state_names.size() > i ? state_names[i] : to_string(i))  << ":" << " ";
 		const Vector & ones = *row_ones[i];
 		const Vector & pluses = *row_pluses[i];
 

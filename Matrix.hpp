@@ -57,7 +57,7 @@ public:
 	Matrix();
 
 	// Print
-	virtual void print(std::ostream& os = std::cout) const = 0;
+	virtual void print(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const = 0;
 
         virtual ExplicitMatrix* toExplicitMatrix() const = 0;
 

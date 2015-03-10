@@ -45,6 +45,9 @@ public:
 	//the set of canonical rewrite rules
 	set<const ExtendedExpression *> canonicalRewriteRules;
 
+	//the state names, default names if empty vector
+	vector<string> state_names;
+
 protected:
 
 	// Constructor
