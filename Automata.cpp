@@ -45,13 +45,16 @@ transdet=(uint**)malloc(Nletters*sizeof(uint *));
 initial=0;
 }
 
+
+
+
 //We assume letters are deterministic
 void ClassicEpsAut::print(ostream& st){
 	st << (int)NbStates << " states " << (int)NbLetters << " letters" << endl;
 	st << "Initial states: ";
 	for (uint i = 0; i < NbStates; i++)
 		if (initialstate[i])
-			st << i << " ";
+			st <<  i << " ";
 	st << endl;
 	st << "Final states: ";
 	for (uint i = 0; i < NbStates; i++)
@@ -343,6 +346,21 @@ string MultiCounterAut::elementToString(char element)
 	return result;
 }
 
+string MultiCounterAut::state_index_to_string(int index)
+{
+	int N = (int)sqrt(NbStates);
+	string res = "";
+	if (index < N)
+		res = "{ " + to_string(index) + " }";
+	else
+	{
+		index -= N;
+		res = "{" + to_string(index / N) + "," + to_string(index % N) + "}";
+	}
+	res.resize(7, ' ');
+	return res;
+}
+
 //print B-automaton
 void MultiCounterAut::print(ostream& st){
 	st << (int)NbStates << " states " << (int)NbLetters << " letters" << endl;
@@ -375,13 +393,14 @@ void MultiCounterEpsAut::print(ostream& st){
 	st << "Initial states: ";
 	for (uint i = 0; i < NbStates; i++)
 		if (initialstate[i])
-			st << i << " ";
+			st << state_index_to_string(i) << " ";
 	st << endl;
 	st << "Final states: ";
 	for (uint i = 0; i < NbStates; i++)
 		if (finalstate[i])
-			st << i << " ";
+			st << state_index_to_string(i) << " ";
 	st << endl;
+
 
 /*	uint** transdet_state;
 	char** transdet_action;*/
@@ -389,7 +408,7 @@ void MultiCounterEpsAut::print(ostream& st){
 	for (char a = 0; a<NbLetters; a++){
 		st << "Letter " << (int)a << endl;
 		for (uint i = 0; i<NbStates; i++){
-			st << "(" << i << "," << elementToString(transdet_action[a][i]) << "," << transdet_state[a][i] << ") ";
+			st << state_index_to_string(i) << " -- " << elementToString(transdet_action[a][i]) << " --> " << state_index_to_string(transdet_state[a][i]) << endl;
 		}
 		st << endl;
 	}
@@ -397,6 +416,7 @@ void MultiCounterEpsAut::print(ostream& st){
 	st << "Epsilon" << endl;
 	for (uint i = 0; i<NbStates; i++)
 	{
+		st << state_index_to_string(i) << ": ";
 		for (uint j = 0; j<NbStates; j++)
 			st << elementToString(trans_eps[i][j]) << " ";
 		st << endl;

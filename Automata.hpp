@@ -109,6 +109,9 @@ public:
 	virtual void print(ostream& st = cout);
 	string elementToString(char element);
 
+protected:
+	string state_index_to_string(int index);
+
 };
 
 
