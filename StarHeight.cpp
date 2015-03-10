@@ -78,12 +78,12 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 		char action;
 
 		//si state de la forme upp
-		if (l>1 && (x%ns == i))
+		if (l>1 && (x%ns == p))
 		{ //alors reset
-			action = EpsBaut->reset(l);
+			action = EpsBaut->reset(l-1);
 		}
 		else{ //sinon increment
-			action = EpsBaut->inc(l);
+			action = EpsBaut->inc(l-1);
 		}
 
 		for (char a = 0; a < nl; a++)
