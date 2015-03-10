@@ -74,7 +74,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 
 		/* NEW DEBUG , better labels for edges */
 
-		int x = (i - w) / ns - 1;  //état parent
+		int x = w / ns - 1;  //état parent
 		char action;
 
 		//si state de la forme upp
@@ -120,8 +120,9 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 		int nouv = (ns>1) ? i*ns + p : i + 1;
 		if (l<k + 1) EpsBaut->trans_eps[i][nouv] = l;
 		*/
+
 		int nouv = (ns > 1) ? (i + 1) * ns + p : i + 1;
-		if (l < k + 1) EpsBaut->trans_eps[i][nouv] = /*k + 1 +*/ EpsBaut->reset(l);
+		if (l < k + 1) EpsBaut->trans_eps[i][nouv] = action; /*  EpsBaut->reset(l); */
 
 		//epsilon-transition wqp->wp with reset of level l-1
 		/* BUGGY code
@@ -129,11 +130,10 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 		if (l>1) EpsBaut->trans_eps[i][nouv] = l - 1;
 
 		*/
-		x = (w / ns) - 1;
 		nouv = (ns > 1) ? x - (x % ns) + p : i - 1;
 		//creates a reset 
 		if (l > 1)
-			EpsBaut->trans_eps[i][nouv] = l - 1;
+			EpsBaut->trans_eps[i][nouv] = action; /* l - 1; */
 
 	}
 
