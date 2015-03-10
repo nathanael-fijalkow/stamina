@@ -317,11 +317,12 @@ void MultiCounterAut::init(char Nletters,uint Nstates, char Ncounters){
 				/* rule for unbounded */
 				: (i == 2 * N + 1 || j == 2 * N + 1) ? 2 * N + 1
 				/* rule for unbounded */
-				: ((i <= N & j <= N) || (N < i & N < j)) ? (i< j ? i : j)
-				: (i <= N & N < j & i < j - N) ? i
-				: (i <= N & N < j & i >= j - N) ? j
-				: (j <= N & N < i & j < i - N) ? j
+				: ((i <= N && j <= N) || (N < i && N < j)) ? (i < j ? i : j)
+				: (i <= N && N < j && i < j - N) ? i
+				: (i <= N && N < j && i >= j - N) ? j
+				: (j <= N && N < i && j < i - N) ? j
 				: /*(j <= N & N < i & j > i - N) ?*/ i;
+//			cout << elementToString(i) << "." << elementToString(j) << "=" << elementToString(act_prod[i][j]) << endl;
 		}
 	}
 	
@@ -367,17 +368,18 @@ void MultiCounterAut::print(ostream& st){
 	st << "Initial states: ";
 	for (uint i = 0; i < NbStates; i++)
 		if (initialstate[i])
-			st << i << " ";
+			st << state_index_to_string(i) << " ";
 	st << endl;
 	st << "Final states: ";
 	for (uint i = 0; i < NbStates; i++)
 		if (finalstate[i])
-			st << i << " ";
+			st << state_index_to_string(i) << " ";
 	st << endl;
 
 	for(char a=0;a<NbLetters;a++){
 		st << "Letter " << (int) a << endl;
 		for(uint i=0;i<NbStates;i++){
+			st << state_index_to_string(i) << " ";
 			for(uint j=0;j<NbStates;j++){
 				st << elementToString(trans[a][i][j]) << " ";
 			}
@@ -433,7 +435,7 @@ char** MultiCounterAut::prod_mat(char** mat1, char **mat2){
 			//compute res[i][j]
 			best_act=2*NbCounters+2;
 			for(uint k=0;k<NbStates;k++){
-				best_act=min(best_act, act_prod[mat1[i][k]][mat2[k][j]]);
+				best_act=min( best_act , act_prod[mat1[i][k]][mat2[k][j]]);
 			}
 			res[i][j]=best_act;
 		}
@@ -445,15 +447,16 @@ char** MultiCounterAut::prod_mat(char** mat1, char **mat2){
 //product of a deterministic transition table with a matrix 
 char** MultiCounterAut::prod_det_mat(uint *det_state, char *det_act, char** mat2 ){
 	char **res=(char **)malloc(NbStates*sizeof(char *));
-	uint k;
-	uint act;
 	for(uint i=0;i<NbStates;i++){
 		res[i]=(char *)malloc(NbStates*sizeof(char));
-		for(uint j=0;j<NbStates;j++){
+		uint k = det_state[i];
+		uint act = det_act[i];
+		for (uint j = 0; j<NbStates; j++){
 			//compute res[i][j]
-			k=det_state[i];
-			act=det_act[i];
-			if (k<NbStates) res[i][j]=act_prod[act][mat2[k][j]]; //if k=NbStates it means no transition
+			if (k < NbStates)
+				res[i][j] = act_prod[act][mat2[k][j]]; //if k=NbStates it means no transition
+			else
+				throw runtime_error("Problem in prod_det_mat: k should be less than NbStates");
 		}
 	}
 	return res;

@@ -98,8 +98,8 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 		int nouv = (ns>1) ? i*ns + p : i + 1;
 		if (l<k + 1) EpsBaut->trans_eps[i][nouv] = l;
 		*/
-		int nouv = (ns>1) ? (i + 1)*ns + p : i + 1;
-		if (l<k + 1) EpsBaut->trans_eps[i][nouv] = l;
+		int nouv = (ns > 1) ? (i + 1) * ns + p : i + 1;
+		if (l < k + 1) EpsBaut->trans_eps[i][nouv] = k + 1 + l;
 
 		//epsilon-transition wqp->wp with reset of level l-1
 		/* BUGGY code
@@ -107,8 +107,8 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 		if (l>1) EpsBaut->trans_eps[i][nouv] = l - 1;
 		*/
 		int x = (w / ns) - 1;
-		nouv = (ns>1) ? x - (x % ns) + p : i - 1;
-		if (l>1) EpsBaut->trans_eps[i][nouv] = l - 1;
+		nouv = (ns > 1) ? x - (x % ns) + p : i - 1;
+		if (l > 1) EpsBaut->trans_eps[i][nouv] = l - 1;
 
 	}
 
