@@ -8,6 +8,9 @@
 
 UnstableMultiMonoid::UnstableMultiMonoid(uint dim, uint counter_number) : UnstableMonoid(dim)
 {
+	initial_states.clear();
+	final_states.clear();
+
 	VectorInt::SetSize(dim);
 	MultiCounterMatrix::init_act_prod(counter_number);
 }
@@ -15,6 +18,9 @@ UnstableMultiMonoid::UnstableMultiMonoid(uint dim, uint counter_number) : Unstab
 //Constructor from automa
 UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata) : UnstableMonoid(automata.NbStates)
 {
+	initial_states.clear();
+	final_states.clear();
+
 	VectorInt::SetSize(automata.NbStates);
 	MultiCounterMatrix::init_act_prod(automata.NbCounters);
 	
@@ -29,6 +35,7 @@ UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata) : Uns
 	for (int i = 0; i < automata.NbStates; i++)
 		if (automata.initialstate[i])
 			initial_states.push_back(i);
+
 	for (int i = 0; i < automata.NbStates; i++)
 		if (automata.finalstate[i])
 			final_states.push_back(i);

@@ -54,8 +54,6 @@ int main(int argc, char **argv)
 	aut->finalstate[0]=true;
 	*/
 
-	
-	
 	//b*(b*ab*a)*	
 	ClassicAut *aut=new ClassicAut(2,2);
 
@@ -66,6 +64,7 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
+	//aut->finalstate[1] = true;
 
 	/*
 	//(a*b*c)*
@@ -88,10 +87,9 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-	*/
 
 	//(aa(ab)*bb(ab*))*
-
+	*/
 
 
 
@@ -164,9 +162,10 @@ int main(int argc, char **argv)
 			break;
 		}
 		h++;
+		std::cin.get();
 	}
     std::cout << "End of Computation\n";
-    std::cin.get();
-    
+	std::cin.get();
+
     return 0; 
 }
