@@ -68,7 +68,11 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	l=1;//length of the sequence
 	bound=ns;//next time the length increases
 	for(uint i=0;i<N;i++){ 
-		if(i==bound){l++; bound=bound*ns+ns;}
+		if(i==bound)
+		{
+			l++;
+			bound=bound*ns+ns;
+		}
 		p = i % ns;//current state
 		w = i-p;
 
@@ -88,7 +92,10 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 
 		for (char a = 0; a < nl; a++)
 		{
-			if (Subsetaut->transdet[a][p] < ns) EpsBaut->transdet_state[a][i] = w + Subsetaut->transdet[a][p]; else EpsBaut->transdet_state[a][i] = N;
+			if (Subsetaut->transdet[a][p] < ns)
+				EpsBaut->transdet_state[a][i] = w + Subsetaut->transdet[a][p];
+			else
+				EpsBaut->transdet_state[a][i] = N;
 			EpsBaut->transdet_action[a][i] = action;
 		}
 		for (uint q = 0; q < ns; q++)
