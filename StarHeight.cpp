@@ -99,7 +99,8 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 			EpsBaut->transdet_action[a][i] = action;
 		}
 		for (uint q = 0; q < ns; q++)
-			EpsBaut->trans_eps[i][w + q] = action;
+			if (Subsetaut->trans_eps[p][q])
+				EpsBaut->trans_eps[i][w + q] = action;
 
 		/*
 		//Deterministic Letter transitions in the same component
