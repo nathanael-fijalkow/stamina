@@ -13,7 +13,7 @@ MultiCounterMatrix::MultiCounterMatrix()
 	init();
 }
 
-void MultiCounterMatrix::init_act_prod(char N)
+void MultiCounterMatrix::set_counter_number(char N)
 {
 	MultiCounterMatrix::N = N;
 	act_prod = (char **)malloc((2 * N + 3)  *  sizeof(char*));
@@ -196,7 +196,6 @@ Matrix * MultiCounterMatrix::stab() const
 	for (uint i = 0; i <n; i++){
 			cd=rows[i]->coefs[i];
 			diags[i] = (cd <= N) ? cd :((cd <= 2*N+1) ? 2*N+1 : 2*N+2);
-			
 	}
 	//system("pause");
 

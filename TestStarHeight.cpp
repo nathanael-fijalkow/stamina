@@ -54,6 +54,7 @@ int main(int argc, char **argv)
 	aut->finalstate[0]=true;
 	*/
 
+
 	//b*(b*ab*a)*	
 	ClassicAut *aut=new ClassicAut(2,2);
 

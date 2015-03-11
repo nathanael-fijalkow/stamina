@@ -45,7 +45,7 @@ public:
 	static char N;
 
 	/* called once each time a new monoid is created, given th enumber of counters*/
-	static void init_act_prod(char N);
+	static void set_counter_number(char N);
 
 	/* coefficients getters and setters */
 	string get(int i, int j) const;

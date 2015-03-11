@@ -12,7 +12,7 @@ UnstableMultiMonoid::UnstableMultiMonoid(uint dim, uint counter_number) : Unstab
 	final_states.clear();
 
 	VectorInt::SetSize(dim);
-	MultiCounterMatrix::init_act_prod(counter_number);
+	MultiCounterMatrix::set_counter_number(counter_number);
 }
 
 //Constructor from automa
@@ -22,7 +22,7 @@ UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata) : Uns
 	final_states.clear();
 
 	VectorInt::SetSize(automata.NbStates);
-	MultiCounterMatrix::init_act_prod(automata.NbCounters);
+	MultiCounterMatrix::set_counter_number(automata.NbCounters);
 	
 	for (char letter = 0; letter < automata.NbLetters; letter++)
 	{
