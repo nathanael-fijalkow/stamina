@@ -42,7 +42,7 @@ char RecLC(ClassicAut *aut, uint subset){
 	
 	vector<uint> vec=SCC(aut, subset);
 	uint newmax, maxloop=0;
-	for (vector<int>::iterator it = vec.begin() ; it != vec.end(); ++it){ 
+	for (vector<uint>::iterator it = vec.begin() ; it != vec.end(); ++it){ 
 		newmax=RecLC(aut, *it);
 		if(newmax>maxloop) maxloop=newmax;
 	}
