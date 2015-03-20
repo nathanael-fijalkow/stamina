@@ -157,4 +157,8 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *aut);
 
 uint myPow(uint x, uint p);
 
+uint TwoPow(uint n);
+
+bool bit(uint n,uint k);
+
 #endif

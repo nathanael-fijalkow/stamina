@@ -69,6 +69,8 @@ int main(int argc, char **argv)
 	*/
 
 	//(a*b*c)*
+
+	
 	ClassicAut *aut=new ClassicAut(3,4);
 
 	aut->trans[0][0][1]= true;
@@ -89,10 +91,8 @@ int main(int argc, char **argv)
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
 
+
 	//(aa(ab)*bb(ab*))*
-
-
-
 	
 	//2 letters 3 states
 	/*
@@ -162,6 +162,7 @@ int main(int argc, char **argv)
 			break;
 		}
 		h++;
+		cout << "Press key to continue..." << endl;
 		std::cin.get();
 	}
     std::cout << "End of Computation\n";

@@ -1,6 +1,67 @@
 #include "StarHeight.hpp"
 #include <fstream>
 
+
+
+//auxiliary function for acyclicity of automata induced by a subset of states
+bool acyclic(ClassicAut *aut, uint subset){
+	//subset uses the standard powerset encoding
+
+	if(subset==0) return 0;
+	//TODO
+}
+
+//auxiliary function for strong connectedness of automata induced by a subset of states
+bool connected(ClassicAut *aut, uint subset){
+	//TODO
+	
+}
+
+//list the connected components
+vector<uint> SCC(ClassicAut *aut, uint subset){
+	//TODO
+	
+}
+
+//recursive auxiliary function for Loop Complexity, on automaton induced by a subset
+char RecLC(ClassicAut *aut, uint subset){
+	if (acyclic(aut, subset)) return 0;
+	if (connected(aut,subset)){
+		//compute 1+min(lc(A-p))
+		uint minloop=aut->NbStates;
+		uint newmin;
+		for(uint p=0;p<aut->NbStates;p++){
+			if (bit(subset,p)){
+				newmin=RecLC(aut, subset-TwoPow(p));
+				if (newmin<minloop) minloop=newmin;
+			}
+		}
+		return 1+minloop;
+	}
+	//else max(lc(SCC)) 
+	
+	vector<uint> vec=SCC(aut, subset);
+	uint newmax, maxloop=0;
+	for (vector<int>::iterator it = vec.begin() ; it != vec.end(); ++it){ 
+		newmax=RecLC(aut, *it);
+		if(newmax>maxloop) maxloop=newmax;
+	}
+	return maxloop;
+	
+}
+
+//final function
+char LoopComplexity(ClassicAut *aut){
+	
+	//for each set of states, we compute the loop complexity of the corresponding induced automaton.
+	//This is done inductively according to the size of the set of states
+	
+	cout << "Computing the Loop Complexity..." << endl;
+	uint n=aut->NbStates;	
+	uint S=TwoPow(n); //number of subsets of the states. element S-1 represents the full automaton, element 0 the empty set.
+	
+	return RecLC(aut, S-1);
+}
 		
 
 MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){

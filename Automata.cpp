@@ -457,7 +457,7 @@ vector<vector<char>> MultiCounterAut::prod_det_mat(vector<uint> det_state, vecto
 			if (k < NbStates)
 				res[i][j] = act_prod[act][mat2[k][j]]; //if k=NbStates it means no transition
 			else
-				throw runtime_error("Problem in prod_det_mat: k should be less than NbStates");
+				;//throw runtime_error("Problem in prod_det_mat: k should be less than NbStates");
 		}
 	}
 	return res;
