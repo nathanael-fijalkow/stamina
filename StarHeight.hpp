@@ -3,6 +3,7 @@
 
 #include "Automata.hpp"
 #include "MultiMonoid.hpp"
+#include <stack>
 
 //graph structure, without letters
 class GraphAut{

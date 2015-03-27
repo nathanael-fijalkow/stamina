@@ -55,6 +55,7 @@ int main(int argc, char **argv)
 	*/
 
 
+	/*
 	//b*(b*ab*a)*	
 	ClassicAut *aut=new ClassicAut(2,2);
 
@@ -67,10 +68,10 @@ int main(int argc, char **argv)
 	aut->finalstate[0]=true;
 	//aut->finalstate[1] = true;
 
-
+	*/
 	//(a*b*c)*
 
-	/*
+	
 	ClassicAut *aut=new ClassicAut(3,4);
 
 	aut->trans[0][0][1]= true;
@@ -90,7 +91,7 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-*/
+
 
 	//(aa(ab)*bb(ab*))*
 	
@@ -123,13 +124,19 @@ int main(int argc, char **argv)
 	printf("Automaton created\n");
 	
 	aut->print();
-
-
+	
+	
+	cout << "******************************" << endl;
+	int LC=LoopComplexity(aut);
+	cout << "Loop Complexity : Star-height is at most " << LC << endl;
+	cout << "*****************************************" << endl;
+	
+	
 	int h = 0;
-	while (true)
+	while (h<LC)
 	{
 		ofstream output("monoid " + to_string(h) + ".txt");
-
+		
 		cout << "******************************" << endl;
 		cout << "Testing starheight " << h << endl;
 		cout << "*****************************************" << endl;
@@ -162,9 +169,17 @@ int main(int argc, char **argv)
 			break;
 		}
 		h++;
-		cout << "Press key to continue..." << endl;
-		std::cin.get();
+		//cout << "Press key to continue..." << endl;
+		//std::cin.get();
 	}
+	
+	if(h==LC) {
+		cout << "*********************************"<<endl;
+		cout<<"Star-height is "<<LC<<endl;
+		cout<< "Witnessed by standard automaton->expression construction"<<endl;
+		cout << "*****************************************" << endl;
+	}
+	
     std::cout << "End of Computation\n";
 	std::cin.get();
 

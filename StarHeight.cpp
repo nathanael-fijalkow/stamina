@@ -5,7 +5,7 @@
 //functions for subsets computations
 bool intersect(uint s1, uint s2) { return ((s1 & s2) != 0);}
 
-uint addin(uint i, uint s){ return (s^TwoPow(i));}
+uint addin(uint s, uint i){ return (s|TwoPow(i));}
 
 
 //GraphAut constructor, from nomrmal non-deterministic automaton
@@ -16,8 +16,8 @@ GraphAut::GraphAut(ClassicAut *aut){
 	uint i,j;
 	for(a=0;a<aut->NbLetters;a++){
 		for(i=0;i<NbStates;i++){
-			for(j=0;j<NbStates;i++){
-				if(aut->trans[a][i][j]) addin(trans[i], j);
+			for(j=0;j<NbStates;j++){
+				if(aut->trans[a][i][j]) trans[i]=addin(trans[i], j);
 			}
 		}
 	}
@@ -29,11 +29,12 @@ uint neighbours(GraphAut *aut, uint subset){
 	uint n=aut->NbStates;
 	uint i;
 	for(i=0;i<n;i++){
-		res=res^aut->trans[i];		
+		res=res|aut->trans[i];		
 	}
 	return res;
 }
 
+/*
 //returns a member of a nonempty set (smaller one)
 uint member(uint subset){
 	if(subset==0){printf("Error: member of empty set\n"); return 0;}
@@ -42,7 +43,7 @@ uint member(uint subset){
 	while((temp & 1)==0){i++; temp=temp>>1;}
 	return i;
 }
-
+*/
 
 //auxiliary function for acyclicity of graph induced by a subset of states
 bool acyclic(GraphAut *aut, uint subset){
@@ -54,24 +55,97 @@ bool acyclic(GraphAut *aut, uint subset){
 	return (alive==0); // acyclic iff nothing is alive after n iterations
 }
 
+uint mindef(uint i,uint j){ 
+	if (i==-1) return j;
+	if (j==-1) return i;
+	return min(i,j);
+}
 
+//recursive function for Tarjan Algorithm
+void strongconnect(uint v, GraphAut *aut, uint *subset, uint *index, vector<int> *indexof, vector<int> *lowlink, vector<bool> *onStack, stack<int> *S, uint *remain, vector<uint> *comps){
+	
+	uint newcomp,w,i;
+			
+	// Set the depth index for v to the smallest unused index
+	(*indexof)[v]=*index;
+	(*lowlink)[v]=*index;
+	do {(*index)++; *remain=*remain>>1;} while((*remain & 1)==0 & *index<aut->NbStates); // go to the next index
+	S->push(v);
+	(*onStack)[v] = true;
+	
+	// Consider successors of v
+	w=0;
+	while(bit(aut->trans[v] & *subset,w)==0) w++;// first available neighbour of v
+	while(w<aut->NbStates){
+;
+		
+		if ((*indexof)[w]==-1){
+		// Successor w has not yet been visited; recurse on it
+			strongconnect(w,aut, subset, index, indexof, lowlink, onStack, S, remain,comps);
+			(*lowlink)[v] = mindef((*lowlink)[v], (*lowlink)[w]);
+		}else if ((*onStack)[w]){
+			// Successor w is in stack S and hence in the current SCC
+			(*lowlink)[v]  = mindef((*lowlink)[v], (*indexof)[w]);
+		}
+	
+		do{w++;} while(bit(aut->trans[v] & *subset,w)==0); // next neighbour of v
+	}
 
-//list the connected components of the graph restricted to subset
+	// If v is a root node, pop the stack and generate an SCC
+	if ((*lowlink)[v] == (*indexof)[v]){
+	//start a new strongly connected component
+	newcomp=0;
+	do{
+		w = S->top();
+		S->pop();
+		(*onStack)[w] = false;
+		newcomp=addin(newcomp,w);
+	}while (w != v);
+	comps->push_back(newcomp);
+	} 
+}
+
+//list the connected components of the graph restricted to subset, using Tarjan's algorithm
 vector<uint> SCC(GraphAut *aut, uint subset){
 	vector<uint> comps; //empty vector of components
 	if(subset==0) return comps;
 	uint n=aut->NbStates;
-	uint i=0;
-	uint reached=TwoPow(member(subset)); //start with a singleton
-	//TODO
-}
+	uint index=0;
+	uint remain=subset;
+	vector<int> indexof(n,-1); //-1 stands for "undefined"
+	vector<int> lowlink(n,-1);
+	vector<bool> onStack(n,false);
+	stack<int> S;
+
+	while((remain & 1)==0 & index<n) {index++; remain=remain>>1;}
+	uint remv=remain;
+	uint v=index; //smallest available state
+	//cout<< "v initialized to "<<v<<endl;
+	while(v < n){
+		if (indexof[v]==-1){
+			strongconnect(v,aut, &subset, &index, &indexof, &lowlink, &onStack, &S, &remain, &comps);
+		}
+		do  {v++; remv=remv>>1;} while((remv & 1)==0 & v<n); //go to the next v available
+	}
+	return comps;
+
+ } 
+
+
+
+
+
+
 
 //recursive auxiliary function for Loop Complexity, on automaton induced by a subset
 char RecLC(GraphAut *aut, uint subset){
-	if (acyclic(aut, subset)) return 0;
+	//cout<< "Recursive call on subset "<<subset<<endl;
+	if (acyclic(aut, subset)) {return 0;}
 	vector<uint> comps=SCC(aut,subset);
+	//cout << comps.size() << " components found"<<endl;
 	if (comps.size()==1){
 		//compute 1+min(lc(A-p))
+	//	cout <<"Min step"<<endl;
 		uint minloop=aut->NbStates;
 		uint newmin;
 		for(uint p=0;p<aut->NbStates;p++){
@@ -80,16 +154,18 @@ char RecLC(GraphAut *aut, uint subset){
 				if (newmin<minloop) minloop=newmin;
 			}
 		}
+	//	cout <<"Min step "<<subset<<" returning "<<1+minloop<<endl;
 		return 1+minloop;
 	}
 	//else max(lc(SCC)) 
-	
+	//cout <<"Max step"<<endl;
 	vector<uint> vec=SCC(aut, subset);
 	uint newmax, maxloop=0;
 	for (vector<uint>::iterator it = vec.begin() ; it != vec.end(); ++it){ 
 		newmax=RecLC(aut, *it);
 		if(newmax>maxloop) maxloop=newmax;
 	}
+	//cout <<"Max step "<<subset<<" returns "<<maxloop<<endl;
 	return maxloop;
 	
 }
@@ -102,8 +178,11 @@ char LoopComplexity(ClassicAut *aut){
 	
 	cout << "Computing the Loop Complexity..." << endl;
 	uint n=aut->NbStates;	
+	uint i;
 	uint S=TwoPow(n); //number of subsets of the states. element S-1 represents the full automaton, element 0 the empty set.
 	GraphAut *gaut=new GraphAut(aut);
+	cout << "Graph automaton created..." << endl;
+	//for (i=0;i<n; i++) cout<< "trans["<<i<<"] : "<<gaut->trans[i]<<endl;  //printing graph automaton for debugging
 	return RecLC(gaut, S-1);
 }
 		
@@ -130,7 +209,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	}
 #endif
 	
-	/*
+	// /* minimisation part, optional if we have doubts
 	Subsetaut=SubMin(Subsetaut);
 	
 	ns=Subsetaut->NbStates;
@@ -139,7 +218,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	printf("Minimized Subset Automaton Computed, %d states\n\n", ns);
 	Subsetaut->print();
 #endif
-	*/
+	// */
 
 	//states of the resulting automaton are words of Q* of length in [1,k+1]
 	//there are n+n^2+...+n^(k+1)=(n^(k+2)-n)/(n-1)
