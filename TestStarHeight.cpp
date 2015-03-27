@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 	aut->finalstate[0]=true;
 	*/
 
-	/*
+
 	//b*(b*ab*a)*	
 	ClassicAut *aut=new ClassicAut(2,2);
 
@@ -66,11 +66,11 @@ int main(int argc, char **argv)
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
 	//aut->finalstate[1] = true;
-	*/
+
 
 	//(a*b*c)*
 
-	
+	/*
 	ClassicAut *aut=new ClassicAut(3,4);
 
 	aut->trans[0][0][1]= true;
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-
+*/
 
 	//(aa(ab)*bb(ab*))*
 	
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			cout << " The automaton is limited, sharpheight is " << h << endl;
+			cout << " The automaton is limited, star-height is " << h << endl;
 			break;
 		}
 		h++;

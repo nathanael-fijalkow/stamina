@@ -4,6 +4,19 @@
 #include "Automata.hpp"
 #include "MultiMonoid.hpp"
 
+//graph structure, without letters
+class GraphAut{
+	public:
+	// Constructor
+	GraphAut(ClassicAut *aut);
+
+	// number of states, numbered 0,1,2,...
+	uint NbStates;
+
+	
+	//transition table: for each set i, trans[i] is a uint representing the set of successors
+	vector<uint> trans;	
+};
 
 //Computing the Loop Complexity of a Classic automaton. 
 //Upper bound for star-height, obtainable via standard Automata->Expressions algorithms

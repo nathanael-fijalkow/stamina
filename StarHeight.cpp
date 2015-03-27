@@ -2,31 +2,75 @@
 #include <fstream>
 
 
+//functions for subsets computations
+bool intersect(uint s1, uint s2) { return ((s1 & s2) != 0);}
 
-//auxiliary function for acyclicity of automata induced by a subset of states
-bool acyclic(ClassicAut *aut, uint subset){
-	//subset uses the standard powerset encoding
+uint addin(uint i, uint s){ return (s^TwoPow(i));}
 
-	if(subset==0) return 0;
-	//TODO
+
+//GraphAut constructor, from nomrmal non-deterministic automaton
+GraphAut::GraphAut(ClassicAut *aut){
+	NbStates=aut->NbStates;
+	trans.resize(NbStates,0);
+	char a;
+	uint i,j;
+	for(a=0;a<aut->NbLetters;a++){
+		for(i=0;i<NbStates;i++){
+			for(j=0;j<NbStates;i++){
+				if(aut->trans[a][i][j]) addin(trans[i], j);
+			}
+		}
+	}
 }
 
-//auxiliary function for strong connectedness of automata induced by a subset of states
-bool connected(ClassicAut *aut, uint subset){
-	//TODO
-	
+//set of direct neighbours
+uint neighbours(GraphAut *aut, uint subset){
+	uint res=0;
+	uint n=aut->NbStates;
+	uint i;
+	for(i=0;i<n;i++){
+		res=res^aut->trans[i];		
+	}
+	return res;
 }
 
-//list the connected components
-vector<uint> SCC(ClassicAut *aut, uint subset){
+//returns a member of a nonempty set (smaller one)
+uint member(uint subset){
+	if(subset==0){printf("Error: member of empty set\n"); return 0;}
+	uint i=0;
+	uint temp=subset;
+	while((temp & 1)==0){i++; temp=temp>>1;}
+	return i;
+}
+
+
+//auxiliary function for acyclicity of graph induced by a subset of states
+bool acyclic(GraphAut *aut, uint subset){
+	if(subset==0) return true;
+	uint n=aut->NbStates;
+	uint i=0;
+	uint alive=subset;
+	while(i<n & alive!=0) {alive=neighbours(aut,alive);i++;}
+	return (alive==0); // acyclic iff nothing is alive after n iterations
+}
+
+
+
+//list the connected components of the graph restricted to subset
+vector<uint> SCC(GraphAut *aut, uint subset){
+	vector<uint> comps; //empty vector of components
+	if(subset==0) return comps;
+	uint n=aut->NbStates;
+	uint i=0;
+	uint reached=TwoPow(member(subset)); //start with a singleton
 	//TODO
-	
 }
 
 //recursive auxiliary function for Loop Complexity, on automaton induced by a subset
-char RecLC(ClassicAut *aut, uint subset){
+char RecLC(GraphAut *aut, uint subset){
 	if (acyclic(aut, subset)) return 0;
-	if (connected(aut,subset)){
+	vector<uint> comps=SCC(aut,subset);
+	if (comps.size()==1){
 		//compute 1+min(lc(A-p))
 		uint minloop=aut->NbStates;
 		uint newmin;
@@ -50,7 +94,7 @@ char RecLC(ClassicAut *aut, uint subset){
 	
 }
 
-//final function
+//final function for computing the loop complexity
 char LoopComplexity(ClassicAut *aut){
 	
 	//for each set of states, we compute the loop complexity of the corresponding induced automaton.
@@ -59,11 +103,11 @@ char LoopComplexity(ClassicAut *aut){
 	cout << "Computing the Loop Complexity..." << endl;
 	uint n=aut->NbStates;	
 	uint S=TwoPow(n); //number of subsets of the states. element S-1 represents the full automaton, element 0 the empty set.
-	
-	return RecLC(aut, S-1);
+	GraphAut *gaut=new GraphAut(aut);
+	return RecLC(gaut, S-1);
 }
 		
-
+//perform
 MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 
 	cout << "Computing the subset automaton..." << endl;
