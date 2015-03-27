@@ -23,13 +23,14 @@ GraphAut::GraphAut(ClassicAut *aut){
 	}
 }
 
-//set of direct neighbours
-uint neighbours(GraphAut *aut, uint subset){
+//set of direct neighbours of s in the subgraph induced by subset
+uint neighbours(GraphAut *aut, uint subset, uint s){
 	uint res=0;
 	uint n=aut->NbStates;
 	uint i;
 	for(i=0;i<n;i++){
-		res=res|aut->trans[i];		
+		
+		if (bit(s,i)) res=res|(aut->trans[i] & subset);		
 	}
 	return res;
 }
@@ -51,7 +52,7 @@ bool acyclic(GraphAut *aut, uint subset){
 	uint n=aut->NbStates;
 	uint i=0;
 	uint alive=subset;
-	while(i<n & alive!=0) {alive=neighbours(aut,alive);i++;}
+	while(i<n & alive!=0) {alive=neighbours(aut,subset,alive);i++;}
 	return (alive==0); // acyclic iff nothing is alive after n iterations
 }
 
