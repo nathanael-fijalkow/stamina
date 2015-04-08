@@ -29,9 +29,10 @@ void pusage(char* s)
 
 int main(int argc, char **argv)
 {
-	/*
+	
 	//3 letters 3 states
 	//
+	/*
 	ClassicAut *aut=new ClassicAut(3,4);
 	
 	aut->trans[0][0][1]=true;
@@ -55,8 +56,24 @@ int main(int argc, char **argv)
 	*/
 
 
-	/*
+	//test for order
+
+	ClassicAut *aut=new ClassicAut(2,3);
+	aut->trans[0][0][1]=true;
+	aut->trans[0][1][1] = true;
+	aut->trans[0][2][0] = true;
+	
+	aut->trans[1][0][1]=true;
+	aut->trans[1][1][2]=true;
+	aut->trans[1][2][0] = true;	
+
+	aut->initialstate[0]=true;
+	aut->finalstate[0]=true;
+
+	
+	
 	//b*(b*ab*a)*	
+	/*
 	ClassicAut *aut=new ClassicAut(2,2);
 
 	aut->trans[0][0][1]=true;
@@ -67,11 +84,11 @@ int main(int argc, char **argv)
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
 	//aut->finalstate[1] = true;
-
 	*/
+	
 	//(a*b*c)*
 
-	
+	/*
 	ClassicAut *aut=new ClassicAut(3,4);
 
 	aut->trans[0][0][1]= true;
@@ -91,7 +108,7 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-
+*/
 
 	//(aa(ab)*bb(ab*))*
 	

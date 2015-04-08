@@ -8,9 +8,10 @@ bool intersect(uint s1, uint s2) { return ((s1 & s2) != 0);}
 uint addin(uint s, uint i){ return (s|TwoPow(i));}
 
 
-//GraphAut constructor, from nomrmal non-deterministic automaton
+//GraphAut constructor, from normal non-deterministic automaton
 GraphAut::GraphAut(ClassicAut *aut){
 	NbStates=aut->NbStates;
+	order.clear();// should not be necessary but just in case
 	trans.resize(NbStates,0);
 	char a;
 	uint i,j;
@@ -76,7 +77,7 @@ void strongconnect(uint v, GraphAut *aut, uint *subset, uint *index, vector<int>
 	
 	// Consider successors of v
 	w=0;
-	while(bit(aut->trans[v] & *subset,w)==0) w++;// first available neighbour of v
+	while(bit(aut->trans[v] & *subset,w)==0 & w<aut->NbStates) w++;// first available neighbour of v
 	while(w<aut->NbStates){
 ;
 		
@@ -133,40 +134,61 @@ vector<uint> SCC(GraphAut *aut, uint subset){
  } 
 
 
-
-
-
-
-
-//recursive auxiliary function for Loop Complexity, on automaton induced by a subset
+void printorder(list<uint> orderlist){
+	list<uint>::iterator it;
+	cout <<"order: ";
+	for (it=orderlist.begin(); it!=orderlist.end(); ++it){
+		 cout<< *it<<" ";
+	}
+	cout<<endl;
+}
+//recursive auxiliary function for Loop Complexity, on automaton induced by a subset.
 char RecLC(GraphAut *aut, uint subset){
 	//cout<< "Recursive call on subset "<<subset<<endl;
 	if (acyclic(aut, subset)) {return 0;}
 	vector<uint> comps=SCC(aut,subset);
+	list<uint> callorder=aut->order;
+	uint beststate;
+	bool debug=true;
 	//cout << comps.size() << " components found"<<endl;
+	if (debug) cout<< comps.size() << " components"<<endl;
 	if (comps.size()==1){
 		//compute 1+min(lc(A-p))
-	//	cout <<"Min step"<<endl;
-		uint minloop=aut->NbStates;
+		if(debug) cout <<"Min step "<<subset<<endl;
+		uint minloop=aut->NbStates+1;
 		uint newmin;
 		for(uint p=0;p<aut->NbStates;p++){
+			
 			if (bit(subset,p)){
+				
+				if(debug) cout <<"Trying cutting state "<<p<< " from "<<subset<<endl;
+				aut->order=callorder;
 				newmin=RecLC(aut, subset-TwoPow(p));
-				if (newmin<minloop) minloop=newmin;
+				if(debug) cout <<"The try "<<p<< " from "<<subset<<" gives "<<newmin<<endl;
+				if (newmin<minloop) {
+					minloop=newmin;
+					(aut->order).push_back(p);
+					beststate=p;
+				} 
+				else {aut->order=callorder;}
+
 			}
+	
+			if(minloop==0) break;
 		}
-	//	cout <<"Min step "<<subset<<" returning "<<1+minloop<<endl;
+		
+		if(debug) cout <<"Min step "<<subset<<" returning "<<1+minloop<< " cutting state "<<beststate << endl;
 		return 1+minloop;
 	}
 	//else max(lc(SCC)) 
-	//cout <<"Max step"<<endl;
+	if(debug) cout <<"Max step"<<endl;
 	vector<uint> vec=SCC(aut, subset);
 	uint newmax, maxloop=0;
 	for (vector<uint>::iterator it = vec.begin() ; it != vec.end(); ++it){ 
 		newmax=RecLC(aut, *it);
 		if(newmax>maxloop) maxloop=newmax;
 	}
-	//cout <<"Max step "<<subset<<" returns "<<maxloop<<endl;
+	if(debug) cout <<"Max step "<<subset<<" returns "<<maxloop<<endl;
 	return maxloop;
 	
 }
@@ -179,12 +201,14 @@ char LoopComplexity(ClassicAut *aut){
 	
 	cout << "Computing the Loop Complexity..." << endl;
 	uint n=aut->NbStates;	
-	uint i;
+	uint i,lc;
 	uint S=TwoPow(n); //number of subsets of the states. element S-1 represents the full automaton, element 0 the empty set.
 	GraphAut *gaut=new GraphAut(aut);
 	cout << "Graph automaton created..." << endl;
 	//for (i=0;i<n; i++) cout<< "trans["<<i<<"] : "<<gaut->trans[i]<<endl;  //printing graph automaton for debugging
-	return RecLC(gaut, S-1);
+	lc=RecLC(gaut, S-1);
+	printorder(gaut->order); //printing graph automaton for debugging
+	return lc;
 }
 		
 //perform
