@@ -1,7 +1,7 @@
 #ifndef STARHEIGHT_HPP
 #define STARHEIGHT_HPP
 
-#include "Automata.hpp"
+#include "RegExp.hpp"
 #include "MultiMonoid.hpp"
 #include <stack>
 #include <list>

@@ -16,5 +16,6 @@ set (SOURCES
 	VectorUInt.cpp
 	ExplicitAutomaton.cpp
 	Output.cpp
+	RegExp.cpp
 	)
 
