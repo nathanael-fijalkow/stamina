@@ -155,7 +155,7 @@ char RecLC(GraphAut *aut, uint subset){
 	vector<uint> comps=SCC(aut,subset);
 	list<uint> callorder=aut->order;
 	uint beststate;
-	bool debug=true;
+	bool debug=false;
 	//cout << comps.size() << " components found"<<endl;
 	if (debug) cout<< comps.size() << " components"<<endl;
 	if (comps.size()==1){
