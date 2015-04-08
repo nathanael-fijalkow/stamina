@@ -145,7 +145,13 @@ void printorder(list<uint> orderlist){
 //recursive auxiliary function for Loop Complexity, on automaton induced by a subset.
 char RecLC(GraphAut *aut, uint subset){
 	//cout<< "Recursive call on subset "<<subset<<endl;
-	if (acyclic(aut, subset)) {return 0;}
+	if (acyclic(aut, subset)) {
+		//add all elements of subset to the end of the order
+		for(uint p=0;p<aut->NbStates;p++){	
+			if (bit(subset,p)) aut->order.push_back(p);
+		}
+		return 0;
+		}
 	vector<uint> comps=SCC(aut,subset);
 	list<uint> callorder=aut->order;
 	uint beststate;
