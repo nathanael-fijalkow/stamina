@@ -148,7 +148,7 @@ char RecLC(GraphAut *aut, uint subset){
 	if (acyclic(aut, subset)) {
 		//add all elements of subset to the end of the order
 		for(uint p=0;p<aut->NbStates;p++){	
-			if (bit(subset,p)) aut->order.push_back(p);
+			if (bit(subset,p)) aut->order.push_front(p);
 		}
 		return 0;
 		}
@@ -173,7 +173,7 @@ char RecLC(GraphAut *aut, uint subset){
 				if(debug) cout <<"The try "<<p<< " from "<<subset<<" gives "<<newmin<<endl;
 				if (newmin<minloop) {
 					minloop=newmin;
-					(aut->order).push_back(p);
+					(aut->order).push_front(p);
 					beststate=p;
 				} 
 				else {aut->order=callorder;}
