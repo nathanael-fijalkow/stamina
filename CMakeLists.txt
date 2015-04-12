@@ -93,3 +93,17 @@ target_link_libraries (TestAut ${EXTRA_LIBS})
 
 add_executable (TestStarHeight ${ALL_SOURCES} ${ALL_HEADERS} TestStarHeight.cpp)
 target_link_libraries (TestStarHeight ${EXTRA_LIBS})
+
+find_package(Boost 1.45.0)
+if(Boost_FOUND)
+  include_directories("${Boost_INCLUDE_DIRS}" "/usr/include/python2.7")
+  set(Boost_USE_STATIC_LIBS OFF)
+  set(Boost_USE_MULTITHREADED ON)
+  set(Boost_USE_STATIC_RUNTIME OFF)
+  find_package(Boost 1.45.0 COMPONENTS python)
+
+  add_library(acme SHARED ${ALL_SOURCES} ${ALL_HEADERS} PyInterface.cpp)
+  target_link_libraries(acme ${Boost_LIBRARIES})
+elseif(NOT Boost_FOUND)
+  message(FATAL_ERROR "Unable to find correct Boost version. Did you set BOOST_ROOT?")
+endif()
