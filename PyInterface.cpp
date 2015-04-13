@@ -113,10 +113,11 @@ int PyInterface::Monoid::has_val1()
 		markovMon->addLetter(letters[i],*(matrices[i]));
 
 	markovMon->setWitnessTest((bool (*)(const Matrix*))&PyInterface::test_witness);
+	int ret = 0;
 	if(markovMon->ComputeMonoid())
-		return 1;
-	else
-		return 0;
+		ret = 1;
+	delete markovMon;
+	return ret;
 }
 
 int PyInterface::Monoid::starheight()
