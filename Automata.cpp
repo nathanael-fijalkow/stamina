@@ -111,7 +111,6 @@ void ClassicAut::print(ostream& st){
 
 void ClassicAut::addLetter(char c, ExplicitMatrix m)
 {
-	cout << "Adding letter: " << (int) c << endl;
 	if(m.stateNb!=NbStates)
 		return;
 	for(int i=0;i<NbStates;i++)
