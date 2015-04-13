@@ -31,6 +31,8 @@ public:
 	//transition table: one boolean matrix for each letter
 	map<char, vector<vector<bool>>> trans;
 
+	void addLetter(char c, ExplicitMatrix m);
+
 	virtual void print(ostream& st = cout);
 
 protected:

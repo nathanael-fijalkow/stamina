@@ -19,12 +19,14 @@ def matrix_to_vvchar(matrix):
 
 def to_monoid(automaton):
     dimension = len(automaton.states())
-    monoid = acme.Monoid(dimension)
+    n_of_letters = len(automaton.input_alphabet)
+    monoid = acme.Monoid(dimension,n_of_letters)
     for letter in automaton.input_alphabet:
         m = acme.MyMatrix(dimension)
         m.coefficients = matrix_to_vvchar(aut.adjacency_matrix(letter))
         monoid.add_letter(letter,m)
-    monoid.set_initial_state(automaton.states().index(automaton.initial_states()[0]))
+    for s in automaton.initial_states():
+        monoid.add_initial_state(automaton.states().index(s))
     for s in automaton.final_states():
         monoid.add_final_state(automaton.states().index(s))
     return monoid

@@ -1,6 +1,9 @@
 #include "Matrix.hpp"
 #include "ProbMatrix.hpp"
 #include "MarkovMonoid.hpp"
+#include "MultiMonoid.hpp"
+#include "StarHeight.hpp"
+#include "Automata.hpp"
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 using namespace boost::python;
@@ -10,21 +13,25 @@ namespace PyInterface
 	class Monoid
 	{
 	public:
-		Monoid(uint);
+		Monoid(uint,uint);
 		~Monoid();
-		void set_initial_state(int);
+		void add_initial_state(int);
 		void add_final_state(int);
 		void add_letter(char, ExplicitMatrix&);
-		int compute_monoid();
+		int has_val1();
+		int starheight();
 		void print();
 	private:
 		int dimension;
-		int initialState;
+		int nbLetters;
+		int cur_let=0;
+		int* initialStates;
 		int* finalStates;
-		UnstableMarkovMonoid* mon;
+		ExplicitMatrix** matrices;
+		char* letters;
 	};
 	int dimension;
-	int initialState;
+	int* initialStates;
 	int* finalStates;
 	bool not_final(int s) 
 	{
@@ -36,60 +43,103 @@ namespace PyInterface
 
 	bool test_witness(const ProbMatrix* m) 
 	{
-		const Vector & ones = *((m->getRowOnes())[initialState]);
-		for (int i = 0; i < Vector::GetStateNb(); i++)
-			if(ones.contains(i)&&not_final(i))
-				return false;
+		for(int j=0;j<dimension && initialStates[j]!=-1;j++) {
+			const Vector & ones = *((m->getRowOnes())[initialStates[j]]);
+			for (int i = 0; i < Vector::GetStateNb(); i++)
+				if(ones.contains(i)&&not_final(i))
+					return false;
+		}
 		return true;
 	}
 }
 
-PyInterface::Monoid::Monoid(uint dim)
+PyInterface::Monoid::Monoid(uint dim,uint nlet)
 {
+	nbLetters = nlet;
 	dimension = dim;
-	mon = new UnstableMarkovMonoid(dim);
 	finalStates = (int*) malloc(sizeof(int)*dim);
 	memset(finalStates,-1,sizeof(int)*dim);
-	initialState = -1;
+	initialStates = (int*) malloc(sizeof(int)*dim);
+	memset(initialStates,-1,sizeof(int)*dim);
+
+	matrices = (ExplicitMatrix**) malloc(sizeof(ExplicitMatrix*)*nlet);
+	for(int i = 0;i < nlet; i++)
+		matrices[i]=new ExplicitMatrix(dim);
+	letters = (char*) malloc(sizeof(char)*nlet);
 }
 PyInterface::Monoid::~Monoid()
 {
-	delete mon;
 	free(finalStates);
+	free(letters);
+	for(int i = 0; i < nbLetters; i++)
+		delete matrices[i];
+	free(matrices);
 }
-void PyInterface::Monoid::set_initial_state(int i)
-{
-	initialState = i;
-}
-void PyInterface::Monoid::add_final_state(int f)
+
+void addToList(int dimension,int s, int* states) 
 {
 	for(int i=0;i<dimension;i++) {
-		if(finalStates[i]==-1) {
-			finalStates[i]=f;
-			break;
+		if(states[i]==-1) {
+			states[i]=s;
+			return;
 		}
 	}
 }
+
+void PyInterface::Monoid::add_initial_state(int i)
+{
+	addToList(dimension,i,initialStates);
+}
+void PyInterface::Monoid::add_final_state(int f)
+{
+	addToList(dimension,f,finalStates);
+}
 void PyInterface::Monoid::add_letter(char c, ExplicitMatrix& m)
 {
-	mon->addLetter(c,m);
+	ExplicitMatrix* mat = new ExplicitMatrix(m);
+
+	letters[cur_let]=c;
+	matrices[cur_let]=mat;
+	cur_let++;
 }
-int PyInterface::Monoid::compute_monoid()
+int PyInterface::Monoid::has_val1()
 {
-	PyInterface::initialState = initialState;
+	PyInterface::initialStates = initialStates;
 	PyInterface::finalStates = finalStates;
 	PyInterface::dimension = dimension;
-	mon->setWitnessTest((bool (*)(const Matrix*))&PyInterface::test_witness);
-	if(mon->ComputeMonoid())
+
+	UnstableMarkovMonoid* markovMon = new UnstableMarkovMonoid(dimension);
+	for(int i=0; i<cur_let;i++) 
+		markovMon->addLetter(letters[i],*(matrices[i]));
+
+	markovMon->setWitnessTest((bool (*)(const Matrix*))&PyInterface::test_witness);
+	if(markovMon->ComputeMonoid())
 		return 1;
 	else
 		return 0;
 }
 
-void PyInterface::Monoid::print()
+int PyInterface::Monoid::starheight()
 {
-	mon->print();
+	int height=0;
+	ClassicAut* automaton = new ClassicAut(nbLetters,dimension);
+	for(int i = 0;i < dimension && initialStates[i]!=-1; i++)
+		automaton->initialstate[initialStates[i]]=true;
+	for(int i = 0;i < dimension && finalStates[i]!=-1; i++)
+		automaton->finalstate[finalStates[i]]=true;
+	for(int i=0; i<cur_let; i++)
+		automaton->addLetter(i,*(matrices[i]));
+
+	while(true) {
+		MultiCounterAut *baut = toNestedBaut(automaton,height);
+		UnstableMultiMonoid monoid(*baut);
+		if(!monoid.containsUnlimitedWitness())
+			return height;
+		delete baut;
+		height++;
+	}
 }
+
 BOOST_PYTHON_MODULE(libacme)
 {
 	class_<vector<char>>("VChar")
@@ -99,10 +149,10 @@ BOOST_PYTHON_MODULE(libacme)
 
 	class_<ExplicitMatrix>("MyMatrix", init<uint>())
 		.def_readwrite("coefficients", &ExplicitMatrix::coefficients);
-	class_<PyInterface::Monoid>("Monoid",init<uint>())
-		.def("set_initial_state", &PyInterface::Monoid::set_initial_state)
+	class_<PyInterface::Monoid>("Monoid",init<uint,uint>())
+		.def("add_initial_state", &PyInterface::Monoid::add_initial_state)
 		.def("add_final_state",&PyInterface::Monoid::add_final_state)
 		.def("add_letter",&PyInterface::Monoid::add_letter)
-		.def("compute_monoid",&PyInterface::Monoid::compute_monoid)
-		.def("printmon",&PyInterface::Monoid::print);
+		.def("has_val1",&PyInterface::Monoid::has_val1)
+		.def("starheight",&PyInterface::Monoid::starheight);
 }
