@@ -107,6 +107,28 @@ const ConcatExpr * isConcatExpr(const ExtendedExpression * expr) { return dynami
 const LetterExpr * isLetterExpr(const ExtendedExpression * expr){ return dynamic_cast<const LetterExpr *>(expr); }
 
 
+//Sharp-height
+
+char LetterExpr::sharp_height() const
+{
+	return 0;
+}
+
+char ConcatExpr::sharp_height() const
+{
+	char maxs=0, temp;
+	for (uint i = sonsNb ; i > 0; i--){
+		temp=sons[i -1]->sharp_height();
+		if (temp>maxs) maxs=temp;
+	}
+	return maxs;
+}
+
+char SharpedExpr::sharp_height() const
+{
+	return 1+son->sharp_height();
+}
+
 // Printing functions
 using namespace std;
 
