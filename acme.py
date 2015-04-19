@@ -23,7 +23,7 @@ def to_monoid(automaton):
     monoid = acme.Monoid(dimension,n_of_letters)
     for letter in automaton.input_alphabet:
         m = acme.MyMatrix(dimension)
-        m.coefficients = matrix_to_vvchar(aut.adjacency_matrix(letter))
+        m.coefficients = matrix_to_vvchar(automaton.adjacency_matrix(letter))
         monoid.add_letter(letter,m)
     for s in automaton.initial_states():
         monoid.add_initial_state(automaton.states().index(s))
