@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <list>
 #include "MarkovMonoid.hpp"
 //#include "StabilisationMonoid.hpp"
 #include "MultiMonoid.hpp"
@@ -141,8 +141,13 @@ int main(int argc, char **argv)
 	printf("Automaton created\n");
 	
 	aut->print();
-	
-	
+
+	cout << "doing regex:" << endl;
+	list<uint> order;
+	for(int i = 0; i<3; i++)
+	  order.push_front(i);
+	(Aut2RegExp(aut,order))->print();
+	cout << endl;
 	cout << "******************************" << endl;
 	int LC=LoopComplexity(aut);
 	cout << "Loop Complexity : Star-height is at most " << LC << endl;

@@ -27,8 +27,9 @@ public:
 	
 	//final states
 	vector<bool> finalstate;
-	
-	//transition table: one boolean matrix for each letter
+	// TODO: very confusing to have letters as char but to treat
+	// them as numbers from 0..  transition table: one boolean
+	// matrix for each letter
 	map<char, vector<vector<bool>>> trans;
 
 	void addLetter(char c, ExplicitMatrix m);

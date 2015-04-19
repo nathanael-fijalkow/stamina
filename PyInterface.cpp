@@ -6,6 +6,7 @@
 #include "Automata.hpp"
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include <list>
 using namespace boost::python;
 
 namespace PyInterface 
@@ -20,6 +21,7 @@ namespace PyInterface
 		void add_letter(char, ExplicitMatrix&);
 		int has_val1();
 		int starheight();
+		string toregexp();
 		void print();
 	private:
 		int dimension;
@@ -140,7 +142,20 @@ int PyInterface::Monoid::starheight()
 		height++;
 	}
 }
-
+string PyInterface::Monoid::toregexp()
+{
+	ClassicAut* automaton = new ClassicAut(nbLetters,dimension);
+	for(int i = 0;i < dimension && initialStates[i]!=-1; i++)
+		automaton->initialstate[initialStates[i]]=true;
+	for(int i = 0;i < dimension && finalStates[i]!=-1; i++)
+		automaton->finalstate[finalStates[i]]=true;
+	for(int i=0; i<cur_let; i++)
+		automaton->addLetter(i,*(matrices[i]));
+	std::list<uint> order;
+	for(int i = 0;i < dimension; i++)
+		order.push_front(i);
+	return (Aut2RegExp(automaton,order))->flat;
+}
 BOOST_PYTHON_MODULE(libacme)
 {
 	class_<vector<char>>("VChar")
@@ -155,5 +170,6 @@ BOOST_PYTHON_MODULE(libacme)
 		.def("add_final_state",&PyInterface::Monoid::add_final_state)
 		.def("add_letter",&PyInterface::Monoid::add_letter)
 		.def("has_val1",&PyInterface::Monoid::has_val1)
-		.def("starheight",&PyInterface::Monoid::starheight);
+		.def("starheight",&PyInterface::Monoid::starheight)
+		.def("toregexp",&PyInterface::Monoid::toregexp);
 }
