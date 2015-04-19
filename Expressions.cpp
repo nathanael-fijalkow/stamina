@@ -134,7 +134,7 @@ using namespace std;
 
 void LetterExpr::print(std::ostream& os) const
 {
-	os << letter;
+	os << (char)('a' + letter);
 }
 
 void ConcatExpr::print(std::ostream& os) const

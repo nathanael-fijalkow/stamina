@@ -47,11 +47,9 @@ RegExp* star(RegExp* base)
 // Printing functions
 void LetterRegExp::print() const
 {
-	if(letter < 'a')
-		cout << (char) ('a'+letter);
-	else
-		cout << letter;
+	cout << (char)('a' + letter);
 }
+
 void ConcatRegExp::print() const
 {
 	left->print();
@@ -135,6 +133,7 @@ LetterRegExp::LetterRegExp(char a)
 	letter = a;
 	flat = string(1,'a' + a);
 }
+
 ConcatRegExp::ConcatRegExp(RegExp *e1, RegExp *e2)
 {
 	left = e1;
@@ -302,7 +301,7 @@ RegExp *Aut2RegExp(ClassicAut *aut, list<state> ord)
 }	
 
 
-ExtendedExpression *Reg2Sharp(RegExp *reg){
+ExtendedExpression *Reg2Sharp(const RegExp *reg){
 	uint i;
 	ExtendedExpression *exp;
 	const LetterRegExp *lexp=isLetter(reg);

@@ -28,7 +28,7 @@ UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata) : Uns
 	{
 		ExplicitMatrix mat(automata.NbStates);
 		mat.coefficients = automata.trans.at(letter);
-		addLetter('a' + letter, mat);
+		addLetter(letter, mat);
 	}
 
 	for (int i = 0; i < automata.NbStates; i++)
@@ -97,22 +97,26 @@ ostream& operator<<(ostream& st, const UnstableMultiMonoid & monoid)
 
 const Matrix * UnstableMultiMonoid::ExtendedExpression2Matrix(const ExtendedExpression * expr,const MultiCounterAut & automata)
 {
+	const LetterExpr * lexpr = isLetterExpr(expr);
+	const ConcatExpr * cexpr = isConcatExpr(expr);
+	const SharpedExpr * sexpr = isSharpedExpr(expr);
+
 	if(isLetterExpr(expr)){
 		ExplicitMatrix mat(automata.NbStates);
-		mat.coefficients = automata.trans.at(expr->letter);
-		return addLetter('a', mat);
+		mat.coefficients = automata.trans.at(lexpr->letter);
+		return addLetter(lexpr->letter, mat);
 	}
 	else
 	{
 		if(isConcatExpr(expr))
 		{
-			Matrix * mat = ExtendedExpression2Matrix(expr->sons[0], automata);
-			for (uint i = 1 ; i < expr->sonsNb; i++) mat = mat->prod(expr->sons[i]);
+			const Matrix * mat = ExtendedExpression2Matrix(cexpr->sons[0], automata);
+			for (uint i = 1; i < cexpr->sonsNb; i++) mat = mat->prod(ExtendedExpression2Matrix(cexpr->sons[i], automata));
 			return mat;
 		}
 		else
 		{
-			Matrix * mat = ExtendedExpression2Matrix(expr->son, automata);
+			const Matrix * mat = ExtendedExpression2Matrix(sexpr->son, automata);
 			return mat->stab();
 		}
 	}

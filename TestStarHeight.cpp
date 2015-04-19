@@ -69,7 +69,6 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-
 	
 	
 	//b*(b*ab*a)*	
@@ -108,7 +107,7 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-*/
+	*/
 
 	//(aa(ab)*bb(ab*))*
 	
@@ -148,12 +147,14 @@ int main(int argc, char **argv)
 	for(int i = 0; i<3; i++)
 	  order.push_front(i);
 	const RegExp* regexpr = Aut2RegExp(aut,order);
-	expr->print();
+	regexpr->print();
 	cout << endl;
 	cout << "******************************" << endl;
 	int LC=LoopComplexity(aut);
 	cout << "Loop Complexity : Star-height is at most " << LC << endl;
-	cout << "*****************************************" << endl;
+	cout << "The Loop Complexity produces the following potential unboundedness witness:" << endl;
+	const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
+	cout << *sharp_expr << endl;
 		
 	int h = 0;
 	while (h<LC)
@@ -167,27 +168,22 @@ int main(int argc, char **argv)
 		cout << "Computing the nested automaton..." << endl;
 		MultiCounterAut *Baut = toNestedBaut(aut, h);
 		
-		/*
-		cout << "The nested automaton " << endl;
-		Baut->print();
-		*/
-
-		const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
-		UnstableMultiMonoid monoid(*Baut);
+//		cout << "The nested automaton " << endl;
+//		Baut->print();
 
 		cout << "Before computing the monoid, we check whether the Loop Complexity induces an unboundedness witness:" << endl;
-		sharp_expr>print();
+		
+		UnstableMultiMonoid monoid(*Baut);
+		const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr,*Baut);
 
-		const Matrix* mat = ExtendedExpression2Matrix(sharp_expr,*Baut);
-
-		// Idea: could also check the previous unlimited witness?
-		if(monoid.(*test)(mat)){
+//		cout << *mat << endl;
+		
+		if(monoid.IsUnlimitedWitness(mat)){
 			cout << "It does, proceed" << endl;
 		}
 		else{
 			cout << "It does not, we compute the monoid" << endl;
-
-			cout << "Checking witness existence on the fly..." << endl;
+			cout << "Computing the monoid, and checking for the existence of an unboundedness witness on the fly..." << endl;
 			auto expr = monoid.containsUnlimitedWitness();
 			monoid.print_summary();
 			if (monoid.expr_to_mat.size() < 5000)

@@ -69,6 +69,6 @@ const StarRegExp * isStar(const RegExp *expr);
 
 RegExp* Aut2RegExp(ClassicAut *Aut, list<uint> order);
 
-ExtendedExpression* Reg2Sharp(RegExp *reg);
+ExtendedExpression* Reg2Sharp(const RegExp *reg);
 
 #endif
