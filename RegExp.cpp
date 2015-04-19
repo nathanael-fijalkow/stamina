@@ -186,6 +186,37 @@ template<class T> bool contains(list<T> list, T element)
 			return true; 
 	return false; 
 }
+
+void eliminateTrans(pair<state,state> t1, pair<state,state> t2,
+		    state toEliminate, list<pair<state,state>> &toRemove,
+		    map<pair<state,state>,RegExp*> &toReg) 
+{
+	if((t1.second == toEliminate) && (t2.first == toEliminate)) {
+		toRemove.push_front(t1);
+		toRemove.push_front(t2);
+		auto pr = make_pair(t1.first,t2.second);
+		auto tt = make_pair(toEliminate, toEliminate);
+
+		if(toReg.find(tt) == toReg.end()) {
+			if(toReg.find(pr) != toReg.end())
+				toReg[pr] = add(toReg[pr],concat(toReg[t1],toReg[t2]));
+			else 
+				toReg[pr] = concat(toReg[t1],toReg[t2]);
+		} 
+		if(toReg.find(tt) != toReg.end()) {
+			if(toReg.find(pr) != toReg.end()) 
+				toReg[pr] = add(toReg[pr],
+						concat(toReg[t1],
+						       concat(star(toReg[tt]),toReg[t2])));
+			else
+				toReg[pr] = concat(toReg[t1],
+						   concat(star(toReg[tt]),toReg[t2]));
+									
+		}
+	}
+}
+
+
 // Borrowed from Charles' cpaut package:
 // http://www.liafa.univ-paris-diderot.fr/~paperman/index.php?page=sage
 RegExp *Aut2RegExp(ClassicAut *aut, list<state> ord)
@@ -238,35 +269,11 @@ RegExp *Aut2RegExp(ClassicAut *aut, list<state> ord)
 				
 				map<pair<state,state>,RegExp*> tempToReg(toReg);
 				toRemove.clear();
-				for(auto t1p : tempToReg) {
-					auto t1 = t1p.first;
-					for(auto t2p : tempToReg) {
-						auto t2 = t2p.first;
-						if((t1.second == toEliminate) && (t2.first == toEliminate)) {
-							toRemove.push_front(t1);
-							toRemove.push_front(t2);
-							auto pr = make_pair(t1.first,t2.second);
-							auto tt = make_pair(toEliminate, toEliminate);
+				for(auto t1 : tempToReg)
+					for(auto t2 : tempToReg)
+						eliminateTrans(t1.first, t2.first, toEliminate,
+							       toRemove, toReg);
 
-							if(toReg.find(tt) == toReg.end()) {
-								if(toReg.find(pr) != toReg.end())
-									toReg[pr] = add(toReg[pr],concat(toReg[t1],toReg[t2]));
-								else 
-									toReg[pr] = concat(toReg[t1],toReg[t2]);
-							} 
-							if(toReg.find(tt) != toReg.end()) {
-								if(toReg.find(pr) != toReg.end()) 
-									toReg[pr] = add(toReg[pr],
-											concat(toReg[t1],
-											       concat(star(toReg[tt]),toReg[t2])));
-								else
-									toReg[pr] = concat(toReg[t1],
-											   concat(star(toReg[tt]),toReg[t2]));
-									
-							}
-						}
-					}
-				}
 				for (auto t : toRemove) 
 					toReg.erase(t);
 			}
@@ -284,7 +291,9 @@ RegExp *Aut2RegExp(ClassicAut *aut, list<state> ord)
 			if(toReg.find(i_i) != toReg.end())
 				toReg[i_f] = concat(star(toReg[i_i]),toReg[i_f]);
 			if(toReg.find(f_i) != toReg.end())
-				ret = add(ret, (concat(star(concat(toReg[i_f],toReg[f_i])),toReg[i_f]))->clone());
+				ret = add(ret,
+					  (concat(star(concat(toReg[i_f],toReg[f_i]))
+						  ,toReg[i_f]))->clone());
 			else
 				ret = add(ret, (toReg[i_f])->clone());
 		}
