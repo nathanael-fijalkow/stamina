@@ -18,6 +18,9 @@ using namespace std;
 /* if 1 recurrent states and idempotent matrices are stored in a static array*/
 #define CACHE_RECURRENT_STATES 1
 
+#define EXP_MAT_1 2
+#define EXP_MAT_PLUS 1
+#define EXP_MAT_ZERO 0
 
 /* CLASS DEFINITIONS */
 // Class of explicit matrices, represented as arrays
@@ -33,6 +36,7 @@ public:
 
 	// Constructor 
 	ExplicitMatrix(uint stateNb);
+	ExplicitMatrix(const ExplicitMatrix&);
 
 	//Random matrix
 	static ExplicitMatrix  * random(uint stateNb);
