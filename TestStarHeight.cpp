@@ -56,8 +56,8 @@ int main(int argc, char **argv)
 	*/
 
 
-	//test for order
-
+	//(a + b(a+b)^2)^*
+	
 	ClassicAut *aut=new ClassicAut(2,3);
 	aut->trans[0][0][1]=true;
 	aut->trans[0][1][1] = true;
@@ -70,6 +70,17 @@ int main(int argc, char **argv)
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
 	
+	
+	//(a + bb)^*
+	/*
+	ClassicAut *aut=new ClassicAut(2,2);
+	aut->trans[0][0][0]=true;	
+	aut->trans[1][0][1]=true;
+	aut->trans[1][1][0]=true;
+
+	aut->initialstate[0]=true;
+	aut->finalstate[0]=true;
+	*/
 	
 	//b*(b*ab*a)*	
 	/*
@@ -142,18 +153,16 @@ int main(int argc, char **argv)
 	aut->print();
 
 	cout << "******************************" << endl;
-	cout << "Regex:" << endl;
-	list<uint> order;
-	for(int i = 0; i<3; i++)
-	  order.push_front(i);
+	pair<char,list<uint>> res = LoopComplexity(aut);
+	int LC = (int)res.first ;
+	list<uint> order = res.second;
 	const RegExp* regexpr = Aut2RegExp(aut,order);
+	const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
+	cout << "Loop Complexity : Star-height is at most " << LC << endl;
+	cout << "Regex:" << endl;
 	regexpr->print();
 	cout << endl;
-	cout << "******************************" << endl;
-	int LC=LoopComplexity(aut);
-	cout << "Loop Complexity : Star-height is at most " << LC << endl;
 	cout << "The Loop Complexity produces the following potential unboundedness witness:" << endl;
-	const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
 	cout << *sharp_expr << endl;
 		
 	int h = 0;
@@ -179,7 +188,7 @@ int main(int argc, char **argv)
 //		cout << *mat << endl;
 		
 		if(monoid.IsUnlimitedWitness(mat)){
-			cout << "It does, proceed" << endl;
+			cout << "It does, proceed" << endl;			
 		}
 		else{
 			cout << "It does not, we compute the monoid" << endl;
@@ -200,10 +209,10 @@ int main(int argc, char **argv)
 			cout << "The automaton is limited, star-height is " << h << endl;
 			break;
 			}
-			h++;
 			//cout << "Press key to continue..." << endl;
 			//std::cin.get();
 		}
+		h++;
 	}
 	
 	if(h==LC) {

@@ -14,19 +14,17 @@ class GraphAut{
 
 	// number of states, numbered 0,1,2,...
 	uint NbStates;
-
 	
 	//transition table: for each set i, trans[i] is a uint representing the set of successors
 	vector<uint> trans;	
 	
 	//ordered list of states to be given to the Brzozowski Mccluskey algorithm, giving an expression of star-height LC(A) 
-	list<uint> order;
-	
+	list<uint> order;	
 };
 
 //Computing the Loop Complexity of a Classic automaton. 
 //Upper bound for star-height, obtainable via standard Automata->Expressions algorithms
-char LoopComplexity(ClassicAut *aut);
+pair<char,list<uint>> LoopComplexity(ClassicAut *aut);
 
 
 // B-automaton testing if L(aut) has star-height at most k.
