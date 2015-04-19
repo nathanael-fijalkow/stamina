@@ -142,27 +142,28 @@ int main(int argc, char **argv)
 	
 	aut->print();
 
-	cout << "doing regex:" << endl;
+	cout << "******************************" << endl;
+	cout << "Regex:" << endl;
 	list<uint> order;
 	for(int i = 0; i<3; i++)
 	  order.push_front(i);
-	(Aut2RegExp(aut,order))->print();
+	const RegExp* regexpr = Aut2RegExp(aut,order);
+	expr->print();
 	cout << endl;
 	cout << "******************************" << endl;
 	int LC=LoopComplexity(aut);
 	cout << "Loop Complexity : Star-height is at most " << LC << endl;
 	cout << "*****************************************" << endl;
-	
-	
+		
 	int h = 0;
 	while (h<LC)
 	{
 		ofstream output("monoid " + to_string(h) + ".txt");
-		
+	
 		cout << "******************************" << endl;
 		cout << "Testing starheight " << h << endl;
 		cout << "*****************************************" << endl;
-
+	
 		cout << "Computing the nested automaton..." << endl;
 		MultiCounterAut *Baut = toNestedBaut(aut, h);
 		
@@ -170,38 +171,52 @@ int main(int argc, char **argv)
 		cout << "The nested automaton " << endl;
 		Baut->print();
 		*/
+
+		const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
 		UnstableMultiMonoid monoid(*Baut);
 
-		cout << "Checking witness existence on the fly..." << endl;
-		auto expr = monoid.containsUnlimitedWitness();
-		monoid.print_summary();
-		if (monoid.expr_to_mat.size() < 5000)
-			output << monoid;
+		cout << "Before computing the monoid, we check whether the Loop Complexity induces an unboundedness witness:" << endl;
+		sharp_expr>print();
 
-		delete Baut;
+		const Matrix* mat = ExtendedExpression2Matrix(sharp_expr);
 
-		if (expr)
-		{
-			cout << "An unlimited witness for h=" << h << endl;
-			cout << *expr << endl;
+		// Idea: could also check the previous unlimited witness?
+		if(monoid.(*test)(mat)){
+			cout << "It does, proceed" << endl;
 		}
-		else
-		{
-			cout << " The automaton is limited, star-height is " << h << endl;
+		else{
+			cout << "It does not, we compute the monoid" << endl;
+
+			cout << "Checking witness existence on the fly..." << endl;
+			auto expr = monoid.containsUnlimitedWitness();
+			monoid.print_summary();
+			if (monoid.expr_to_mat.size() < 5000)
+				output << monoid;
+			delete Baut;
+
+			if (expr)
+			{
+				cout << "An unlimited witness for h = " << h << endl;
+				cout << *expr << endl;
+			}
+			else
+			{
+			cout << "The automaton is limited, star-height is " << h << endl;
 			break;
+			}
+			h++;
+			//cout << "Press key to continue..." << endl;
+			//std::cin.get();
 		}
-		h++;
-		//cout << "Press key to continue..." << endl;
-		//std::cin.get();
 	}
 	
 	if(h==LC) {
-		cout << "*********************************"<<endl;
-		cout<<"Star-height is "<<LC<<endl;
-		cout<< "Witnessed by standard automaton->expression construction"<<endl;
+		cout << "*********************************" << endl;
+		cout << "Star-height is " << LC << endl;
+		cout << "Witnessed by standard automaton->expression construction" << endl;
 		cout << "*****************************************" << endl;
 	}
-	
+
     std::cout << "End of Computation\n";
 	std::cin.get();
 

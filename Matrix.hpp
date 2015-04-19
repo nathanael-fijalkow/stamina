@@ -56,7 +56,7 @@ public:
 	// Print
 	virtual void print(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const = 0;
 
-        virtual ExplicitMatrix* toExplicitMatrix() const = 0;
+    virtual ExplicitMatrix* toExplicitMatrix() const = 0;
 
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns

@@ -53,7 +53,7 @@ public:
 	// Print
 	void print(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const;
 
-        ExplicitMatrix* toExplicitMatrix() const;
+    ExplicitMatrix* toExplicitMatrix() const;
 
 	// Constructor
 	MultiCounterMatrix();

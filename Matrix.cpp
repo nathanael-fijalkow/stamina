@@ -98,7 +98,6 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat){
 }
 
 // Create a new vector, keep only coordinates of v that are true in tab
-// Create a new vector, keep only coordinates of v that are true in tab
 const Vector * Matrix::purge(const Vector *varg, const Vector * tab){
 	size_t * new_vec = (size_t *)malloc(Vector::GetBitSize() * sizeof(size_t));
 
@@ -108,5 +107,3 @@ const Vector * Matrix::purge(const Vector *varg, const Vector * tab){
 	auto it = vectors.emplace(new_vec, false).first;
 	return &(*it);
 }
-
-

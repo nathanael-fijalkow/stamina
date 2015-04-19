@@ -95,5 +95,28 @@ ostream& operator<<(ostream& st, const UnstableMultiMonoid & monoid)
 	return st;
 }
 
+const Matrix * UnstableMultiMonoid::ExtendedExpression2Matrix(const ExtendedExpression * expr,const MultiCounterAut & automata)
+{
+	if(isLetterExpr(expr)){
+		ExplicitMatrix mat(automata.NbStates);
+		mat.coefficients = automata.trans.at(expr->letter);
+		return addLetter('a', mat);
+	}
+	else
+	{
+		if(isConcatExpr(expr))
+		{
+			Matrix * mat = ExtendedExpression2Matrix(expr->sons[0], automata);
+			for (uint i = 1 ; i < expr->sonsNb; i++) mat = mat->prod(expr->sons[i]);
+			return mat;
+		}
+		else
+		{
+			Matrix * mat = ExtendedExpression2Matrix(expr->son, automata);
+			return mat->stab();
+		}
+	}
+}
+
 #define MONOID_COMPUTATION_VERBOSITY 0
 
