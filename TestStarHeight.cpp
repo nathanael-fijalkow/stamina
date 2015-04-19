@@ -178,7 +178,7 @@ int main(int argc, char **argv)
 		cout << "Before computing the monoid, we check whether the Loop Complexity induces an unboundedness witness:" << endl;
 		sharp_expr>print();
 
-		const Matrix* mat = ExtendedExpression2Matrix(sharp_expr);
+		const Matrix* mat = ExtendedExpression2Matrix(sharp_expr,*Baut);
 
 		// Idea: could also check the previous unlimited witness?
 		if(monoid.(*test)(mat)){
