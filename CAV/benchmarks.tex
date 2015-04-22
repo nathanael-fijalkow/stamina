@@ -13,8 +13,8 @@ vice-versa, some small automata can produce large monoids.
 To this extent, for each state $s$ we pick a state $t$ with uniform
 probability on the set of states and add a transition between $s$ and
 $t$. After this we uniformly pick a number $p\in[0,1]$, and for all
-other states $t'$ different from $t$, we add a transition between $s$
-and $t'$ by flipping a $p$-biased coin.
+other states $t'$ different from $t$, we decide whether we will add a
+transition between $s$ and $t'$ by flipping a $p$-biased coin.
 
 The results have been plotted in Fig. \ref{bench1}. 
 
@@ -33,9 +33,9 @@ either timed out or had a stack overflow.
 \end{figure}
 
 One can observe that there is a threshold in the size of the Markov
-monoid after which AcmeML will not be useful. This threshold is
-expressed by the vertical line in the graph above (it hovers around
-3500 elements).
+monoid after which AcmeML will not be useful, i.e. it will either take
+too much time or have a stack overflow. This threshold is expressed by
+the vertical line in the graph above (it hovers around 3500 elements).
 
 Even on smaller examples Acme++ outperforms AcmeML by a considerable
 factor as seen in Fig. \ref{bench1zoomed}.

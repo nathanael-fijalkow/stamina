@@ -44,9 +44,9 @@ The following theorem guarantees the correctness of the reduction.
 The automaton $\cB$ is limited if and only if $L$ is expressible with a regular expression of star-height $k$.
 \end{theorem}
 
-Therefore, for any fixed $k$, we can decide in EXPSPACE whether a regular language has star-height $k$, if its is given via a nondeterministic automaton for the complement (or via a deterministic automaton).
+Therefore, for any fixed $k$, we can decide in EXPSPACE whether a regular language has star-height $k$, if it is given via a nondeterministic automaton for the complement (or via a deterministic automaton).
 
-The algorithm is as follow, minimize it, then , and finally test for limitedness of $\cB$ by building its stabilization monoid and looking for an unlimitedness witness.
+The algorithm is as follows, minimize it, then , and finally test for limitedness of $\cB$ by building its stabilization monoid and looking for an unlimitedness witness.
 \begin{framed}
 We are given as input an integer $k$ and the dual of the non-deterministic automaton for $A^*\setminus L$. In particular a deterministic automaton for $L$ works.
 \begin{enumerate}
