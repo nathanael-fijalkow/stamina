@@ -124,7 +124,7 @@ int PyInterface::Monoid::has_val1()
 
 int PyInterface::Monoid::starheight()
 {
-	int height=0;
+	int height = 0;
 	ClassicAut* automaton = new ClassicAut(nbLetters,dimension);
 	for(int i = 0;i < dimension && initialStates[i]!=-1; i++)
 		automaton->initialstate[initialStates[i]]=true;

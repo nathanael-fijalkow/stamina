@@ -49,53 +49,43 @@ bool test_witness(const ProbMatrix* m)
 	return true;
 }
 
-Monoid* toMonoid(ExplicitAutomaton* aut) 
+UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
 {
-	if(aut->type==PROB) 
-	{
-		finalStates = aut->finalStates;
-		initialState = aut->initialState;
-		size = aut->size;
-		UnstableMarkovMonoid* ret = new UnstableMarkovMonoid(aut->size);
-		ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
-		for(int i=0;i<aut->alphabet.length();i++)
-			ret->addLetter(aut->alphabet[i],*(aut->matrices[i]));
-		return ret;
-	}
-	if (aut->type==CLASSICAL) 
-	{
-		ClassicAut* a = new ClassicAut(aut->size,aut->alphabet.length());
+	finalStates = aut->finalStates;
+	initialState = aut->initialState;
+	size = aut->size;
+	UnstableMarkovMonoid* ret = new UnstableMarkovMonoid(aut->size);
+	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
+	for(int i=0;i<aut->alphabet.length();i++)
+		ret->addLetter(aut->alphabet[i],*(aut->matrices[i]));
+	return ret;
+}
 
-		for(int i=0;i<aut->alphabet.length();i++)
-			for(int j=0;i<aut->size;i++)
-				for(int k=0;k<aut->size;k++)
-					if(aut->matrices[i]->coefficients[j][k]>0)
-						a->trans[i][j][k]=true;
+UnstableMultiMonoid* toMultiMonoid(ClassicAut* aut, int height)
+{
+	return new UnstableMultiMonoid(*toNestedBaut(aut,height));
+}
 
-		a->initialstate[aut->initialState]=true;
-		for(int i=0;aut->finalStates[i]!=-1 && i<aut->size;i++)
-			a->finalstate[aut->finalStates[i]]=true;
+ClassicAut* fromExplicitToClassic(ExplicitAutomaton* aut)
+{
+	ClassicAut* ret = new ClassicAut(aut->alphabet.length(),aut->size);
 
-		MultiCounterAut *Baut=toNestedBaut(a, 1);
-		UnstableMultiMonoid* monoid = new UnstableMultiMonoid(*Baut);
+	for(int i=0;i<aut->alphabet.length();i++)
+		ret->addLetter(i,*(aut->matrices[i]));
 
-		return monoid;
-	}
-	if (aut->type >= 1) 
-	{
-		// Do something with automata with counters
-	}
-	return NULL;
-  
+	ret->initialstate[aut->initialState]=true;
+	for(int i=0;aut->finalStates[i]!=-1 && i<aut->size;i++)
+		ret->finalstate[aut->finalStates[i]]=true;
+	return ret;
 }
 
 int main(int argc, char **argv)
 {
-	ExplicitMatrix mata(1);
-	mata.coefficients[0][0] = INC;
-	UnstableMultiMonoid monoid(1,1);
-	monoid.addLetter('a',mata);
-	monoid.ComputeMonoid();
+	// ExplicitMatrix mata(1);
+	// mata.coefficients[0][0] = INC;
+	// UnstableMultiMonoid monoid(1,1);
+	// monoid.addLetter('a',mata);
+	// monoid.ComputeMonoid();
 	
 
 
@@ -370,7 +360,7 @@ int main(int argc, char **argv)
 	ExplicitAutomaton* expa = Parser::parseFile(ifs);
 	if(expa->type==PROB)
 	{
-		UnstableMarkovMonoid* m = dynamic_cast<UnstableMarkovMonoid*>(toMonoid(expa));
+		UnstableMarkovMonoid* m = toMarkovMonoid(expa);
 		auto expr = m->ComputeMonoid();
 	  
 		pair<int, const ExtendedExpression*> r = m->maxLeakNb();
@@ -389,19 +379,21 @@ int main(int argc, char **argv)
 	}
 	else if (expa->type==CLASSICAL)
 	{
-		UnstableMultiMonoid* m = dynamic_cast<UnstableMultiMonoid*>(toMonoid(expa));
-		auto expr = m->containsUnlimitedWitness();
-		if (expr) 
-		{
-			cout << "An unlimited witness: " << endl;
-			cout << *expr << endl;
+		int height = 0;
+		ClassicAut* aut = fromExplicitToClassic(expa);
+		
+		while(true) {
+			cout << "Checking for height: " << height << endl;
+			UnstableMultiMonoid* m = toMultiMonoid(aut,height);
+			if(!m->containsUnlimitedWitness()) {
+				cout << "This automaton has star-height: " << height << endl;
+				break;
+			}
+			if(verbose)
+				m->print();
+			delete m;
+			height++;
 		}
-		else
-		{
-			cout << " The automaton is limited " << endl;
-		}
-		if(verbose)
-			m->print();
 	}
 	// system("pause");
 	ifs.close();

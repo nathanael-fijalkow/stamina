@@ -27,7 +27,7 @@ parser.add_argument('-o','--output',help='output to file')
 parser.add_argument('-a',help='accumulative generation',action='store_true')
 parser.add_argument('-r','--repeat',help='repeat the experiment x times',
                      type=int, default=1)
-parser.add_argument('-c','--classical',help='generate a classical automaton',action='store_true')
+parser.add_argument('-c','--deterministic',help='generate a deterministic automaton',action='store_true')
 parser.add_argument('-d','--density',help='pick density',type=float,default=0)
 parser.add_argument('-s',help='simple picking of transitions',action='store_true')
 parser.add_argument('acme1', help='path to the Acme++ executable')
@@ -73,7 +73,7 @@ def gen(n,m):
                 if k==chosen:
                     output += str(1) + ' '
                 else:
-                    if args.classical == 1:
+                    if args.deterministic == 1:
                         output += toform(0) + ' '
                     else:
                         output += toform(bisect.bisect([pickprob,1],random.random())) + ' '
