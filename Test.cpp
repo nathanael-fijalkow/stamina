@@ -8,6 +8,7 @@
 #include "Parser.hpp"
 #include "StarHeight.hpp"
 
+
 #include <fstream>
 #include <sstream>
 
@@ -59,11 +60,6 @@ UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
 	for(int i=0;i<aut->alphabet.length();i++)
 		ret->addLetter(aut->alphabet[i],*(aut->matrices[i]));
 	return ret;
-}
-
-UnstableMultiMonoid* toMultiMonoid(ClassicAut* aut, int height)
-{
-	return new UnstableMultiMonoid(*toNestedBaut(aut,height));
 }
 
 ClassicAut* fromExplicitToClassic(ExplicitAutomaton* aut)
@@ -381,19 +377,30 @@ int main(int argc, char **argv)
 	{
 		int height = 0;
 		ClassicAut* aut = fromExplicitToClassic(expa);
+
+		pair<char,list<uint>> res = LoopComplexity(aut);
+		int lc = (int) res.first;
+		list<uint> order = res.second;
+		const RegExp* regexpr = Aut2RegExp(aut,order);
+		const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
+		cout << "Automaton with regexp: ";
+		regexpr->print();
+		cout << endl;
 		
-		while(true) {
+		while(height < lc) {
 			cout << "Checking for height: " << height << endl;
-			UnstableMultiMonoid* m = toMultiMonoid(aut,height);
-			if(!m->containsUnlimitedWitness()) {
-				cout << "This automaton has star-height: " << height << endl;
+			MultiCounterAut* baut = toNestedBaut(aut, height);
+			UnstableMultiMonoid monoid(*baut);
+			const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr, *baut);
+			if(!monoid.IsUnlimitedWitness(mat) && 
+			   !monoid.containsUnlimitedWitness()) 
 				break;
-			}
 			if(verbose)
-				m->print();
-			delete m;
+				monoid.print();
+			delete baut;
 			height++;
 		}
+		cout << "This automaton has star-height: " << height << endl;
 	}
 	// system("pause");
 	ifs.close();
