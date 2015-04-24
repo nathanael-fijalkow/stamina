@@ -44,7 +44,18 @@ RegExp* add(RegExp* lhs, RegExp* rhs)
 RegExp* star(RegExp* base)
 {
 	if(isStar(base))
-		return base; 
+		return base;
+	// Check for (aa*)* = a*; (a*a)*=a*
+	const ConcatRegExp* concat = isConcat(base);
+	if(concat) {
+	  const StarRegExp* lhs = isStar(concat->left);
+	  const StarRegExp* rhs = isStar(concat->right);
+	  if(lhs && !rhs && *(lhs->base) == rhs)
+	    return (RegExp*) lhs;
+	  if(!lhs && rhs && *(rhs->base) == lhs)
+	    return (RegExp*) rhs;
+	}
+
 	return new StarRegExp(base);
 }
 
