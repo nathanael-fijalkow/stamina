@@ -20,10 +20,6 @@ RegExp* concat(RegExp* lhs, RegExp* rhs)
 
 	if(stl && str && (*stl)==rhs)
 		return stl;
-	if(stl && !str && (*stl->base) == rhs)
-		return stl;
-	if(!stl && str && (*str->base) == lhs)
-		return str;
 	
 	return new ConcatRegExp(lhs,rhs);
 }
@@ -35,6 +31,14 @@ RegExp* add(RegExp* lhs, RegExp* rhs)
 		return lhs->clone();
 	if(*lhs == rhs)
 		return lhs;
+	
+	StarRegExp* stl = (StarRegExp*) isStar(lhs);
+	StarRegExp* str = (StarRegExp*) isStar(rhs);
+	if(stl && !str && (*stl->base) == rhs)
+		return stl;
+	if(!stl && str && (*str->base) == lhs)
+		return str;
+
 	return new UnionRegExp(lhs,rhs);
 }
 RegExp* star(RegExp* base)
