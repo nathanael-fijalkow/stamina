@@ -155,8 +155,7 @@ char RecLC(GraphAut *aut, uint subset){
 	vector<uint> comps=SCC(aut,subset);
 	list<uint> callorder=aut->order;
 	uint beststate;
-	bool debug=false;
-	//cout << comps.size() << " components found"<<endl;
+	bool debug = true;
 	if (debug) cout<< comps.size() << " components"<<endl;
 	if (comps.size()==1){
 		//compute 1+min(lc(A-p))
@@ -164,26 +163,23 @@ char RecLC(GraphAut *aut, uint subset){
 		uint minloop=aut->NbStates+1;
 		uint newmin;
 		for(uint p=0;p<aut->NbStates;p++){
-			
-			if (bit(subset,p)){
-				
-				if(debug) cout <<"Trying cutting state "<<p<< " from "<<subset<<endl;
+			if (bit(subset,p)){				
+				if(debug) cout << "Trying cutting state " << p << " from "<< subset << endl;
 				aut->order=callorder;
 				newmin=RecLC(aut, subset-TwoPow(p));
-				if(debug) cout <<"The try "<<p<< " from "<<subset<<" gives "<<newmin<<endl;
+				if(debug) cout << "The try " << p << " from " << subset << " gives " << newmin << endl;
 				if (newmin<minloop) {
 					minloop=newmin;
-					(aut->order).push_back(p);
+//					(aut->order).push_back(p);
 					beststate=p;
 				} 
-				else {aut->order=callorder;}
-
+//				else {aut->order=callorder;}
 			}
-	
 			if(minloop==0) break;
 		}
 		
 		if(debug) cout <<"Min step "<<subset<<" returning "<<1+minloop<< " cutting state "<<beststate << endl;
+		aut->order.push_back(beststate);
 		return 1+minloop;
 	}
 	//else max(lc(SCC)) 
@@ -206,17 +202,14 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut){
 	
 	cout << "Computing the Loop Complexity..." << endl;
 	uint n=aut->NbStates;	
-	//	uint i;
 	uint S=TwoPow(n); //number of subsets of the states. element S-1 represents the full automaton, element 0 the empty set.
 	GraphAut *gaut=new GraphAut(aut);
 	cout << "Graph automaton created..." << endl;
-	//for (i=0;i<n; i++) cout<< "trans["<<i<<"] : "<<gaut->trans[i]<<endl;  //printing graph automaton for debugging
 	char lc = RecLC(gaut, S-1);
-	printorder(gaut->order); //printing graph automaton for debugging
+	printorder(gaut->order);
 	return pair<char, list<uint>>(lc, gaut->order);
 }
 		
-//perform
 MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 
 	cout << "Computing the subset automaton..." << endl;
@@ -229,7 +222,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	char nl=Subsetaut->NbLetters;
 	
 #if VERBOSE_AUTOMATA_COMPUTATION
-	printf("Subset Automaton Builded, %d states\n\n",ns);
+	printf("Subset Automaton Built, %d states\n\n",ns);
 	Subsetaut->print();
 #endif	
 #if LOG_COMPUTATION_TO_FILE

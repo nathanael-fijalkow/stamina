@@ -231,6 +231,7 @@ RegExp *Aut2RegExp(ClassicAut *in, list<state> order)
 	      aut->trans[let][s][t] = in->trans[let][s][t];
 	      if(in->initialstate[t] && in->trans[let][t][s]) aut->trans[let][init][s] = true;
 	      if(in->finalstate[t] && in->trans[let][s][t]) aut->trans[let][s][final] = true;
+
 	    }
 
 	aut->print();
@@ -353,7 +354,7 @@ ExtendedExpression *Reg2Sharp(const RegExp *reg){
 		ExtendedExpression *exp2=Reg2Sharp(uexp->right);		
 		char s1=exp1->sharp_height();
 		char s2=exp2->sharp_height();
-		if (s1>s2) return exp1;
+		if (s1>=s2) return exp1;
 		else return exp2;
 	}
 	const ConcatRegExp *cexp=isConcat(reg);	
