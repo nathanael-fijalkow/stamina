@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
 
 	//(a + b(a+b)^2)^*
-	
+	/*
 	ClassicAut *aut=new ClassicAut(2,3);
 	aut->trans[0][0][1]=true;
 	aut->trans[0][1][1] = true;
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
-	
+	*/
 	
 	//(a + bb)^*
 	/*
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 	*/
 	
 	//b*(b*ab*a)*	
-	/*
+	
 	ClassicAut *aut=new ClassicAut(2,2);
 
 	aut->trans[0][0][1]=true;
@@ -94,7 +94,6 @@ int main(int argc, char **argv)
 	aut->initialstate[0]=true;
 	aut->finalstate[0]=true;
 	//aut->finalstate[1] = true;
-	*/
 	
 	//(a*b*c)*
 
