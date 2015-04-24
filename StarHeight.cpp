@@ -154,6 +154,7 @@ char RecLC(GraphAut *aut, uint subset){
 		}
 	vector<uint> comps=SCC(aut,subset);
 	list<uint> callorder=aut->order;
+	list<uint> neworder;
 	uint beststate;
 	bool debug = true;
 	if (debug) cout<< comps.size() << " components"<<endl;
@@ -170,6 +171,7 @@ char RecLC(GraphAut *aut, uint subset){
 				if(debug) cout << "The try " << p << " from " << subset << " gives " << newmin << endl;
 				if (newmin<minloop) {
 					minloop=newmin;
+					neworder=aut->order;
 //					(aut->order).push_back(p);
 					beststate=p;
 				} 
@@ -179,6 +181,7 @@ char RecLC(GraphAut *aut, uint subset){
 		}
 		
 		if(debug) cout <<"Min step "<<subset<<" returning "<<1+minloop<< " cutting state "<<beststate << endl;
+		aut->order=neworder;
 		aut->order.push_back(beststate);
 		return 1+minloop;
 	}
