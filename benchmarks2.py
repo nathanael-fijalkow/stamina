@@ -97,8 +97,15 @@ for i in range(fr,args.n+1):
                              stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         if maybeTimeout(s):
             (acme_out,time_out)=s.communicate()
-            starheight = re.search(r'height: (\d+)',acme_out).group(1)
-            print 'Language with starheight ' + starheight
+            print acme_out
+            # if(re.match(r'guessed', acme_out)):
+            #     print 'We guessed the unlimited witness'
+            # if(re.match(r'good', acme_out)):
+            #     print 'The guess was not good, but we found one anyway'
+            # match = re.search(r'height: (\d+)',acme_out)
+            # if(match): 
+            #     starheight = match.group(1)
+            #     print 'Language with starheight ' + starheight
             x1=time_out.replace('"','').strip()
             print 'Acme++ took ' + x1
     

@@ -354,6 +354,8 @@ int main(int argc, char **argv)
 #endif
 
 	ExplicitAutomaton* expa = Parser::parseFile(ifs);
+	ifs.close();
+
 	if(expa->type==PROB)
 	{
 		UnstableMarkovMonoid* m = toMarkovMonoid(expa);
@@ -382,26 +384,38 @@ int main(int argc, char **argv)
 		int lc = (int) res.first;
 		list<uint> order = res.second;
 		const RegExp* regexpr = Aut2RegExp(aut,order);
+		if(!regexpr) {
+		  cout << "This automaton does not accept any words." << endl;
+		  cout << "This automaton has star-height: 0" << endl;
+		  exit(0);
+		}
+		  
 		const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
 		cout << "Automaton with regexp: ";
 		regexpr->print();
 		cout << endl;
-		
+		cout << "And loop complexity: " << lc << endl;
 		while(height < lc) {
 			cout << "Checking for height: " << height << endl;
 			MultiCounterAut* baut = toNestedBaut(aut, height);
 			UnstableMultiMonoid monoid(*baut);
 			const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr, *baut);
 			if(!monoid.IsUnlimitedWitness(mat) && 
-			   !monoid.containsUnlimitedWitness()) 
+			   !monoid.containsUnlimitedWitness())  
 				break;
+			if(monoid.IsUnlimitedWitness(mat))
+			  cout << "We guessed an unlimited witness" << endl;
+			else
+			  cout << "The guess was not good, but we found an unlimited witness" << endl;
 			if(verbose)
 				monoid.print();
 			delete baut;
 			height++;
 		}
 		cout << "This automaton has star-height: " << height << endl;
+		if(height == lc)
+		  cout << "And it is optimal (loop complexity is equal to the star height)" << endl;
 	}
+	ofs.close();
 	// system("pause");
-	ifs.close();
 }
