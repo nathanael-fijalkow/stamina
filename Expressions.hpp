@@ -14,9 +14,9 @@ typedef unsigned int uint;
 namespace std
 {
 size_t inline hash_value(const size_t & _Keyval)
-{
+	{
         return ((size_t)_Keyval ^ _HASH_SEED);
-}
+	}
 }
 #else
 #include <functional>

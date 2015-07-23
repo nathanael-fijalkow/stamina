@@ -18,7 +18,7 @@ Implementing Hashiguchi algorithm is hopeless: the algorithm proceeds by enumera
 and has a terrible complexity \cite{LS02}.
 It took another 22 years before an algorithm with a better algorithmic complexity was given by Kirsten in \cite{Kirsten05}. Kirsten algorithm is based on the transformation of the input automaton on finite words to 
 a nested counter automaton with the following key property: the counter automaton is \emph{unbounded}
-if and only if the star height of the regular language is less than $h$. To checks whether the
+if and only if the star height of the regular language is less than $h$. To check whether the
 counter automaton is unbounded, Acme++ computes the associated stabilization monoid.
 
 Acme++ aims at solving the Star-height problem for practical applications,
@@ -46,9 +46,9 @@ reduces to the computation of the associated Markov monoid.
 The Star-Height problem is related to the limitedness problem of nested distance automata.
 A seminal paper by Simon \cite{Sim94} unifies several results using monoids of matrices, providing in particular a combinatorial tool called the forest factorization theorem. 
 The first proof of the computability of the star height was given by Hashigushi and was very intricate.
-Hopefully, Kirsten gave a much more elementary and clean algorithm:
+Thankfully, Kirsten gave a much more elementary and clean algorithm:
 a language has star-height at most $h$ if and only if the stabilization monoid of an associated nested desert automaton contains an \emph{unbounded witness}.
-Desert automata are automata with ranked counters that can be either incremented and reset,
+Desert automata are automata with ranked counters that can be either incremented or reset,
 with the extra condition that if a counter is reset all counters of lower rank are reset as well.
 Colcombet extended further the work of Kirsten introducing stabilization monoids and generalizing regular language theory into cost function theory, including algebraic and logical characterizations \cite{Colcombet09,CKL10,Kup14}. 
 The algebraic techniques of Simon were adapted to solve the value $1$ problem for probabilistic automata:
@@ -59,8 +59,8 @@ contains a value $1$ witness~\cite{FGO12}.
 % incrementally
 %
 %computes the whole stabilization monoid, which is described by a set of matrices on a finite domain together with %rewrite rules. The algorithm 
-apply iteratively the productand stabilization operators of the monoid in order to generate all elements of the monoid, represented by a minimal collection of matrices on finite domains, and a set of rewrite rules that define how the product and the stabilization operators act on elements.
-Acme++ search particular elements in the monoid and stops as soon a witness is found. If no witness is found then the whole monoid is computed before the algorithm stops and outputs a negative answer.
+applies iteratively the product and stabilization operators of the monoid in order to generate all elements of the monoid, represented by a minimal collection of matrices on finite domains, and a set of rewrite rules that define how the product and the stabilization operators act on elements.
+Acme++ searches particular elements in the monoid and stops as soon a witness is found. If no witness is found then the whole monoid is computed before the algorithm stops and outputs a negative answer.
 
 To cope with large monoids, Acme++ uses compact data structures. In particular the matrices representing elements are not stored explicitely in memory: each vector appearing as a row or a column is stored at most once and matrices only store pointers to these rows and vertices. This way, Acme++ was able to generate monoids with more than fifty thousands elements and could handle the construction of stabilizaton monoid of automata with several hundreds of states.
 
@@ -74,3 +74,8 @@ This approach using weighted automata was generalized and inspired the rich theo
 like the Star-height problem on finite trees~\cite{CL08sh}, as well as others problems related to regular languages and reducible to boundedness of automata with counters~\cite{CL08sh,CL08b,CKLB13}.
 
 
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

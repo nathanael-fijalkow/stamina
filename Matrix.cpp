@@ -10,6 +10,17 @@ ExplicitMatrix::ExplicitMatrix(uint size) : stateNb(size)
 		row.resize(size);
 };
 
+ExplicitMatrix::ExplicitMatrix(const ExplicitMatrix& mat)
+{
+	stateNb = mat.stateNb;
+	coefficients.resize(stateNb);
+	for (auto & row : coefficients)
+		row.resize(stateNb);
+	for (int i=0;i<stateNb;i++)
+		for(int j=0;j<stateNb;j++)
+			coefficients[i][j]=mat.coefficients[i][j];
+}
+
 void ExplicitMatrix::print(std::ostream& os) const
 {
 	for (int i = 0; i < stateNb; i++)
@@ -87,7 +98,6 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat){
 }
 
 // Create a new vector, keep only coordinates of v that are true in tab
-// Create a new vector, keep only coordinates of v that are true in tab
 const Vector * Matrix::purge(const Vector *varg, const Vector * tab){
 	size_t * new_vec = (size_t *)malloc(Vector::GetBitSize() * sizeof(size_t));
 
@@ -97,5 +107,3 @@ const Vector * Matrix::purge(const Vector *varg, const Vector * tab){
 	auto it = vectors.emplace(new_vec, false).first;
 	return &(*it);
 }
-
-

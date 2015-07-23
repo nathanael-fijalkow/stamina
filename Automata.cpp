@@ -46,8 +46,6 @@ initial=0;
 }
 
 
-
-
 //We assume letters are deterministic
 void ClassicEpsAut::print(ostream& st){
 	st << (int)NbStates << " states " << (int)NbLetters << " letters" << endl;
@@ -109,6 +107,15 @@ void ClassicAut::print(ostream& st){
 		st << endl;
 	}
 	st << endl;
+}
+
+void ClassicAut::addLetter(char c, ExplicitMatrix m)
+{
+	if(m.stateNb!=NbStates)
+		return;
+	for(int i=0;i<NbStates;i++)
+		for(int j=0;j<NbStates;j++)
+			trans[c][i][j]=(m.coefficients[i][j]==EXP_MAT_1);
 }
 
 //compute x^p

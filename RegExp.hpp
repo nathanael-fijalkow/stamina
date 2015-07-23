@@ -16,41 +16,49 @@ using namespace std;
 
 struct RegExp
 {
-    virtual ~RegExp() {}
-    virtual void print() const=0;
+	virtual ~RegExp() {}
+	virtual void print() const=0;
+	virtual RegExp* clone() const=0;
+	virtual bool operator ==(const RegExp*) const;
+	string flat;
 };
 
 struct LetterRegExp :RegExp
 {
-	LetterRegExp(char a) : letter(a) {};
+	LetterRegExp(char a);
 	char letter;
 	virtual void print() const;
+	virtual RegExp* clone() const;
 };
 
 struct ConcatRegExp : RegExp
 {
-    ConcatRegExp(RegExp *e1, RegExp *e2) : left(e1), right(e2) {}
-    RegExp *left;
-    RegExp *right;
-    virtual void print() const;
+	ConcatRegExp(RegExp *e1, RegExp *e2);
+	~ConcatRegExp();
+	RegExp *left;
+	RegExp *right;
+	virtual void print() const;
+	virtual RegExp* clone() const;
 };
 
 struct UnionRegExp : RegExp
 {
-    UnionRegExp(RegExp *e1, RegExp *e2) : one(e1), two(e2) {}
-    RegExp *one;
-    RegExp *two;
-    virtual void print() const;
+	UnionRegExp(RegExp *e1, RegExp *e2);
+	~UnionRegExp();
+	RegExp *left;
+	RegExp *right;
+	virtual void print() const;
+	virtual RegExp* clone() const;
 };
 
 struct StarRegExp : RegExp
 {
-    StarRegExp(RegExp *e1) : base(e1) {}
-    RegExp *base;
-    virtual void print() const;
+	StarRegExp(RegExp *e1);
+	~StarRegExp();
+	RegExp *base;
+	virtual void print() const;
+	virtual RegExp* clone() const;
 };
-
-
 
 // Dynamic casts to test the type of a regular expression
 const LetterRegExp * isLetter(const RegExp * expr);
@@ -61,6 +69,6 @@ const StarRegExp * isStar(const RegExp *expr);
 
 RegExp* Aut2RegExp(ClassicAut *Aut, list<uint> order);
 
-ExtendedExpression* Reg2Sharp(RegExp *reg);
+ExtendedExpression* Reg2Sharp(const RegExp *reg);
 
 #endif

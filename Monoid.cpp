@@ -425,6 +425,7 @@ const ExtendedExpression * UnstableMonoid::sharpify_expression(const ExtendedExp
 			expr_to_mat[new_expr] = mat;
 			mat_to_expr[&(*result.first)] = new_expr;
 			new_elements.push_back(new_expr);
+
 			if (test != NULL && test(mat))
 				return new_expr;
 		}
@@ -456,6 +457,15 @@ const ExtendedExpression * UnstableMonoid::ComputeMonoid()
 		new_elements.push_back(elements[cur_index]);
 		to_be_sharpified.push_back(elements[cur_index]);
 		cur_index++;
+	}
+
+	if(test) 
+	{
+		for (auto mat : mat_to_expr) 
+		{
+			if(test(mat.first))
+				return(mat.second);
+		}
 	}
 
 	int i = 1 ;
