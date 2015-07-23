@@ -58,18 +58,71 @@ int main(int argc, char **argv)
 
 	//test for order
 
-	ClassicAut *aut=new ClassicAut(2,3);
-	aut->trans[0][0][1]=true;
-	aut->trans[0][1][1] = true;
-	aut->trans[0][2][0] = true;
+	//ClassicAut *aut=new ClassicAut(2,3);
+	//aut->trans[0][0][1]=true;
+	//aut->trans[0][1][1] = true;
+	//aut->trans[0][2][0] = true;
 	
-	aut->trans[1][0][1]=true;
-	aut->trans[1][1][2]=true;
-	aut->trans[1][2][0] = true;	
+	//aut->trans[1][0][1]=true;
+	//aut->trans[1][1][2]=true;
+	//aut->trans[1][2][0] = true;	
 
-	aut->initialstate[0]=true;
-	aut->finalstate[0]=true;
+	//aut->initialstate[0]=true;
+	//aut->finalstate[0]=true;
 
+	
+	//David Doose Example, 6 letters 5 states
+	
+	 ClassicAut *aut=new ClassicAut(6, 5);
+
+    // a
+    aut->trans[0][0][1] = true;
+    aut->trans[0][1][4] = true;
+    aut->trans[0][2][4] = true;
+    aut->trans[0][3][4] = true;
+    aut->trans[0][4][4] = true;
+
+    // b
+    aut->trans[1][0][4] = true;
+    aut->trans[1][1][2] = true;
+    aut->trans[1][2][4] = true;
+    aut->trans[1][3][4] = true;
+    aut->trans[1][4][4] = true;
+
+    // c
+    aut->trans[2][0][4] = true;
+    aut->trans[2][1][4] = true;
+    aut->trans[2][2][1] = true;
+    aut->trans[2][3][4] = true;
+    aut->trans[2][4][4] = true;
+
+    // d
+    aut->trans[3][0][4] = true;
+    aut->trans[3][1][4] = true;
+    aut->trans[3][2][3] = true;
+    aut->trans[3][3][4] = true;
+    aut->trans[3][4][4] = true;
+
+    // e
+    aut->trans[4][0][4] = true;
+    aut->trans[4][1][4] = true;
+    aut->trans[4][2][4] = true;
+    aut->trans[4][3][3] = true;
+    aut->trans[4][4][4] = true;
+
+    // e
+    aut->trans[5][0][4] = true;
+    aut->trans[5][1][4] = true;
+    aut->trans[5][2][4] = true;
+    aut->trans[5][3][1] = true;
+    aut->trans[5][4][4] = true;
+
+    aut->initialstate[0]=true;
+
+    aut->finalstate[0]=true;
+    aut->finalstate[1]=true;
+    aut->finalstate[2]=true;
+    aut->finalstate[3]=true;
 	
 	
 	//b*(b*ab*a)*	
