@@ -1,0 +1,86 @@
+\section{Introduction}
+
+Acme++ is a tool for deciding properties of some algebraic structures called stabilization monoids,
+with three motivations in mind:
+\begin{itemize}
+\item compute the star height of a regular language of finite words,
+\item decide boundedness and equivalence for regular cost functions,
+\item decide whether a probabilistic automaton has value $1$.
+\end{itemize}
+
+\textbf{The Star-height problem.} The Star-height problem \cite{Eggan63} takes as input a regular language $L$ and an integer $h$ and decides whether there exists a regular expression for $L$ with at most $h$ nested Kleene stars.
+The minimal $h$ having this property is called the star height of $L$. 
+An excellent introduction about the Star-height problem is given in \cite{Kirsten05},
+which mentions some of the important industrial applications as
+speech recognition \cite{Mohri97}, database theory \cite{GT01}, and image compression \cite{CK93,KMT04}.
+This problem was considered as one of the most difficult problems in the theory of recognizable languages
+and it took 25 years before being solved by Hashiguchi \cite{Hashiguchi88}.
+Implementing Hashiguchi algorithm is hopeless: even for a language $L$ given via a $4$-state automaton, a ``very low minorant'' of the number of languages to be tested with $L$ for equality is  $ c^{(c^c)}$ with $c=10^{10^{10}}$ \cite{LS02}.
+% the algorithm proceeds by enumeration of certain expressionsand has a terrible complexity:
+%\left(10^{10^{10}}\right)^{\left(10^{10^{10}}\right)^{\left(10^{10^{10}}\right)}}$
+It took another 22 years before an algorithm with a better algorithmic complexity was given by Kirsten in \cite{Kirsten05}. Kirsten algorithm is based on the transformation of the input automaton on finite words to 
+a nested counter automaton with the following key property: the counter automaton is \emph{bounded}
+if and only if the star height of the regular language is less than $h$.
+% To check whether the counter automaton is unbounded, Acme++ computes the associated stabilization monoid.
+
+Acme++ aims at solving the Star-height problem for practical applications,
+albeit the doubly exponential space complexity of Kirsten's algorithm is a challenge to tackle.
+To our best knowledge, this is the first time a solution to the star-height problem is implemented.
+
+\textbf{The Value 1 problem.} Probabilistic automata are a versatile tool widely used in speech recognition as well as a modelling tool for the control of systems with partial observation or no observation.
+Probabilistic automata are a natural extension on automata on finite words,
+with probabilistic transitions, see \cite{Rabin63} for an introduction.
+
+The Value 1 problem takes as input a probabilistic automaton on finite words and checks whether there are words accepted with probability arbitrarily close to $1$, see~\cite{FGO12} for an introduction.
+The Value $1$ problem is a reformulation of a natural controller synthesis problem:
+assume a blackbox finite state system with random events
+is controlled by a blind controller which inputs actions to the blackbox
+but has absolutely no feedback on the state of the system.
+Then the synthesis of controllers with arbitraily high reliability is equivalent to solving the value $1$ problem.
+
+
+
+\textbf{ Stabilization monoids.} Stabilization monoids are the key mathematical object needed to solve both the Star-Height and the Value 1 problems:
+computing the starheight of a language can be done by computation of the stabilization monoid of
+nested distance desert automata and deciding whether a leaktight probabilistic automaton has value $1$
+reduces to the computation of the associated Markov monoid.
+
+The Star-Height problem is related to the limitedness problem of nested distance automata.
+A seminal paper by Simon \cite{Sim94} unifies several results using monoids of matrices, providing in particular a combinatorial tool called the forest factorization theorem. 
+The first proof of the computability of the star height was given by Hashigushi and was very intricate.
+Thankfully, Kirsten gave a much more elementary and clean algorithm:
+a language has star-height at most $h$ if and only if the stabilization monoid of an associated nested desert automaton contains an \emph{unbounded witness}.
+Desert automata are automata with hierarchical counters that can be either incremented or reset,
+with the extra condition that if a counter is reset all counters of lower rank are reset as well.
+Colcombet extended further the work of Kirsten introducing stabilization monoids and generalizing regular language theory into cost function theory, including algebraic and logical characterizations \cite{Colcombet09,CKL10,Kup14}. Other problems than star-height can be reduced to boundedness question for regular cost functions (see e.g.~\cite{CL08sh,CL08b,CKLB13}), and Acme++ includes a general-purpose cost functions library.
+The algebraic techniques of Simon were adapted to solve the value $1$ problem for probabilistic automata:
+a leaktight automaton has value $1$ if and only if its Markov monoid
+contains a value $1$ witness~\cite{FGO12}.
+
+\textbf{An efficient implementation.} Computing stabilization monoids of automata is challenging since the construction induces an exponential blowup, and the two decision problems we tackle are PSPACE-complete. In order to find unbounded and value $1$ witnesses in the stabilizaton monoids, Acme++
+% incrementally
+%
+%computes the whole stabilization monoid, which is described by a set of matrices on a finite domain together with %rewrite rules. The algorithm 
+applies iteratively the product and stabilization operators of the monoid in order to generate all elements of the monoid, represented by a minimal collection of matrices on finite domains, and a set of rewrite rules that define how the product and the stabilization operators act on elements.
+Acme++ searches particular elements in the monoid and stops as soon as a witness is found. If no witness is found then the whole monoid is computed before the algorithm stops and outputs a negative answer.
+
+To cope with large monoids, Acme++ uses compact data structures. In particular the matrices representing elements are not stored explicitely in memory: each vector appearing as a row or a column is stored at most once and matrices only store pointers to these rows and vertices. This way, Acme++ was able to generate monoids with more than fifty thousands elements and could handle the construction of stabilizaton monoid of automata with several hundreds of states.
+
+The Starheight computation performed by Acme++ relies on an optimization from \cite{CL08sh}: the structure of Subset Automata, whose algebraic properties allow minimization. Moreover, the complexity of the algorithm is simply exponential because the input of Acme++ are restricted to deterministic automata, or non-deterministic automata for the complement language (dualized for uniformity of the input). We also use a heuristic inspired by experiments, where we start by testing potential witnesses that the input automaton has optimal loop complexity, in which case we can quickly compute an expression of optimal star-height.
+
+The tool ACME++ is open source and available from Github, details are given on the webpage
+\url{http://www.liafa.univ-paris-diderot.fr/\textasciitilde nath/?page=acmepp}.
+
+\textbf{Related work.}
+This tool is an improvement of a previous tool called Acme (or AcmeML) \cite{FK14}, implemented in OCaml, which was a first proof-of-concept tool implementing regular cost functions algorithms and the Markov Monoid Algorithm.
+We introduced both optimizations of previous algorithms, and new functionalities such as the  star-height computation. We provide quantitative experiments comparing both versions.
+
+%This approach using weighted automata was generalized and inspired the rich theory of regular cost functions \cite{Colcombet09}, which allows to solve other problems 
+%like the Star-height problem on finite trees~\cite{CL08sh}, as well as others problems related to regular languages and reducible to boundedness of automata with counters~\cite{CL08sh,CL08b,CKLB13}.
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
