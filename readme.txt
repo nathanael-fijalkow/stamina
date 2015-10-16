@@ -20,11 +20,11 @@ File = S (ensemble des générateurs)
 Soit u le premier élément dans la file
   Pour tout v dans S,
     Vérifier si uv se réduit. Il y a 4 cas, selon le premier opérateur de u et de v. Puisque u et v sont réduits, cela se simplifie à des questions de réducibilité pour une hauteur de # inférieure, qui peuvent être répondues en temps constant en lisant dans T.
-    S'il ne se réduit pas, on le calcule (un produit entre u et v). On vérifie s'il apparaît déjà dans la table T. On l'ajoute dans la table T, avec le booléen correspondant. S'il n'apparaissaît pas pas dans T, on l'enfile.
+    S'il ne se réduit pas, on le calcule (un produit entre u et v). On vérifie s'il apparaît déjà dans la table T. On l'ajoute dans la table T, avec le booléen correspondent. S'il n'apparaissaît pas pas dans T, on l'enfile.
 
 (2) Fonction StabilizationClosure
 Pour tout u dans S
-  Calculer u^# (si applicable). On vérifie s'il apparaît déjà dans la table T. On l'ajoute dans la table T, avec le booléen correspondant.
+  Calculer u^# (si applicable). On vérifie s'il apparaît déjà dans la table T. On l'ajoute dans la table T, avec le booléen correspondent.
 
 Initialement S = {1}. On applique (1), puis (2), puis (1), etc...
 Après avoir appliqué (1) et (2) k fois, on a un système de réécriture pour les #-expressions de hauteur au plus k.
