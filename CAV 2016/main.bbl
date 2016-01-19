@@ -1,0 +1,116 @@
+\begin{thebibliography}{FGKO15}
+
+\bibitem[CKL10]{CKL10}
+Thomas Colcombet, Denis Kuperberg, and Sylvain Lombardy.
+\newblock Regular temporal cost functions.
+\newblock In {\em ICALP (2)}, pages 563--574, 2010.
+
+\bibitem[CKLV13]{CKLB13}
+Thomas Colcombet, Denis Kuperberg, Christof L{\"o}ding, and Michael {Vanden
+  Boom}.
+\newblock Deciding the weak definability of b{\"u}chi definable tree languages.
+\newblock In {\em CSL}, pages 215--230, 2013.
+
+\bibitem[CL08a]{CL08sh}
+Thomas Colcombet and Christof L{\"{o}}ding.
+\newblock The nesting-depth of disjunctive {\(\mathrm{\mu}\)}-calculus for tree
+  languages and the limitedness problem.
+\newblock In {\em CSL, Bertinoro, Italy, September 16-19, 2008}, pages
+  416--430, 2008.
+
+\bibitem[CL08b]{CL08b}
+Thomas Colcombet and Christof L{\"o}ding.
+\newblock The non-deterministic mostowski hierarchy and distance-parity
+  automata.
+\newblock In {\em ICALP (2)}, pages 398--409, 2008.
+
+\bibitem[Coh70]{Cohen70}
+Rina~S. Cohen.
+\newblock Star height of certain families of regular events.
+\newblock {\em J. Comput. Syst. Sci.}, 4(3):281--297, 1970.
+
+\bibitem[Col09]{Colcombet09}
+Thomas Colcombet.
+\newblock The theory of stabilisation monoids and regular cost functions.
+\newblock In {\em ICALP (2)}, pages 139--150, 2009.
+
+\bibitem[Col13]{Colcombet13}
+Thomas Colcombet.
+\newblock Regular cost-functions, part {I}: Logic and algebra over words.
+\newblock {\em Logical Methods in Computer Science}, 9(3), 2013.
+
+\bibitem[Egg63]{Eggan63}
+L.~C. Eggan.
+\newblock Transition graphs and the star-height of regular events.
+\newblock {\em Michigan Math. J.}, 10:385--397, 1963.
+
+\bibitem[FGKO15]{FGKO15}
+Nathana{\"{e}}l Fijalkow, Hugo Gimbert, Edon Kelmendi, and Youssouf Oualhadj.
+\newblock Deciding the value 1 problem for probabilistic leaktight automata.
+\newblock {\em Logical Methods in Computer Science}, 11(1), 2015.
+
+\bibitem[FGO12]{FGO12}
+Nathana{\"e}l Fijalkow, Hugo Gimbert, and Youssouf Oualhadj.
+\newblock Deciding the value 1 problem for probabilistic leaktight automata.
+\newblock In {\em LICS}, pages 295--304, 2012.
+
+\bibitem[FK14]{FK14}
+Nathana{\"{e}}l Fijalkow and Denis Kuperberg.
+\newblock {ACME:} automata with counters, monoids and equivalence.
+\newblock In {\em {ATVA} 2014, Sydney, NSW, Australia}, pages 163--167, 2014.
+
+\bibitem[GT01]{GT01}
+G{\"{o}}sta Grahne and Alex Thomo.
+\newblock Approximate reasoning in semistructured data.
+\newblock In {\em Proceedings of the 8th International Workshop on Knowledge
+  Representation meets Databases {(KRDB} 2001), Rome, Italy, September 15,
+  2001}, 2001.
+
+\bibitem[Has88]{Hashiguchi88}
+Kosaburo Hashiguchi.
+\newblock Algorithms for determining relative star height and star height.
+\newblock {\em Inf. Comput.}, 78(2):124--169, 1988.
+
+\bibitem[IK93]{CK93}
+Karel~Culik II and Jarkko Kari.
+\newblock Image compression using weighted finite automata.
+\newblock {\em Computers {\&} Graphics}, 17(3):305--313, 1993.
+
+\bibitem[Kir05]{Kirsten05}
+Daniel Kirsten.
+\newblock Distance desert automata and the star height problem.
+\newblock {\em ITA}, 39(3):455--509, 2005.
+
+\bibitem[KMT04]{KMT04}
+Frank Katritzke, Wolfgang Merzenich, and Michael Thomas.
+\newblock Enhancements of partitioning techniques for image compression using
+  weighted finite automata.
+\newblock {\em Theor. Comput. Sci.}, 313(1):133--144, 2004.
+
+\bibitem[Kup14]{Kup14}
+Denis Kuperberg.
+\newblock Linear temporal logic for regular cost functions.
+\newblock {\em Logical Methods in Computer Science}, 10(1), 2014.
+
+\bibitem[LS02]{LS02}
+Sylvain Lombardy and Jacques Sakarovitch.
+\newblock Star height of reversible languages and universal automata.
+\newblock In {\em {LATIN}: Theoretical Informatics, Cancun, Mexico, April 3-6,
+  2002}, pages 76--90, 2002.
+
+\bibitem[Moh97]{Mohri97}
+Mehryar Mohri.
+\newblock Finite-state transducers in language and speech processing.
+\newblock {\em Computational Linguistics}, 23(2):269--311, 1997.
+
+\bibitem[Rab63]{Rabin63}
+Michael~O. Rabin.
+\newblock Probabilistic automata.
+\newblock {\em Information and Control}, 6(3):230--245, 1963.
+
+\bibitem[Sim94]{Sim94}
+Imre Simon.
+\newblock On semigroups of matrices over the tropical semiring.
+\newblock {\em {ITA}}, 28(3-4):277--294, 1994.
+
+\end{thebibliography}

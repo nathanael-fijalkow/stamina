@@ -1,0 +1,91 @@
+\documentclass[11pt]{llncs}
+
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage{amssymb,amsmath,amscd,latexsym,graphicx}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{automata,positioning,calc,shapes.geometric}
+\usepackage{framed}
+\usepackage[]{algorithm2e}
+%\usepackage[usenames]{color}
+\usepackage{fullpage}
+
+
+\newcommand{\set}[1]{\{ #1 \}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\perm}[1]{\langle #1 \rangle}
+\newcommand{\ic}{\mathbf{ic}}
+\newcommand{\e}{\mathbf{e}}
+\newcommand{\re}{\mathbf{r}}
+\newcommand{\val}[1]{\mathrm{val}(#1)}
+\newcommand{\sem}[1]{[\![#1]\!]}
+\newcommand{\New}{\mathbf{New}}
+
+
+\newcommand{\trans}[1]{\stackrel{#1}{\longrightarrow}}
+\newcommand{\PSPACE}{\mathrm{PSPACE}}
+
+\def\mynote#1{{\sf $\dagger$ #1 $\dagger$}}
+
+% Remove the author and date fields and the space associated with them
+% from the definition of maketitle!
+\makeatletter
+\renewcommand{\@maketitle}{
+\newpage
+ \null
+ \vskip 2em%
+ \begin{center}%
+  {\LARGE \@title \par}%
+ \end{center}%
+ \par} \makeatother
+
+\title{Acme++: Optimizing Stabilization Monoids Computations for Probabilistic Automata and the Star-Height Problem}
+
+%\author{Nathana\"el Fijalkow\inst{1,2} \and Hugo Gimbert\inst{3} \and Edon Kelmendi\inst{3} \and Denis Kuperberg\inst{4}}
+%\institute{LIAFA, Paris 7, France \and University of Warsaw, Poland \and LaBRI, Bordeaux, France \and Onera, Toulouse, France}
+
+
+\begin{document}
+
+\begin{center}
+{\large
+Acme++: Optimizing Stabilization Monoids Computations for Probabilistic Automata and the Star-Height Problem}
+\end{center}
+
+\begin{abstract}
+We present Acme++, a tool manipulating stabilization monoids.
+
+Acme++ can solve three fundamental algorithmic problems.  First, compute
+the star height of a regular language, i.e. the minimal number of
+nested Kleene stars needed for expressing the language with a
+complement-free regular expression.  Second, decide boundedness and equivalence for regular cost functions. Third, decide whether a
+probabilistic automaton has value 1, i.e. whether a probabilistic
+automaton accept words with probability arbitrarily close to 1.
+
+All three problems reduce to the computation of the saturation monoid associated with an automaton,
+which is a challenge since the monoid is exponentially larger than the automaton.
+The compact data structures used in Acme++, together with optimizations and heuristics, allow this program to handle automata with
+several hundreds of states. This radically improves upon the performance of AcmeML,
+a previous version of the tool.
+\end{abstract}
+
+
+\input{intro}
+
+\input{MonforAut}
+
+\input{ComputeMon}
+\input{benchmarks}
+
+
+\input{starheight}
+
+
+\bibliographystyle{alpha}
+\bibliography{bib}
+\end{document}
