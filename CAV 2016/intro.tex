@@ -68,12 +68,12 @@ To cope with large monoids, Acme++ uses compact data structures. In particular t
 
 The Starheight computation performed by Acme++ relies on an optimization from \cite{CL08sh}: the structure of Subset Automata, whose algebraic properties allow minimization. Moreover, the complexity of the algorithm is simply exponential because the input of Acme++ are restricted to deterministic automata, or non-deterministic automata for the complement language (dualized for uniformity of the input). We also use a heuristic inspired by experiments, where we start by testing potential witnesses that the input automaton has optimal loop complexity, in which case we can quickly compute an expression of optimal star-height.
 
-The tool ACME++ is open source and available from Github, details are given on the webpage
-\url{http://www.liafa.univ-paris-diderot.fr/\textasciitilde nath/?page=acmepp}.
+The tool ACME++ is open source and available from Github\footnote{details are given on the webpage
+\url{http://www.liafa.univ-paris-diderot.fr/\textasciitilde nath/?page=acmepp}}.
 
 \textbf{Related work.}
-This tool is an improvement of a previous tool called Acme (or AcmeML) \cite{FK14}, implemented in OCaml, which was a first proof-of-concept tool implementing regular cost functions algorithms and the Markov Monoid Algorithm.
-We introduced both optimizations of previous algorithms, and new functionalities such as the  star-height computation. We provide quantitative experiments comparing both versions.
+This tool is an improvement of a previous tool called ACME (or AcmeML) \cite{FK14}, implemented in OCaml, which was a first proof-of-concept tool implementing regular cost functions algorithms and the Markov Monoid Algorithm.
+Here we introduced both optimizations of previous algorithms, and new functionalities such as the star-height computation. We provide quantitative experiments comparing both versions.
 
 %This approach using weighted automata was generalized and inspired the rich theory of regular cost functions \cite{Colcombet09}, which allows to solve other problems 
 %like the Star-height problem on finite trees~\cite{CL08sh}, as well as others problems related to regular languages and reducible to boundedness of automata with counters~\cite{CL08sh,CL08b,CKLB13}.

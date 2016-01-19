@@ -34,15 +34,15 @@
 
 % Remove the author and date fields and the space associated with them
 % from the definition of maketitle!
-\makeatletter
-\renewcommand{\@maketitle}{
-\newpage
- \null
- \vskip 2em%
- \begin{center}%
-  {\LARGE \@title \par}%
- \end{center}%
- \par} \makeatother
+%\makeatletter
+%\renewcommand{\@maketitle}{
+%\newpage
+% \null
+% \vskip 2em%
+% \begin{center}%
+%  {\LARGE \@title \par}%
+% \end{center}%
+% \par} \makeatother
 
 \title{Acme++: Optimizing Stabilization Monoids Computations for Probabilistic Automata and the Star-Height Problem}
 
@@ -62,12 +62,11 @@ We present Acme++, a tool manipulating stabilization monoids.
 
 Acme++ can solve three fundamental algorithmic problems.  First, compute
 the star height of a regular language, i.e. the minimal number of
-nested Kleene stars needed for expressing the language with a
-complement-free regular expression.  Second, decide boundedness and equivalence for regular cost functions. Third, decide whether a
+nested Kleene stars needed for expressing the language with a regular expression. Second, decide boundedness and equivalence for regular cost functions. Third, decide whether a
 probabilistic automaton has value 1, i.e. whether a probabilistic
 automaton accept words with probability arbitrarily close to 1.
 
-All three problems reduce to the computation of the saturation monoid associated with an automaton,
+All three problems reduce to the computation of the stabilisation monoid associated with an automaton,
 which is a challenge since the monoid is exponentially larger than the automaton.
 The compact data structures used in Acme++, together with optimizations and heuristics, allow this program to handle automata with
 several hundreds of states. This radically improves upon the performance of AcmeML,
