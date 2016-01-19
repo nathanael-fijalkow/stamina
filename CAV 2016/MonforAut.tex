@@ -8,9 +8,9 @@ The underlying ideas have then been transferred to the setting of probabilistic 
 \subsection{Stabilization Monoids in the Theory of Regular Cost Functions}
 
 At the heart of the theory of regular cost functions lies the equivalence between different formalisms:
-a logical formalism, cost MSO, two automata model, $B$- and $S$-automata, and an algebraic counterpart, stabilization monoids.
+a logical formalism, cost MSO, two automata models, $B$- and $S$-automata, and an algebraic counterpart, stabilization monoids.
 
-Here we briefly describe the model of $B$-automata, and their transformations to stabilization monoid.
+Here we briefly describe the model of $B$-automata, and their transformations to stabilization monoids.
 This automaton model generalizes the non-deterministic automata by adding a finite set of counters.
 Instead of accepting or rejecting a word as a non-deterministic automaton does, 
 a $B$-automaton associates an integer value to each input word.
@@ -19,7 +19,7 @@ $\Gamma$ is a finite set of counters, $I \subseteq Q$ is the set of initial stat
 and $\Delta \subseteq Q \times A \times \set{\ic,\e,\re}^\Gamma \times Q$ is the set of transitions.
 
 A transition $(p,a,\tau,q)$ allows the automaton to go from state $p$ to state $q$ while reading letter $a$ and performing action $\tau(\gamma)$ on counter $\gamma$. 
-Action $\ic$ increments the current counter value by $1$, $\e$ leaves the counter unchanged, and $\re$ resets the counter to $0$.
+The action $\ic$ increments the current counter value by $1$, $\e$ leaves the counter unchanged, and $\re$ resets the counter to $0$.
 
 %A run of the automaton $\A$ on a word $w = a_1 a_2 \dots a_n$ is a sequence $\rho = q_0,\tau_1,q_1,\tau_2,\dots, \tau_n, q_n$ such that $q_0 \in I, q_n \in F$, 
 %and for all $i \in [1,n]$, $(q_{i-1},a_i,\tau_i,q_i) \in \Delta$.
@@ -38,7 +38,7 @@ We say that a $B$-automaton $\A$ is \emph{limited} if there exists $N$ such that
 
 \vskip1em
 One way to solve the limitedness problem is by computing the stabilization monoid.
-It is a monoid of matrices over the semiring of sets of counter actions $\set{\ic,\e,\re,\omega}^\Gamma$.
+It is a monoid of matrices over the semiring of sets of counter actions $\set{\ic,\e,\re,\omega}^\Gamma$, where $\omega$ represents an unbounded counter value.
 There are two operations on matrices: a binary composition called product and a unary operation called stabilization.
 
 The stabilization monoid of a $B$-automaton is the set of matrices containing the matrices corresponding to each letter,
@@ -64,7 +64,7 @@ The notion of stabilization monoid can be abstracted, and any set equipped with 
 
 The notion of stabilization monoids also appeared for probabilistic automata, for the Markov Monoid Algorithm.
 This algorithm was introduced in~\cite{FGO12} to partially solve the value $1$ problem: given a probabilistic automaton $\A$,
-does there exist $(u_n)_{n \in \N}$ a sequence of words such that $\lim_n \mathbb{P}_\A(u_n) = 1$?
+does there exist a sequence of words $(u_n)_{n \in \N}$ such that $\lim_n \mathbb{P}_\A(u_n) = 1$?
 
 Although the value $1$ problem is undecidable, it has been shown that
 the Markov Monoid Algorithm correctly determines whether a probabilistic automaton has value $1$

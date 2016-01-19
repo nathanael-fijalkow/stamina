@@ -42,14 +42,14 @@ rules known so far:
 This means that the algorithm processes a lot of new $\sharp$-expressions,
 and should be able to quickly detect if a $\sharp$-expression can be rewritten using the set $R$.
 This task is performed very efficiently thanks to an optimized representation of $R$
-using pointers and a Hashing table.
+using pointers and a hash table.
 
 \vskip1em
 The second optimization is about how matrices themselves are stored in memory.
 %The three operations performed on matrices are product, stabilization and equality check.
 Empirically, although the stabilization monoid may contain a lot of different matrices,
 these matrices are very similar to each other.
-In particular, if we consider the set of lines of these matrices, it is rather small compared to the number of matrices.
+In particular, if we consider the set of rows of these matrices, it is rather small compared to the number of matrices.
 Hence the idea of storing lines in a table, and matrices as a set of pointers to the corresponding lines.
 This simple idea turned out to be a game changer.
 

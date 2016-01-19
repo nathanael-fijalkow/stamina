@@ -6,18 +6,18 @@
 The latest algorithm in the literature for computing star-height is designed for tree automata \cite{CL08sh}, but we will use it here in the special case of words. The main improvement over the previous algorithm from \cite{Kirsten05} is the identification of the structure of Subset Automata, which allows minimization.
 
 We describe here briefly the ideas of the algorithm.
-
-\subsection{Subset automata}
-
-\begin{definition}\cite{CL08sh}
-A subset automaton $\A$ is a deterministic automaton with additional $\epsilon$-transitions, such that $\epsilon$-transitions encode a lattice structure on the state space of $\A$. More precisely, $\epsilon$-transitions define a partial order on states, and for all states $p,q$, there are states $x,y$ such that $x\trans{\epsilon}p, x\trans{\epsilon}q, p\trans{\epsilon}y$ and $q\trans{\epsilon}y$.
-\end{definition}
-
-Due to the algebraic nature of their definition, subset automata can be minimized in a similar way to deterministic automata.
-
-\begin{theorem}\cite{CL08sh}
-Any language can be recognized by a subset automaton, obtained by a powerset construction from a non-deterministic automaton for the complement language.
-\end{theorem}
+%
+%\subsection{Subset automata}
+%
+%\begin{definition}\cite{CL08sh}
+%A subset automaton $\A$ is a deterministic automaton with additional $\epsilon$-transitions, such that $\epsilon$-transitions encode a lattice structure on the state space of $\A$. More precisely, $\epsilon$-transitions define a partial order on states, and for all states $p,q$, there are states $x,y$ such that $x\trans{\epsilon}p, x\trans{\epsilon}q, p\trans{\epsilon}y$ and $q\trans{\epsilon}y$.
+%\end{definition}
+%
+%Due to the algebraic nature of their definition, subset automata can be minimized in a similar way to deterministic automata.
+%
+%\begin{theorem}\cite{CL08sh}
+%Any language can be recognized by a subset automaton, obtained by a powerset construction from a non-deterministic automaton for the complement language.
+%\end{theorem}
 
 \subsection{Reduction to limitedness}
 %
@@ -42,8 +42,8 @@ In \cite{CL08sh}, it is shown that given a non-deterministic automaton $\A$ for 
 
 Therefore, for any fixed $k$, we can decide whether a regular language has star-height $k$.
 
-The construction of $\cB$ goes through an intermediary subset automaton $\A'$ obtained as a powerset of $\A$. This automaton $\A'$ can be minimized before being used to build $\cB$, thanks to its structure of subset automaton.
-We implemented this minimization as an additionnal optimization step.
+The construction of $\cB$ goes through an intermediary automaton $\A'$ obtained as a powerset of $\A$. This automaton $\A'$ can be minimized before being used to build $\cB$, due to a special algebraic structure called ``subset automaton'', introduced in \cite{CL08sh}.
+We implemented this minimization as an additional optimization step.
 %
 
 %\begin{framed}
@@ -73,29 +73,34 @@ Note that Kirsten's algorithm uses doubly exponential space because it takes a n
 
 Given an automaton $\A$, its \emph{loop complexity} $\lc(\A)$ is the optimal star-height of an expression obtained from it via standard algorithms \cite{Eggan63}. Moreover, the star-height of a language $L$ is equal to $\min\{\lc(\A)| L(\A)=L\}$.
 
+Computing an expression witnessing this $\lc(\A)$ is exponentially faster than the star-height algorithm, so it comes ``for free'' in our context, and indeed it always appeared instantaneous during the tests.
+There are several reasons which make the computation of this expression particularly useful here:
+
+\begin{enumerate}
+\item 
 There are many natural cases where the star-height is equal to the loop-complexity of the input automaton \cite{Cohen70}, for instance if all transition labels are distincts. These automata are relevant for instance for modelling processes where communication between two components (states) are uniquely identified. 
 
-Since computing the loop-complexity is exponentially faster than the star-height algorithm, we start by computing ``for free'' an expression witnessing the loop-complexity.
+\item 
+%Additionnally, we argue we can use this expression as a speed-up for the main algorithm, in two different ways.
+The loop-complexity provides an upper bound for star-height, and we can therefore stop the search if all heights strictly lower have been tested.
 
-Additionnally, we argue we can use this expression as a speed-up for the main algorithm, in two different ways.
-First, the loop-complexity provides an upper bound for star-height, and we can therefore stop the search if all heights strictly lower have been tested.
-The second way is heuristic: during the tests of Acme++, it seemed that such expressions witnessing loop complexity could often be used as unboundedness witnesses in the computed stabilization monoid, in cases where the loop complexity does not match the star-height.
+\item During the tests of Acme++, it seemed that such expressions witnessing loop complexity could often be used as unboundedness witnesses in the computed stabilization monoid, in cases where the loop complexity does not match the star-height.
 
-Moreover, having computed this expression allows us to provide a witness of optimal star-height when it matches the loop-complexity. In general, the star-height algorithm does not provide any witness.
-
-This naturally led us to implement a heuristic using these locally optimal expressions.
-When testing star-height $h$ for an input automaton $\A$ (starting with $h=0$), we execute the following steps:
-
-\begin{itemize}
-\item Compute a regular expression $e$ matching $\lc(\A)$.
-\item If $\lc(\A)=h$, then return $h$ together with $e$ and stop.
-\item Otherwise, turn $e$ into a $\sharp$-expression $e'$ by removing disjunctions.
-\item Test $e'$ as unboundedness witness in the stabilization monoid.
-	\begin{itemize} 
-	\item If $e'$ is such a witness, increase $h$, and go back to Step 1,
-	\item Otherwise, test unboundedness, and increase $h$ if a witness is found. 
-	\end{itemize}
-\end{itemize}
+\item This provides a witness of optimal star-height when it matches the loop-complexity. In general, the star-height algorithm does not provide any witness.
+\end{enumerate}
+%This naturally led us to implement a heuristic using these locally optimal expressions.
+%When testing star-height $h$ for an input automaton $\A$ (starting with $h=0$), we execute the following steps:
+%
+%\begin{itemize}
+%\item Compute a regular expression $e$ matching $\lc(\A)$.
+%\item If $\lc(\A)=h$, then return $h$ together with $e$ and stop.
+%\item Otherwise, turn $e$ into a $\sharp$-expression $e'$ by removing disjunctions.
+%\item Test $e'$ as unboundedness witness in the stabilization monoid.
+%	\begin{itemize} 
+%	\item If $e'$ is such a witness, increase $h$, and go back to Step 1,
+%	\item Otherwise, test unboundedness, and increase $h$ if a witness is found. 
+%	\end{itemize}
+%\end{itemize}
 
 %The purpose of this heuristic is two-fold. First, speeding up the star-height algorithm by priviledging certain witnesses and stopping when we reach $\lc(\A)$ (this avoids the computation of a stabilization monoid). Second, providing a witness expression of optimal star-height when it matches $\lc(\A)$ (as no witness is produce by the general algorithm).
 
