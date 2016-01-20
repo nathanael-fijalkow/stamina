@@ -3,18 +3,17 @@ We compared the running times of Acme++ and the previous
 implementation AcmeML to justify this upgrade. We report the results
 in this section.
 
-For the benchmarks we randomly chose automata which produce larger
-Markov monoids in order to observe the difference in performance
-between the two versions. The point of comparison is the size of the
-computed monoid rather than the number of states in the automaton,
-since some large automata can indeed produce small monoids, and
-vice-versa, some small automata can produce large monoids.
+The comparison is done with regard to the value 1 problem. Since the algorithm
+for solving the other problems also relies on computing stabilization monoids
+very similar results should be expected if we chose them instead of the value 1
+problem.
 
-To this end, for each state $s$ we pick a state $t$ with uniform
-probability on the set of states and add a transition between $s$ and
-$t$. After this we uniformly pick a number $p\in[0,1]$, and for all
-other states $t'$ different from $t$, we decide whether we will add a
-transition between $s$ and $t'$ by flipping a $p$-biased coin.
+The probabilistic automata on which the benchmarks were performed, were chosen
+in the following way: for each state $s$ we pick a state $t$ with uniform
+probability on the set of states and add a transition between $s$ and $t$. After
+this we uniformly pick a number $p\in[0,1]$, and for all other states $t'$
+different from $t$, we decide whether we will add a transition between $s$ and
+$t'$ by flipping a $p$-biased coin.
 
 The results have been plotted in Fig. \ref{bench1}.1. 
 
@@ -42,6 +41,13 @@ the vertical line in Fig. \ref{bench1}.1 (it hovers around 3500 elements).
 
 Even on smaller examples Acme++ outperforms AcmeML by a considerable
 factor as seen in Fig. \ref{bench1}.2.
+
+When it comes to the running time for deciding the star-height problem it
+completely depends whether the instance is caught by the {\em loop complexity}
+heuristic, see Section~\ref{subsec:loop complexity}. In case it is, the running
+time is typically a few seconds, otherwise it is too large (i.e. more than the
+timeout of 15 minutes for 10 state automata). Consequently a benchmark is not
+very illuminating and has been omitted.
 %
 %\begin{figure}[h!]
 %  \label{bench1zoomed}
