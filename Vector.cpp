@@ -1,4 +1,3 @@
-
 #include <Expressions.hpp>
 #include <Vector.hpp>
 #include <string.h>

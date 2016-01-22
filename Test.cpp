@@ -77,6 +77,119 @@ ClassicAut* fromExplicitToClassic(ExplicitAutomaton* aut)
 
 int main(int argc, char **argv)
 {
+
+	int opt,verbose=0,toOut=0;
+	ifstream ifs;
+	ofstream ofs; 
+	string outputFilename;
+#ifndef WIN32
+	while((opt = getopt(argc,argv, "vho:")) != -1) 
+	{
+		switch(opt) 
+		{
+		case 'h':
+			pusage(argv[0]);
+		case 'v':
+			verbose = 1;
+			break;
+		case 'o':
+			toOut=1;
+			outputFilename = optarg;
+			break;
+		default:
+			pusage(argv[0]);
+		}
+	}
+	if (optind >= argc)
+	{
+		cerr << "Expected file" << endl;
+		pusage(argv[0]);
+	}
+	
+	ifs.open(argv[optind]);
+	if(ifs.fail())
+	{
+		cerr << "Could not open file " << argv[optind] << endl;
+		pusage(argv[0]);
+	}
+	
+	if(toOut)
+	{
+		ofs.open(outputFilename);
+		if(ofs.fail())
+		{
+			cerr << "Could not open file " << outputFilename << endl;
+			pusage(argv[0]);
+		}
+	}
+#endif
+
+	ExplicitAutomaton* expa = Parser::parseFile(ifs);
+	ifs.close();
+
+	if(expa->type==PROB)
+	{
+		UnstableMarkovMonoid* m = toMarkovMonoid(expa);
+		auto expr = m->ComputeMonoid();
+	  
+		pair<int, const ExtendedExpression*> r = m->maxLeakNb();
+		cout << r.first << " leak(s) found" << endl;
+		cout << "The monoid has " << m->expr_to_mat.size() << " elements" << endl;
+		cout << "The automaton has value 1: ";
+		if (expr)
+			cout << "Yes" << endl;
+		else
+			cout << "No" << endl;
+		if(verbose)
+			m->print();
+		if(toOut)
+			ofs << Dot::toDot(expa,m);
+		
+	}
+	else if (expa->type==CLASSICAL)
+	{
+		int height = 0;
+		ClassicAut* aut = fromExplicitToClassic(expa);
+
+		pair<char,list<uint>> res = LoopComplexity(aut);
+		int lc = (int) res.first;
+		list<uint> order = res.second;
+		const RegExp* regexpr = Aut2RegExp(aut,order);
+		if(!regexpr) {
+		  cout << "This automaton does not accept any words." << endl;
+		  cout << "This automaton has star-height: 0" << endl;
+		  exit(0);
+		}
+		  
+		const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
+		cout << "Automaton with regexp: ";
+		regexpr->print();
+		cout << endl;
+		cout << "And loop complexity: " << lc << endl;
+		while(height < lc) {
+			cout << "Checking for height: " << height << endl;
+			MultiCounterAut* baut = toNestedBaut(aut, height);
+			UnstableMultiMonoid monoid(*baut);
+			const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr, *baut);
+			if(!monoid.IsUnlimitedWitness(mat) && 
+			   !monoid.containsUnlimitedWitness())  
+				break;
+			if(monoid.IsUnlimitedWitness(mat))
+			  cout << "We guessed an unlimited witness" << endl;
+			else
+			  cout << "The guess was not good, but we found an unlimited witness" << endl;
+			if(verbose)
+				monoid.print();
+			delete baut;
+			height++;
+		}
+		cout << "This automaton has star-height: " << height << endl;
+		if(height == lc)
+		  cout << "And it is optimal (loop complexity is equal to the star height)" << endl;
+	}
+	ofs.close();
+}
+
 	// ExplicitMatrix mata(1);
 	// mata.coefficients[0][0] = INC;
 	// UnstableMultiMonoid monoid(1,1);
@@ -306,116 +419,3 @@ int main(int argc, char **argv)
 //	cmats.clear();
 
 	// monoid.print() ;
-
-	int opt,verbose=0,toOut=0;
-	ifstream ifs;
-	ofstream ofs; 
-	string outputFilename;
-#ifndef WIN32
-	while((opt = getopt(argc,argv, "vho:")) != -1) 
-	{
-		switch(opt) 
-		{
-		case 'h':
-			pusage(argv[0]);
-		case 'v':
-			verbose = 1;
-			break;
-		case 'o':
-			toOut=1;
-			outputFilename = optarg;
-			break;
-		default:
-			pusage(argv[0]);
-		}
-	}
-	if (optind >= argc)
-	{
-		cerr << "Expected file" << endl;
-		pusage(argv[0]);
-	}
-	
-	ifs.open(argv[optind]);
-	if(ifs.fail())
-	{
-		cerr << "Could not open file " << argv[optind] << endl;
-		pusage(argv[0]);
-	}
-	
-	if(toOut)
-	{
-		ofs.open(outputFilename);
-		if(ofs.fail())
-		{
-			cerr << "Could not open file " << outputFilename << endl;
-			pusage(argv[0]);
-		}
-	}
-#endif
-
-	ExplicitAutomaton* expa = Parser::parseFile(ifs);
-	ifs.close();
-
-	if(expa->type==PROB)
-	{
-		UnstableMarkovMonoid* m = toMarkovMonoid(expa);
-		auto expr = m->ComputeMonoid();
-	  
-		pair<int, const ExtendedExpression*> r = m->maxLeakNb();
-		cout << r.first << " leak(s) found" << endl;
-		cout << "The monoid has " << m->expr_to_mat.size() << " elements" << endl;
-		cout << "The automaton has value 1: ";
-		if (expr)
-			cout << "Yes" << endl;
-		else
-			cout << "No" << endl;
-		if(verbose)
-			m->print();
-		if(toOut)
-			ofs << Dot::toDot(expa,m);
-		
-	}
-	else if (expa->type==CLASSICAL)
-	{
-		int height = 0;
-		ClassicAut* aut = fromExplicitToClassic(expa);
-
-		pair<char,list<uint>> res = LoopComplexity(aut);
-		int lc = (int) res.first;
-		list<uint> order = res.second;
-		const RegExp* regexpr = Aut2RegExp(aut,order);
-		if(!regexpr) {
-		  cout << "This automaton does not accept any words." << endl;
-		  cout << "This automaton has star-height: 0" << endl;
-		  exit(0);
-		}
-		  
-		const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
-		cout << "Automaton with regexp: ";
-		regexpr->print();
-		cout << endl;
-		cout << "And loop complexity: " << lc << endl;
-		while(height < lc) {
-			cout << "Checking for height: " << height << endl;
-			MultiCounterAut* baut = toNestedBaut(aut, height);
-			UnstableMultiMonoid monoid(*baut);
-			const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr, *baut);
-			if(!monoid.IsUnlimitedWitness(mat) && 
-			   !monoid.containsUnlimitedWitness())  
-				break;
-			if(monoid.IsUnlimitedWitness(mat))
-			  cout << "We guessed an unlimited witness" << endl;
-			else
-			  cout << "The guess was not good, but we found an unlimited witness" << endl;
-			if(verbose)
-				monoid.print();
-			delete baut;
-			height++;
-		}
-		cout << "This automaton has star-height: " << height << endl;
-		if(height == lc)
-		  cout << "And it is optimal (loop complexity is equal to the star height)" << endl;
-	}
-	ofs.close();
-	// system("pause");
-}
