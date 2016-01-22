@@ -1,3 +1,4 @@
+
 /* INCLUDES */
 #ifndef MARKOV_MONOID_HPP
 #define MARKOV_MONOID_HPP

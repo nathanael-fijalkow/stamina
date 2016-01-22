@@ -1,3 +1,4 @@
+
 /* INCLUDES */
 #ifndef MONOID_HPP
 #define MONOID_HPP

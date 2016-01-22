@@ -1,3 +1,4 @@
+
 #ifndef STARHEIGHT_HPP
 #define STARHEIGHT_HPP
 

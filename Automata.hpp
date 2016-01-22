@@ -1,3 +1,4 @@
+
 #ifndef AUTOMATA_HPP
 #define AUTOMATA_HPP
 

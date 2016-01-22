@@ -1,3 +1,4 @@
+
 /* INCLUDES */
 #ifndef STAB_MONOID_HPP
 #define STAB_MONOID_HPP

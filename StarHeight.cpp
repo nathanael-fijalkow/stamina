@@ -1,3 +1,4 @@
+
 #include "StarHeight.hpp"
 #include <fstream>
 

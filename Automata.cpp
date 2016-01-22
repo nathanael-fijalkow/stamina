@@ -1,3 +1,4 @@
+
 #include "Automata.hpp"
 #include <algorithm>
 
