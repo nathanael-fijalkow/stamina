@@ -134,14 +134,25 @@ int PyInterface::Monoid::starheight()
 	for(int i=0; i<cur_let; i++)
 		automaton->addLetter(i,*(matrices[i]));
 
-	while(true) {
-		MultiCounterAut *baut = toNestedBaut(automaton,height);
-		UnstableMultiMonoid monoid(*baut);
-		if(!monoid.containsUnlimitedWitness())
-			return height;
-		delete baut;
-		height++;
+	std::pair<char,std::list<uint>> res = LoopComplexity(automaton);
+	int lc = (int) res.first;
+	std::list<uint> order = res.second;
+	const RegExp* regexpr = Aut2RegExp(automaton,order);
+
+	if(!regexpr) return height; // the automaton does not accept anywords
+	
+	const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
+	
+	while(height < lc) {
+	  MultiCounterAut* baut = toNestedBaut(automaton, height);
+	  UnstableMultiMonoid monoid(*baut);
+	  const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr, *baut);
+	  if(!monoid.IsUnlimitedWitness(mat) && !monoid.containsUnlimitedWitness())
+	    break;
+	  delete baut; 
+	  height++;
 	}
+	return height;
 }
 string PyInterface::Monoid::toregexp()
 {
