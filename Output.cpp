@@ -1,3 +1,4 @@
+
 #include <sstream>
 #include "Output.hpp"
 const string start = "digraph G{\n"

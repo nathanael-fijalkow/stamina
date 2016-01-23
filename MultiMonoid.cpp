@@ -1,5 +1,4 @@
 
-
 #include <iostream>
 #include "Monoid.hpp"
 #include <sstream>

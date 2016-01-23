@@ -1,5 +1,5 @@
-#include <iostream>
 
+#include <iostream>
 #include "Expressions.hpp"
 #include "Matrix.hpp"
 #include "MarkovMonoid.hpp"

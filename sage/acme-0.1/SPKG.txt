@@ -1,0 +1,9 @@
+= acme =
+== Description ==
+
+ACME, a tool for computing stabilization monoids
+
+== Changelog ==
+
+=== acme-0.1 (Jan, 2016) ===
+ * Preliminary version

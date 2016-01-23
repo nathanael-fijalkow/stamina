@@ -1,3 +1,4 @@
+
 #ifndef PARSER_HPP
 #define PARSER_HPP
 #include "ExplicitAutomaton.hpp"
