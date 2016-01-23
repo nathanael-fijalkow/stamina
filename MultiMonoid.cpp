@@ -24,7 +24,7 @@ UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata) : Uns
 	VectorInt::SetSize(automata.NbStates);
 	MultiCounterMatrix::set_counter_number(automata.NbCounters);
 	
-	for (char letter = 0; letter < automata.NbLetters; letter++)
+	for (unsigned char letter = 0; letter < automata.NbLetters; letter++)
 	{
 		ExplicitMatrix mat(automata.NbStates);
 		mat.coefficients = automata.trans.at(letter);

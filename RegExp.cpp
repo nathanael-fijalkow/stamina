@@ -220,7 +220,6 @@ RegExp *Aut2RegExp(ClassicAut *in, list<state> order)
 	bool debug_aut2reg=false;
 	map<pair<state,state>,RegExp*> toReg;
 	list<pair<state,state>> toRemove;
-	RegExp* ret = NULL;
 
 	ClassicAut* aut = new ClassicAut(in->NbLetters, in->NbStates+2);
 	state init = in->NbStates;
@@ -373,8 +372,6 @@ RegExp *Aut2RegExp(ClassicAut *in, list<state> order)
 
 
 ExtendedExpression *Reg2Sharp(const RegExp *reg){
-	uint i;
-	ExtendedExpression *exp;
 	const LetterRegExp *lexp=isLetter(reg);
 	if (lexp!=NULL) {
 		LetterExpr *res= new LetterExpr(lexp->letter);

@@ -38,7 +38,7 @@ trans_eps=(bool**)malloc(Nstates*sizeof(bool *));
 		}
 		
 transdet=(uint**)malloc(Nletters*sizeof(uint *));
-		for(char a=0;a<Nletters;a++){
+		for(unsigned char a=0;a<Nletters;a++){
 			transdet[a]=(uint*)malloc(Nstates*sizeof(uint));
 			memset(transdet[a], Nstates, Nstates); //initialize with Nstates, meaning "no transition"
 		}
@@ -61,7 +61,7 @@ void ClassicEpsAut::print(ostream& st){
 	st << endl;
 
 
-	for (char a = 0; a<NbLetters; a++){
+	for (unsigned char a = 0; a<NbLetters; a++){
 		st << "Letter " << (int)a << endl;
 		for (uint i = 0; i<NbStates; i++){
 				st << transdet[a][i];
@@ -96,7 +96,7 @@ void ClassicAut::print(ostream& st){
 	st << endl;
 
 
-	for (char a = 0; a<NbLetters; a++){
+	for (unsigned char a = 0; a<NbLetters; a++){
 		st << "Letter " << (int) a <<  endl;
 		for (uint i = 0; i<NbStates; i++){
 			for (uint j = 0; j<NbStates; j++){
@@ -175,7 +175,7 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	//transitions are as usually in powerset
 	
 	bool* tabj=(bool *)malloc(n*sizeof(bool));
-	for(char a=0;a<aut->NbLetters;a++){
+	for(unsigned char a=0;a<aut->NbLetters;a++){
 		for(uint i=0;i<nspow;i++){
 			//compute the j such that i--a-->j
 			memset(tabj,false,n);
@@ -239,7 +239,7 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 		//printf("nbpart:%d\n",nbpart);
 		
 		for(uint i=0;i<N;i++){
-			for(char a=0;a<aut->NbLetters;a++){		
+			for(unsigned char a=0;a<aut->NbLetters;a++){
 				data[a]=part[aut->transdet[a][i]]; //store the partitions of destinations in data
 			}
 			for(uint j=0;j<N;j++){		
@@ -274,7 +274,7 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 	}
 	
 	//det transitions
-	for(char a=0;a<aut->NbLetters;a++){
+	for(unsigned char a=0;a<aut->NbLetters;a++){
 		for(uint n=0;n<nbpart;n++){
 			MinAut->transdet[a][n]=part[aut->transdet[a][original[n]]];
 		}
@@ -411,7 +411,7 @@ void MultiCounterEpsAut::print(ostream& st){
 /*	uint** transdet_state;
 	char** transdet_action;*/
 
-	for (char a = 0; a<NbLetters; a++){
+	for (unsigned char a = 0; a<NbLetters; a++){
 		st << "Letter " << (int)a << endl;
 		for (uint i = 0; i<NbStates; i++){
 			st << state_index_to_string(i) << " -- " << elementToString(transdet_action[a][i]) << " --> " << state_index_to_string(transdet_state[a][i]) << endl;
@@ -479,11 +479,11 @@ MultiCounterEpsAut::MultiCounterEpsAut(char Nletters, uint Nstates, char Ncounte
 
 
 	transdet_state.resize(Nletters);
-	for (char a = 0; a < Nletters; a++)
+	for (unsigned char a = 0; a < Nletters; a++)
 		transdet_state[a].resize(Nstates, Nstates);//initialize with Nstates, meaning "no transition"
 
 	transdet_action.resize(Nletters);
-	for (char a = 0; a < Nletters; a++)
+	for (unsigned char a = 0; a < Nletters; a++)
 		transdet_action[a].resize(Nstates, 2 * Ncounters + 2);
 }
 

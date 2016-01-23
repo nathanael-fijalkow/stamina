@@ -81,7 +81,7 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat){
 		if (mat[j] != Matrix::zero_vector)
 			for (uint i = 0; i < Vector::GetBitSize(); i++)
 			{
-			ok = (vec->bits[i] & mat[j]->bits[i]) != 0;
+			  ok = ((vec->bits[i]) & (mat[j]->bits[i])) != 0;
 			if (ok) break;
 			}
 		//cout << "Equal " << (ok ? 1 : 0) << endl;
@@ -102,7 +102,7 @@ const Vector * Matrix::purge(const Vector *varg, const Vector * tab){
 	size_t * new_vec = (size_t *)malloc(Vector::GetBitSize() * sizeof(size_t));
 
 	for (uint i = 0; i < Vector::GetBitSize(); i++)
-		new_vec[i] = (varg->bits[i] & tab->bits[i]);
+	  new_vec[i] = ((varg->bits[i]) & (tab->bits[i]));
 
 	auto it = vectors.emplace(new_vec, false).first;
 	return &(*it);

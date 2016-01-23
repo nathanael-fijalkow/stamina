@@ -55,7 +55,7 @@ public:
 	void update_hash()
 	{
 		_hash = 0;
-		for (char c = 0; c < 4; c++)
+		for (unsigned char c = 0; c < 4; c++)
 		{
 			for (uint i = 0; i < Vector::GetStateNb(); i++)
 			{

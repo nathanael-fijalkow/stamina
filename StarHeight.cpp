@@ -66,7 +66,7 @@ uint mindef(uint i,uint j){
 //recursive function for Tarjan Algorithm
 void strongconnect(uint v, GraphAut *aut, uint *subset, uint *index, vector<int> *indexof, vector<int> *lowlink, vector<bool> *onStack, stack<int> *S, uint *remain, vector<uint> *comps){
 	
-	uint newcomp,w,i;
+	uint newcomp,w;
 			
 	// Set the depth index for v to the smallest unused index
 	(*indexof)[v]=*index;
@@ -300,7 +300,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 			action = EpsBaut->inc(l-1);
 		}
 
-		for (char a = 0; a < nl; a++)
+		for (unsigned char a = 0; a < nl; a++)
 		{
 			if (Subsetaut->transdet[a][p] < ns)
 				EpsBaut->transdet_state[a][i] = w + Subsetaut->transdet[a][p];

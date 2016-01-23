@@ -25,7 +25,7 @@ public:
 
 	// Entries is an array containing integers whose first entriesNb bits encode the entries
 	// thus the array size is the smallest integer larger than entriesNb / (sizeof(uint) * 8) 
-	char * coefs;
+	unsigned char * coefs;
 
 //	bool contains(size_t n) const { return  ( bits[n / (sizeof(uint) * 8)] & (1 << (n % (sizeof(uint) * 8)) ) ) != 0; };
 
@@ -38,7 +38,7 @@ public:
 	// Third constructor
 	VectorInt(std::vector<char> data);
 
-	VectorInt(char * data, bool copy = true);
+	VectorInt(unsigned char * data, bool copy = true);
 
 	// Function returning the hash
 	size_t Hash() const { return _hash; };
@@ -67,7 +67,7 @@ protected:
 	// Function computing the hash
 	void update_hash(){
 		_hash = 0;
-		for (char * index = coefs; index != coefs + entriesNb; index++)
+		for (unsigned char * index = coefs; index != coefs + entriesNb; index++)
 			_hash ^= std::hash_value(*index) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 	};
 

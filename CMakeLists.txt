@@ -85,6 +85,9 @@ target_link_libraries (AcmeTest ${EXTRA_LIBS})
 add_executable (OneLeakTest ${ALL_SOURCES} ${ALL_HEADERS} OneLeak.cpp)
 target_link_libraries (OneLeakTest ${EXTRA_LIBS})
 
+add_executable (WebDemo ${ALL_SOURCES} ${ALL_HEADERS} WebDemo.cpp)
+target_link_libraries (WebDemo ${EXTRA_LIBS})
+
 add_executable (Statistics ${ALL_SOURCES} ${ALL_HEADERS} Statistics.cpp)
 target_link_libraries (Statistics ${EXTRA_LIBS})
 
@@ -94,6 +97,10 @@ target_link_libraries (TestAut ${EXTRA_LIBS})
 add_executable (TestStarHeight ${ALL_SOURCES} ${ALL_HEADERS} TestStarHeight.cpp)
 target_link_libraries (TestStarHeight ${EXTRA_LIBS})
 
+if(APPLE)
+	include(FindPythonLibs)
+endif()
+
 find_package(Boost 1.45.0)
 if(Boost_FOUND)
   include_directories("${Boost_INCLUDE_DIRS}" "/usr/include/python2.7")
@@ -102,8 +109,14 @@ if(Boost_FOUND)
   set(Boost_USE_STATIC_RUNTIME OFF)
   find_package(Boost 1.45.0 COMPONENTS python)
 
+
   add_library(acme SHARED ${ALL_SOURCES} ${ALL_HEADERS} PyInterface.cpp)
+if(APPLE)
+  target_link_libraries(acme ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+else()
   target_link_libraries(acme ${Boost_LIBRARIES})
+endif()
+
 elseif(NOT Boost_FOUND)
   message(FATAL_ERROR "Unable to find correct Boost version. Did you set BOOST_ROOT?")
 endif()

@@ -104,7 +104,7 @@ public:
 	const ExtendedExpression ** sons;
 
 protected:
-	ConcatExpr() : sons(NULL), sonsNb(0) {};
+	ConcatExpr() : sonsNb(0), sons(NULL) {};
 
 public:
 	// Second constructor: a copy constructor which performs a memcopy of the field sons

@@ -9,7 +9,7 @@ using namespace std;
 // Class Vector
 //For constructors
 void VectorInt::init(){
-  	coefs = (char *)malloc(entriesNb * sizeof(char));
+  	coefs = (unsigned char *)malloc(entriesNb * sizeof(char));
 	memset(coefs, (char)0, entriesNb * sizeof(char));
 	update_hash();
 }
@@ -38,11 +38,11 @@ VectorInt::VectorInt(vector<char> data)
 }
 
 // Fourth constructor
-VectorInt::VectorInt(char * data, bool copy)
+VectorInt::VectorInt(unsigned char * data, bool copy)
 {
 	if (copy)
 	{
-		coefs = (char *)malloc(entriesNb * sizeof(char));
+		coefs = (unsigned char *)malloc(entriesNb * sizeof(char));
 		memcpy(coefs, data, entriesNb * sizeof(char));
 	}
 	else

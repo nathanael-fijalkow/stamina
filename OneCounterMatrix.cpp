@@ -5,7 +5,7 @@ OneCounterLargeMatrix::OneCounterLargeMatrix()
 {
 	rows = (const Vector ***)malloc(4 * sizeof(const Vector **));
 	cols = (const Vector ***)malloc(4 * sizeof(const Vector **));
-	for (char act = 0; act<4; act++){
+	for (unsigned char act = 0; act<4; act++){
 		rows[act] = (const Vector **)malloc(Vector::GetStateNb() * sizeof(const Vector *));
 		cols[act] = (const Vector **)malloc(Vector::GetStateNb() * sizeof(const Vector *));
 	}
@@ -17,7 +17,7 @@ void OneCounterSmallMatrix::init()
 {
 	rows = (uint **)malloc(4 * sizeof(void *));
 	cols = (uint **)malloc(4 * sizeof(void *));
-	for (char act = 0; act<4; act++){
+	for (unsigned char act = 0; act<4; act++){
 		rows[act] = (uint *)malloc(Vector::GetStateNb() * sizeof(uint));
 		cols[act] = (uint *)malloc(Vector::GetStateNb() * sizeof(uint));
 
@@ -34,7 +34,7 @@ OneCounterSmallMatrix::OneCounterSmallMatrix()
 //Constructor from Explicit Matrix
 OneCounterLargeMatrix::OneCounterLargeMatrix(const ExplicitMatrix & explMatrix)
 {
-	for (char act = 0; act<4; act++){
+	for (unsigned char act = 0; act<4; act++){
 		for (uint i = 0; i < Vector::GetStateNb(); i++)
 		{
 			vector<bool> row(Vector::GetStateNb());
@@ -61,7 +61,7 @@ OneCounterLargeMatrix::OneCounterLargeMatrix(const ExplicitMatrix & explMatrix)
 OneCounterSmallMatrix::OneCounterSmallMatrix(const ExplicitMatrix & explMatrix)
 {
 	init();
-	for (char act = 0; act<4; act++){
+	for (unsigned char act = 0; act<4; act++){
 		for (uint i = 0; i < Vector::GetStateNb(); i++)
 		{
 			for (int j = Vector::GetStateNb() - 1; j >= 0; j--)
@@ -83,7 +83,7 @@ void OneCounterMatrix::print(std::ostream & os, vector<string> state_names) cons
 	string actions = "REIO_";
 	/*
 	for (uint i = 0; i < Vector::GetStateNb(); i++){
-		for (char act = 0; act < 4; act++){
+		for (unsigned char act = 0; act < 4; act++){
 				{
 					const Vector & row = *rows[act][i];
 					os << row.bits << endl;
@@ -92,7 +92,7 @@ void OneCounterMatrix::print(std::ostream & os, vector<string> state_names) cons
 	}
 
 	for (uint i = 0; i < Vector::GetStateNb(); i++){
-		for (char act = 0; act < 4; act++){
+		for (unsigned char act = 0; act < 4; act++){
 				{
 					const Vector & col = *cols[act][i];
 					os << col.bits << endl;
@@ -127,7 +127,7 @@ bool OneCounterLargeMatrix::operator==(const OneCounterLargeMatrix & mat) const
 	//only on rows
 	if (mat._hash != _hash) return false;
 
-	for (char act = 0; act<4; act++){
+	for (unsigned char act = 0; act<4; act++){
 		const Vector ** rows1 = rows[act];
 		const Vector ** rows2 = mat.rows[act];
 		for (; rows1 != rows[act] + Vector::GetStateNb(); rows1++, rows2++)
@@ -143,7 +143,7 @@ bool OneCounterSmallMatrix::operator==(const OneCounterSmallMatrix & mat) const
 	//only on rows
 	if (mat._hash != _hash) return false;
 
-	for (char act = 0; act<4; act++)
+	for (unsigned char act = 0; act<4; act++)
 		for (uint i = 0; i < Vector::GetStateNb(); i++)
 			if (rows[act][i] != mat.rows[act][i])
 				return false;
@@ -172,7 +172,7 @@ Matrix * OneCounterLargeMatrix::prod(const Matrix * pmat1) const
 		result->cols[EPS][i] = sub_prodor(mat2.cols[EPS][i], mat1.rows[EPS], result->cols[RESET][i]);
 	}
 
-	for (char act = INC; act<4; act++){
+	for (unsigned char act = INC; act<4; act++){
 		for (uint i = 0; i < n; i++)
 		{
 			result->rows[act][i] = sub_prod(mat1.rows[act][i], mat2.cols[act]);
@@ -199,8 +199,8 @@ Matrix * OneCounterSmallMatrix::prod(const Matrix * pmat1) const
 		row_res = 0;
 		for (int j = n - 1; j >= 0; j--)
 		{
-			row_res = (row_res << 1) | ((mat1.rows[RESET][i] & mat2.cols[INC][j] | mat1.rows[INC][i] & mat2.cols[RESET][j]) ? 1 : 0);
-			col_res = (col_res << 1) | ((mat2.cols[RESET][i] & mat1.rows[INC][j] | mat2.cols[INC][i] & mat1.rows[RESET][j]) ? 1 : 0);
+		  row_res = (row_res << 1) | (( (mat1.rows[RESET][i] & mat2.cols[INC][j]) | (mat1.rows[INC][i] & mat2.cols[RESET][j])) ? 1 : 0);
+		  col_res = (col_res << 1) | (((mat2.cols[RESET][i] & mat1.rows[INC][j]) | (mat2.cols[INC][i] & mat1.rows[RESET][j])) ? 1 : 0);
 		}
 	}
 
@@ -217,7 +217,7 @@ Matrix * OneCounterSmallMatrix::prod(const Matrix * pmat1) const
 		col_res |= result->cols[RESET][i];
 	}
 
-	for (char act = INC; act < 4; act++){
+	for (unsigned char act = INC; act < 4; act++){
 		for (uint i = 0; i < n; i++)
 		{
 			uint & row_res = result->rows[act][i];
@@ -246,7 +246,7 @@ Matrix * OneCounterLargeMatrix::stab() const
 	size_t *new_row = (size_t *)malloc(bitsN * sizeof(size_t));
 	size_t *new_col = (size_t *)malloc(bitsN * sizeof(size_t));
 
-	for (char act = 0; act<4; act++){
+	for (unsigned char act = 0; act<4; act++){
 		if(act==INC) continue;
 		diags[act]=(uint *)malloc(bitsN * sizeof(size_t));
 		for (uint b = 0; b<bitsN; b++){ //initialisation de la diagonale
@@ -262,7 +262,7 @@ Matrix * OneCounterLargeMatrix::stab() const
 	diags[INC] = diags[EPS]; //IC impossible, restriction to E
 
 
-	for (char act = 0; act<4; act++){
+	for (unsigned char act = 0; act<4; act++){
 		for (uint i = 0; i <n; i++){
 			memset(new_row, 0, bitsN*sizeof(size_t));
 			memset(new_col, 0, bitsN*sizeof(size_t));
@@ -306,7 +306,7 @@ Matrix * OneCounterSmallMatrix::stab() const
 
 	uint diags[4]; //sharp of the diagonal, for now on one uint
 	
-	for (char act = 0; act<4; act++)
+	for (unsigned char act = 0; act<4; act++)
 	{
 		diags[act] = 0;
 	//compute the diagonal 
@@ -315,7 +315,7 @@ Matrix * OneCounterSmallMatrix::stab() const
 	}
 	diags[INC] = diags[EPS]; //IC impossible, restriction to E
 
-	for (char act = 0; act<4; act++){
+	for (unsigned char act = 0; act<4; act++){
 		for (uint i = 0; i <n; i++){
 			uint & new_row = result->rows[act][i];
 			uint & new_col = result->cols[act][i];
@@ -345,7 +345,7 @@ Matrix * OneCounterSmallMatrix::stab() const
 /* coefficients getters */
 char OneCounterSmallMatrix::get(int i, int j) const
 {
-	for (char c = 0; c < 4; c++)
+	for (unsigned char c = 0; c < 4; c++)
 		if (rows[c][i] & (1 << j))
 			return c;
 	return 4;
@@ -353,7 +353,7 @@ char OneCounterSmallMatrix::get(int i, int j) const
 
 char OneCounterLargeMatrix::get(int i, int j) const
 {
-	for (char c = 0; c < 4; c++)
+	for (unsigned char c = 0; c < 4; c++)
 		if (rows[c][i]->contains(j))
 			return c;
 	return 4;

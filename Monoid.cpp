@@ -86,8 +86,8 @@ const Matrix * UnstableMonoid::addLetter(char a, ExplicitMatrix & mat)
 {
 //	if (mat.Vector::GetStateNb() != dim)
 //		throw runtime_error("Cannot add an element of dim " + toString(mat.Vector::GetStateNb()) + " to a monoid of size " + toString(dim));
-
-	unordered_set<LetterExpr>::const_iterator it = letterExpressions.emplace(a).first;
+  if(a < 'A') a+= 'A';
+	auto it = letterExpressions.emplace(a).first;
 	auto pmat = convertExplicitMatrix(mat);
 	auto it2 = addMatrix(pmat);
 

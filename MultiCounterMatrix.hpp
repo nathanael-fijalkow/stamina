@@ -12,7 +12,7 @@ class MultiCounterMatrix : public Matrix
 protected:
 
 	// This matrix act_prod is of size (2N+3)*(2N+3), it is computed once and for all.
-	static char ** act_prod;
+	static unsigned char ** act_prod;
 
 // encoding for counter actions, smaller is better
 // 0: R_0 = (R,R,...,R) 

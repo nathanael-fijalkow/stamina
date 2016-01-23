@@ -134,7 +134,11 @@ using namespace std;
 
 void LetterExpr::print(std::ostream& os) const
 {
+  if(letter < 'A')
 	os << (char)('a' + letter);
+  else
+	os << (char) letter;
+    
 }
 
 void ConcatExpr::print(std::ostream& os) const

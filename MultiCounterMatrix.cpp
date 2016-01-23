@@ -16,9 +16,9 @@ MultiCounterMatrix::MultiCounterMatrix()
 void MultiCounterMatrix::set_counter_number(char N)
 {
 	MultiCounterMatrix::N = N;
-	act_prod = (char **)malloc((2 * N + 3)  *  sizeof(char*));
+	act_prod = (unsigned char **)malloc((2 * N + 3)  *  sizeof(char*));
 	for (uint i = 0; i < (2 * N + 3); i++){
-		act_prod[i] = (char *)malloc((2 * N + 3)  *  sizeof(char));
+		act_prod[i] = (unsigned char *)malloc((2 * N + 3)  *  sizeof(char));
 		for (uint j = 0; j < (2 * N + 3); j++){
 			act_prod[i][j] =
 				(i == 2 * N + 2 || j == 2 * N + 2) ? 2 * N + 2
@@ -69,7 +69,7 @@ MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N
 
 char MultiCounterMatrix::N = 0;
 
-char ** MultiCounterMatrix::act_prod = NULL;
+unsigned char ** MultiCounterMatrix::act_prod = NULL;
 
 /* the set of all vectors */
 std::unordered_set<VectorInt> MultiCounterMatrix::int_vectors;
@@ -122,12 +122,12 @@ bool MultiCounterMatrix::operator==(const MultiCounterMatrix & mat) const
 
 const VectorInt * MultiCounterMatrix::sub_prod_int(const VectorInt * vec, const VectorInt ** mat_cols)
 {
-	char * new_vec = (char *)malloc(VectorInt::GetStateNb() * sizeof(char));
+	unsigned char * new_vec = (unsigned char *)malloc(VectorInt::GetStateNb() * sizeof(char));
 	memset(new_vec, 0, (VectorInt::GetStateNb() * sizeof(char)));
 
 	for (int j = VectorInt::GetStateNb() - 1; j >= 0; j--)
 	{
-		char min_curr = 2 * N + 2;
+		unsigned char min_curr = 2 * N + 2;
 		for (uint i = 0; i < VectorInt::GetStateNb(); i++)
 			min_curr = min(min_curr, act_prod[ vec->coefs[i] ][ mat_cols[j]->coefs[i] ] );
 		new_vec[j] = min_curr;
@@ -184,13 +184,13 @@ Matrix * MultiCounterMatrix::stab() const
 	MultiCounterMatrix * result = new MultiCounterMatrix();
 
 	
-	char * diags; //sharp of the diagonal
-	diags=(char *)malloc(n*sizeof(char));
+	unsigned char * diags; //sharp of the diagonal
+	diags=(unsigned char *)malloc(n*sizeof(char));
 
-	char *new_row = (char *)malloc(n * sizeof(char));
-	char *new_col = (char *)malloc(n * sizeof(char));
+	unsigned char *new_row = (unsigned char *)malloc(n * sizeof(char));
+	unsigned char *new_col = (unsigned char *)malloc(n * sizeof(char));
 
-	char cd;
+	unsigned char cd;
 	//compute the diagonal 
 	//cout << " act:" << (int)act << "\n";
 	for (uint i = 0; i <n; i++){
@@ -204,7 +204,7 @@ Matrix * MultiCounterMatrix::stab() const
 			memset(new_col, 2*N+2, n*sizeof(char));
 			for (uint j = 0; j<n; j++){
 				//look for a possible path
-				char t=2*N+2;
+				unsigned char t=2*N+2;
 				for (uint b = 0; b<n; b++){ 
 					 t = min(t, act_prod[rows[i]->coefs[b]][act_prod[diags[b]][cols[j]->coefs[b]]]); 
 					 }
