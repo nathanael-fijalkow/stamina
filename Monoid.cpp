@@ -323,9 +323,9 @@ const ExtendedExpression * UnstableMonoid::CloseByProduct()
 				return witness;
 			if (--cnt == 0)
 			{
-				cout << "Scanning known elts: ";
+				cout << "Processing: ";
 				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i - 1) + new_elements.size()* new_elements.size());
-				cnt = MAX_MONOID_SIZE / 100;
+				cnt = MAX_MONOID_SIZE / 10;
 			}
 			j++;
 		}
@@ -348,7 +348,7 @@ const ExtendedExpression * UnstableMonoid::CloseByProduct()
 				return witness;
 			if (--cnt == 0)
 			{
-				cout << "Scanning new elts: ";
+				cout << "Processing: ";
 				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i - 1));
 			}
 
@@ -377,7 +377,7 @@ const ExtendedExpression * UnstableMonoid::CloseByStabilization()
 			cout << " rewrite_rules and " << to_be_sharpified.size() - cur_index << " elements to sharpify" << endl;
 			if (to_be_sharpified.size() > MAX_MONOID_SIZE)
 				throw std::runtime_error("Monoid too large");
-			cnt = MAX_MONOID_SIZE / 100;
+			cnt = MAX_MONOID_SIZE / 10;
 		}
 	}
 	return NULL;
@@ -441,7 +441,7 @@ const ExtendedExpression * UnstableMonoid::sharpify_expression(const ExtendedExp
 
 const ExtendedExpression * UnstableMonoid::ComputeMonoid()
 {
-	cnt = MAX_MONOID_SIZE / 100;
+	cnt = MAX_MONOID_SIZE / 10;
 
 	new_elements.clear();
 	to_be_sharpified.clear();

@@ -136,7 +136,7 @@ protected:
 	{
 		cout << expr_to_mat.size() << " expressions ";
 		cout << " and " << rewriteRules.size() << " rules and " << Matrix::vectors.size() << " vectors and " << i << " expressions to process." << endl;
-		cnt = MAX_MONOID_SIZE / 1000;
+		cnt = MAX_MONOID_SIZE / 10;
 
 		if (new_elements.size() > MAX_MONOID_SIZE)
 				throw std::runtime_error("Monoid too large");
