@@ -135,7 +135,7 @@ int main(int argc, char **argv)
       auto expr = m->ComputeMonoid();
 
       if(expr == NULL)
-	cout << "The monoid has exactly than " << m->expr_to_mat.size() << " elements" << endl;
+	cout << "The monoid has exactly " << m->expr_to_mat.size() << " elements" << endl;
       else
 	{
 	cout << "The monoid has at least " << m->expr_to_mat.size() << " elements,<br/>";
@@ -162,7 +162,7 @@ int main(int argc, char **argv)
 	}
       else if(r.first == 0)
 	{
-	cout << "The automaton has not value 1, because it is leaktight and there is no value 1 witness." << endl;
+	cout << "The automaton does not have value 1, because it is leaktight and there is no value 1 witness." << endl;
 	}
       else
 	{
