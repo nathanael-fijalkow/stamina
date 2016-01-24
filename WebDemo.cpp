@@ -29,8 +29,25 @@ int size;
 
 bool test_witness(const ProbMatrix* m) 
 {
+  //  cout << "Call to test_witness for " << endl << *m;
   auto row = m->getRowOnes();
+  /*
+  cout << "Row ones " << endl;
+	for (int i = 0; i < size; i++)
+	  cout << row[i] << endl;
+  */
+  /*
+  cout << initialState << endl;
+	for (int i = 0; i < size; i++)
+	  cout << row[initialState]->contains(i) << endl;
+  */
        auto ones = row[initialState];
+  
+
+       /*	for (int i = 0; i < size; i++)
+	  cout << i << ": " << finalStates[i] << " " << ones->contains(i) << endl;
+       */
+
 	for (int i = 0; i < size; i++)
 	  if( !finalStates[i]  && ones->contains(i))
 			return false;
@@ -45,11 +62,12 @@ UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
 	for(int i = 0 ; i < size; i++)
 	  {
 	    auto s = aut->finalStates[i];
+	    //	    cout << i << " fstate: " << s << endl;
 	    if(s>= 0 && s< size)
 	      finalStates[s] = true;
 	  }
 	UnstableMarkovMonoid* ret = new UnstableMarkovMonoid(aut->size);
-	//	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
+       	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
 	for(int i=0;i<aut->alphabet.length();i++)
 		ret->addLetter(aut->alphabet[i],*(aut->matrices[i]));
 	return ret;
@@ -116,17 +134,42 @@ int main(int argc, char **argv)
       UnstableMarkovMonoid* m = toMarkovMonoid(expa);
       auto expr = m->ComputeMonoid();
 
+      if(expr == NULL)
+	cout << "The monoid has exactly than " << m->expr_to_mat.size() << " elements" << endl;
+      else
+	{
+	cout << "The monoid has at least " << m->expr_to_mat.size() << " elements,<br/>";
+      cout << "the computation stopped because a value 1 witness was found." << endl;
+	}
+
       pair<int, const ExtendedExpression*> r = m->maxLeakNb();
-      cout << r.first << " leak(s) found" << endl;
-      cout << "The monoid has " << m->expr_to_mat.size() << " elements" << endl;
-      cout << "The automaton has value 1: ";
+      auto lnb = r.first;
+      if(lnb == 0)
+	{
+	  cout << "This automaton is leaktight" << endl;
+	}
+      else
+	{
+	  cout << "This automaton is NOT leaktight, it has " << lnb << " leak, for example" << endl;
+	  cout << *expr << endl;
+	    cout << "is a leak" << endl;
+	}
+  
       if (expr)
-	cout << "Yes" << endl;
+	{
+	cout << "The automaton has value 1, a value 1 witness is " << endl;
+	cout << *expr << endl;
+	}
       else if(r.first == 0)
-	cout << "No" << endl;
-        else
-        cout << "Maybe" << endl;
-      //      if(verbose)
+	{
+	cout << "The automaton has not value 1, because it is leaktight and there is no value 1 witness." << endl;
+	}
+      else
+	{
+	  cout << "Since the automaton is not leaktight, and since there is no value1 witness,";
+	  cout << "the algorithm could not determine whether the automaton has value 1 or not." << endl;
+	}
+      cout << endl << endl;
 	m->print();
 	//      if(toOut)
 	//ofs << Dot::toDot(expa,m);

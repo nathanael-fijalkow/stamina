@@ -3,8 +3,8 @@ session_start();
 $iid = session_id();
 		
 $dir = $iid;
-$input=realpath($dir."/input.aut");
-$output=realpath($dir."/output.log");
+$input="input.".$dir."aut";
+$output="output.".$dir."log";
 
 if(isset($_POST['action']))
 {
@@ -16,8 +16,8 @@ if(isset($_POST['action']))
 
 		     //starts a new computation
 		     //we create the computation dir
-		     if(!is_dir($dir))
-		         mkdir($dir,"0777",true);
+//		     if(!is_dir($dir))
+//		         mkdir($dir,"0777",true);
 		     //we create the input file
 
 
@@ -350,8 +350,8 @@ $(".compute").click(function() {
     	for(i=1; i <= statesnb; i++)
 	{
 		var obj = $('#f'+i);
-		if($('#f'+i).find("input").prop('checked')) final += i;
-		if($('#i'+i).find("input").prop('checked')) initial += i;
+		if($('#f'+i).find("input").prop('checked')) final += (i-1) + " ";
+		if($('#i'+i).find("input").prop('checked')) initial += (i-1) + " ";
 	}
 	for(i=1; i <= lettersnb; i++)
 	{	 
@@ -393,6 +393,8 @@ $( "input" ).change(function() {
 }).change();
 
 </script>
+<br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
 </body>
 <?php

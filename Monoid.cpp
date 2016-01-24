@@ -37,7 +37,17 @@ void Monoid::print_summary() const
 
 ostream& operator<<(ostream& st, const Monoid & monoid)
 {
-
+	st << "***************************************" << endl;
+	st << "Summary " << endl;
+	st << "***************************************" << endl;
+  	if (monoid.expr_to_mat.size() == 0)
+		st << "Empty monoid" << endl;
+	else
+	{
+		st << "Dimension " << Vector::GetStateNb() << endl;
+		st << monoid.expr_to_mat.size() << " elements" << endl;
+		st << monoid.rewriteRules.size() << " rewrite rules whose " << monoid.canonicalRewriteRules.size() << " are canonical." << endl;
+	}
 	st << "***************************************" << endl;
 	st << "Elements (" << monoid.expr_to_mat.size() << ")" << endl;
 	st << "***************************************" << endl;

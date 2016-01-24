@@ -62,6 +62,7 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
   try
     {
   ret->initialState = stoi(line);
+  //	  cout << "Initial state: " << stoi(line) << endl;
     }
     catch(const exception & exc){ throw runtime_error("Error while parsing initial states, could not parse '" + line + "' to integer"); }
   
@@ -73,6 +74,7 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
       try
 	{
 	  ret->finalStates[i]=stoi(line);
+	  //	  cout << "Final state: " << i << ":"  << stoi(line) << endl;
 	}
       catch(const exception & exc){ throw runtime_error("Error while parsing final states, could not parse '" + line + "' to integer"); }
     i++;
