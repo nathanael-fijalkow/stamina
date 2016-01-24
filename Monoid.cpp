@@ -309,11 +309,13 @@ const ExtendedExpression * UnstableMonoid::CloseByProduct()
 
 	while (i < elements.size())
 	{
+        int d1 = elements.size() - i;
 		const ExtendedExpression * expr_left = elements[i];
 
 		size_t j = 0;
 		while (j < new_elements.size())
 		{
+            int d2 = new_elements.size() - j;
 			const ExtendedExpression * expr_right = new_elements[j];
 			auto witness = process_expression(expr_left, expr_right);
 			if (witness)
@@ -323,8 +325,8 @@ const ExtendedExpression * UnstableMonoid::CloseByProduct()
 				return witness;
 			if (--cnt == 0)
 			{
-				cout << "Processing: ";
-				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i - 1) + new_elements.size()* new_elements.size());
+				cout << "Processing product: ";
+				check_size(d2 + new_elements.size() *(d1 - 1) + new_elements.size()* new_elements.size());
 				cnt = MAX_MONOID_SIZE / 10;
 			}
 			j++;
@@ -337,19 +339,21 @@ const ExtendedExpression * UnstableMonoid::CloseByProduct()
 
 	while (i < new_elements.size())
 	{
+        int d2  = new_elements.size() - i;
 		const ExtendedExpression * expr_left = new_elements[i];
 
 		size_t j = 0;
 		while (j < new_elements.size())
 		{
+            int d1  = new_elements.size() - j;
 			const ExtendedExpression * expr_right = new_elements[j];
 			auto witness = process_expression(expr_left, expr_right);
 			if (witness)
 				return witness;
 			if (--cnt == 0)
 			{
-				cout << "Processing: ";
-				check_size((new_elements.size() - j) + new_elements.size() *(new_elements.size() - i - 1));
+				cout << "Processing product: ";
+				check_size(d1 + new_elements.size() *(d2 - 1));
 			}
 
 			j++;
@@ -373,6 +377,7 @@ const ExtendedExpression * UnstableMonoid::CloseByStabilization()
 		cur_index++;
 		if (--cnt == 0)
 		{
+            cout << "Processing stabilization: ";
 			cout << expr_to_mat.size() << " elements and " << rewriteRules.size();
 			cout << " rewrite_rules and " << to_be_sharpified.size() - cur_index << " elements to sharpify" << endl;
 			if (to_be_sharpified.size() > MAX_MONOID_SIZE)
