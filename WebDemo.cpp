@@ -157,8 +157,8 @@ int main(int argc, char **argv)
   
       if (expr)
 	{
-	cout << "The automaton has value 1, a value 1 witness is " << endl;
-	cout << *expr << endl;
+	cout << "The automaton has value 1.\nA value 1 witness is " << endl;
+	cout << *expr << endl << endl;
 	}
       else if(r.first == 0)
 	{
@@ -169,7 +169,6 @@ int main(int argc, char **argv)
 	  cout << "Since the automaton is not leaktight, and since there is no value1 witness,";
 	  cout << "the algorithm could not determine whether the automaton has value 1 or not." << endl;
 	}
-      cout << endl << endl;
 	m->print();
 	//      if(toOut)
 	//ofs << Dot::toDot(expa,m);
