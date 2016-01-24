@@ -133,7 +133,22 @@ The following form allows you to specify a two-letters automaton with three stat
 <tr>
 <td class="mats">
 </td>
-</tr></table>
+</tr>
+<tr>
+<td>Density
+<select id="density">
+<?php
+for($i=10;$i <=40; $i+=10)
+	      echo '<option value="'.$i.'">'.$i.'%</option>';
+echo '<option selected="selected" value="50">50%</option>';
+for($i=60;$i <=90; $i+=10)
+	      echo '<option value="'.$i.'">'.$i.'%</option>';
+?>
+</select>
+</td>
+</tr>
+
+</table>
 </form>
 <h2>Output</h2>
 <div class="output">
@@ -194,9 +209,10 @@ function fill_random()
 {
 	$('.c').prop('checked',false);
 	var ok = false;
+	var density = $('#density').val() / 100.0;
 	for(j=1; j<= statesnb; j++)		 
 	{
-		var yes = Math.random() > 0.5;
+		var yes = Math.random() < density;
 		$('#f'+j).find("input").prop('checked',yes);
 		ok |= yes;
 	}
@@ -218,9 +234,9 @@ function fill_random()
 			for(k=1; k<= statesnb; k++)
 			{
 				var cell = $('#c'+i+'_'+j+'_'+k);
-				cell.prop('checked', (Math.random()> 0.5));
+				cell.prop('checked', (Math.random() < density));
 			}
-			var cell = $('#c'+i+'_'+j+'_'+(1 + Math.round(Math.random()*statesnb)));
+			var cell = $('#c'+i+'_'+j+'_'+(1 + Math.floor(Math.random()*statesnb)));
 			cell.prop('checked',true);
 		}
 	}
