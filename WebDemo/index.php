@@ -3,8 +3,8 @@ session_start();
 $iid = session_id();
 		
 $dir = $iid;
-$input="input.".$dir."aut";
-$output="output.".$dir."log";
+$input="automaton.".$dir.".acme";
+$output="computation.".$dir.".log";
 
 if(isset($_POST['action']))
 {
@@ -23,7 +23,7 @@ if(isset($_POST['action']))
 
 		     $f = fopen($input,"w+");
 		     $o = fopen($output,"w+");
-		     fwrite($o,"Parsing data...<br/>");
+		     fwrite($o,"Parsing data...\n");
 		     if($f === FALSE)
 		     {
 		     	     $msg = "Failed to create input automaton file";
@@ -63,7 +63,11 @@ if(isset($_POST['action']))
 				fwrite($f,$aut["mats"][$i]);
 			}
 			fclose($f);
-			fwrite($o,"Computation started<br/>");
+			fwrite($o,'The <a href="'.$input.'"> automaton file</a>'."\n"); 
+			fwrite($o,'The <a href="'.$output.'"> complete log file</a>'."\n"); 
+			fwrite($o,"******************************************\n");
+			fwrite($o,"Computation started\n");
+			fwrite($o,"******************************************\n");
 			fclose($o);
 			echo "Computation started";	
 			exec("/usr/local/bin/WebDemo ".$input." >> ".$output. " 2>/dev/null  &");
@@ -78,12 +82,21 @@ if(isset($_POST['action']))
 			break;
 		     } 
 		     $out = "";
+		     $total = 0;
+		     $max = 100000;
 		     while(true)
 		     {
 			$chunk  = fread($f,1024);
 			if($chunk == "")	
-				break;
+				break;				
 			echo str_replace("\n","<br/>",$chunk);		
+			$total += strlen($chunk);
+			if($total > $max)
+			{
+				echo "Computation too long, output truncated.<br/>";
+				echo "Please download the log file for a complete log.<br/>";
+				break;
+			}
 		     }
 		     fclose($f);
 		      break;
@@ -99,15 +112,29 @@ else
 <script src="jquery-2.2.0.min.js"></script>
 </head>
 <body>
-<h1>Acme++</h1>
+<h1>Demo page of Acme++</h1>
 
 
 <p>Welcome on the demo page of Acme++,
-a tool manipulating stabilization monoids in order to solve three algorithmic problems. The first is to compute the star-height of a regular language, i.e. the minimal number of nested Kleene stars needed for expressing the language with a regular expression. The second is to decide boundedness and equivalence for regular cost functions. The third is decide whether a probabilistic automaton has value 1, i.e. whether a probabilistic automaton accept some words with probability arbitrarily close to 1.
-All three problems reduce to the computation of the stabilization monoid associated with the automaton, which is a challenge since the monoid is exponentially larger than the automaton. The compact data structures used in Acme++, together with optimizations and heuristics, allow this program to handle automata with several hundreds of states.
+a tool manipulating stabilization monoids in order to solve three algorithmic problems.
+</p>
+<ul>
+<li> Computing the star-height of a regular language, i.e. the minimal number of nested Kleene stars needed for expressing the language with a regular expression.
+</li>
+<li> Deciding boundedness and equivalence for regular cost functions.
+</li>
+<li>
+Deciding whether a leaktight probabilistic automaton has value 1, i.e. whether the automaton accepts some words with probability arbitrarily close to 1.
+</li>
+</ul>
+These three problems reduce to the computation of the stabilization monoid associated with the automaton, which is a challenge since the monoid is exponentially larger than the automaton. The compact data structures used in Acme++, together with optimizations and heuristics, allow this program to handle automata with several hundreds of states.
 </p>
 <p>
-The following form allows you to specify a two-letters automaton with three states.
+The project source code is available <a href="https://github.com/nathanael-fijalkow/acmeplusplus">on Github</a>.
+</p>
+<p>
+The following form allows you to specify a small probabilistic automaton
+and compute a presentation of the associated Markov monoid.
 </p>
 <form method="post">
 <table>
