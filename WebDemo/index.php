@@ -47,9 +47,10 @@ if(isset($_POST['action']))
 			{
 
 			//we send data to the file
+			$type = $aut["type"];
 			$snb = $aut["statesnb"];
 			$lnb = $aut["lettersnb"];
-			fwrite($f,$snb."\np\n");
+			fwrite($f,$snb."\n".$type."\n");
 			$c='a';
 			for($i=0; $i < $lnb; $i++)
 				fwrite($f,$c++);
@@ -140,6 +141,22 @@ and compute a presentation of the associated Markov monoid.
 <table>
 <tr>
 <td>
+<b>Type of automaton</b>
+<select class="auttype">
+<option value="proba">Probabilistic</option>
+<option value="counter">with Counters</option>
+</select>
+</tr>
+<tr>
+<td>
+<div id="countersnbdiv">
+<b>Number of counters</b>
+<select id="countersnb"/>
+</div>
+</td>
+</tr>
+<tr>
+<td>
 <b>Number of states</b>
 <select name="states" class="statesnb">
 </select>
@@ -158,7 +175,11 @@ and compute a presentation of the associated Markov monoid.
 </div>
 </tr></td>
 <tr>
-<td class="mats">
+<td>
+<div id="probamats">
+</div>
+<div id="countermats">
+</div>
 </td>
 </tr>
 <tr>
@@ -176,6 +197,17 @@ for($i=60;$i <=90; $i+=10)
 </tr>
 
 </table>
+<div id="buttons">
+<input type="button" class="random" value="Random" />
+<div style="float: left" id="probabdiv">
+<input type="button" class="compute" value="Check value 1" />
+</div>
+<div style="float: left" id="counterbdiv">
+<input type="button" class="compute" value="Check boundedness" />
+</div>
+
+
+</div>
 </form>
 <h2>Output</h2>
 <div class="output">
@@ -185,6 +217,47 @@ var statesnb = 3;
 var maxstatesnb = 10;
 var lettersnb = 2;
 var maxlettersnb = 4;
+var auttype = "proba";
+var maxcountersnb = 5;
+var countersnb = 2;
+
+generate_statesnb_select();
+generate_initial();
+set_type();
+generate_mats();
+
+//setting initial value to 0 enforces generation of the form
+countersnb= 0;
+update_mats(2);
+
+fill_random();
+
+setInterval(showProgress, 500);
+
+function set_type()
+{
+    auttype = $('.auttype').val();
+
+    if(auttype == "proba")
+    {	    
+    	$('#countersnbdiv').hide();
+
+	$('#countermats').hide();
+	$('#probamats').show();
+    	$('#probabdiv').show();
+	$('#counterbdiv').hide();
+	$('#density').show();
+	}
+    else
+    {
+  	$('#countersnbdiv').show();
+	$('#probamats').hide();
+	$('#countermats').show();
+	$('#probabdiv').hide();
+	$('#counterbdiv').show();
+	$('#density').hide();
+    }
+}
 
 function generate_statesnb_select()
 {
@@ -204,6 +277,16 @@ function generate_statesnb_select()
 		else
 			$('.lettersnb').append('<option>'+i+'</option>');
 	}
+	var cselect = $('#countersnb');
+	cselect.empty();
+	for(var i = 1 ; i < maxcountersnb; i++)
+	{
+		if(i == countersnb)
+			cselect.append('<option selected="selected">'+i+'</option>');
+		else
+			cselect.append('<option>'+i+'</option>');
+	} 
+
 }
 function generate_initial()
 {
@@ -237,6 +320,8 @@ function fill_random()
 	$('.c').prop('checked',false);
 	var ok = false;
 	var density = $('#density').val() / 100.0;
+	var ccoeff = counters_list();
+
 	for(j=1; j<= statesnb; j++)		 
 	{
 		var yes = Math.random() < density;
@@ -253,72 +338,176 @@ function fill_random()
 	}
 
 	var res = '';
+	var pmat = $('#probamats');
+	var cmat = $('#countermats');
 	for(i=1; i <= lettersnb; i++)
 	{
-		var mat = $('#Mat'+i);
-		for(j=1; j<= statesnb; j++)
+		for(j=1; j<= maxstatesnb; j++)
 		{
-			for(k=1; k<= statesnb; k++)
+			for(k=1; k<= maxstatesnb; k++)
 			{
-				var cell = $('#c'+i+'_'+j+'_'+k);
-				cell.prop('checked', (Math.random() < density));
+				var pcell = pmat.find('#c'+i+'_'+j+'_'+k);
+				pcell.prop('checked', (Math.random() < density));
+				var ccell = cmat.find('#c'+i+'_'+j+'_'+k);
+				ccell.val(ccoeff[Math.floor(Math.random()*ccoeff.length)]);
 			}
-			var cell = $('#c'+i+'_'+j+'_'+(1 + Math.floor(Math.random()*statesnb)));
+			var cell = pmat.find('#c'+i+'_'+j+'_'+(1 + Math.floor(Math.random()*statesnb)));
 			cell.prop('checked',true);
 		}
 	}
 }
-function update_mats()
+
+function setCharAt(str,index,chr) {
+    if(index > str.length-1) return str;
+    return str.substr(0,index) + chr + str.substr(index+1);
+}
+
+function next_coef(coef)
 {
+	if(coef == "")
+		return "";
+	for(var i = coef.length -1; i >= 0; i--)
+	{
+		switch(coef[i])
+		{
+		case 'O': 
+		     return setCharAt(coef,i,'E');
+		case 'E': 
+		     return setCharAt(coef,i,'I');
+		case 'I': 
+		     return setCharAt(coef,i,'R');
+		case 'R':
+			if(i == 0) 
+			     return "";
+			coef[i]='O';
+		}
+	}
+	return "";
+}
+
+function counters_list()
+{
+	var result = [];
+	var coef = '';
+	for(var i = 1; i <= countersnb; i++)
+		coef += "O";
+	var li = 500;
+	while( (coef != '') && (li-- >0))
+	{
+		result.push(coef);
+		coef = next_coef(coef);
+	}
+	return result;
+}
+
+function generate_counters_select()
+{
+	var result = '';
+	var counters = counters_list();
+	for(var i = 0 ; i < counters.length; i++)
+		result += '<option>'+counters[i]+'</option>';
+	return result;
+}
+function update_mats(ncountersnb)
+{
+	var counterschanged = (ncountersnb != countersnb);
+	countersnb = ncountersnb;
+
+	var cselect = counterschanged ? generate_counters_select() : '' ;
+
 	for(i=1; i <= maxlettersnb; i++)
 	{
-		var mat = $('#Mat'+i);
+		var pmat = $('#probamats').find('#Mat'+i);
+		var cmat = $('#countermats').find('#Mat'+i);
 		if(i <= lettersnb)
 		{
-			mat.show();
+			if(auttype == "proba")
+			{ 
+			  pmat.show();
+			  cmat.hide();
+			}
+			else
+			{
+			  pmat.hide();
+			  cmat.show();
+			}
+
 			for(j=1; j<= maxstatesnb; j++)
 			{
-				var line = $('#l'+i+'_'+j);
+				var pline = pmat.find('#l'+i+'_'+j);
+				var cline = cmat.find('#l'+i+'_'+j);
 				if(j > statesnb)
 				{
-					line.hide();
+					pline.hide();
+					cline.hide();
 				}
 				else
 				{		
-					line.show();
+					pline.show();
+					cline.show();
 				 	for(k=1; k<= maxstatesnb; k++)
 				 	{
-						var cell = $('#c'+i+'_'+j+'_'+k);
+						var lab= '#c'+i+'_'+j+'_'+k;
+						var ccell = cmat.find(lab);
+						var pcell = pmat.find(lab);
+						if(counterschanged)
+						{
+							var old = ccell.val();
+							ccell.empty();
+							ccell.append(cselect);
+							ccell.val(old);
+							if(ccell.val() == "")
+							{
+								cmat.find(lab +' :nth-child(0)').prop('selected', true);
+							}
+						}
 				 		if(k <= statesnb)
-						     cell.show();
+						{
+						     ccell.show();
+    						     pcell.show();
+						}
 	  		  			else
-							cell.hide();
+						{
+						     pcell.hide();
+    						     ccell.hide();
+						}
 					}
 				}
 			}
 		}
 		else
-			mat.hide();
-	}
+		{
+			pmat.hide();
+			cmat.hide();
+		}
+	}	
 }
 
 function generate_mats()
 {
-	$('.mats').empty();
+	$('#probamats').empty();
+	$('#countermats').empty();
 	for(i=1; i <= maxlettersnb; i++)
 	{
-		$('.mats').append('<div style="float:left;margin-right:30px" id="Mat'+i+'"><b>Mat '
-					+String.fromCharCode(97 + i - 1)+'</b></div>');
-		var mat = $('#Mat'+i);
-		mat.append('<br/>');
+		var smat = '<div style="float:left;margin-right:30px" id="Mat'+i+'"><b>Mat '
+					+String.fromCharCode(97 + i - 1)+'</b></div>';
+		$('#probamats').append(smat);
+		$('#countermats').append(smat);
+		var pmat = $('#probamats').find('#Mat'+i);
+		var cmat = $('#countermats').find('#Mat'+i);
+		pmat.append('<br/>');
+		cmat.append('<br/>');
 		for(j=1; j<= maxstatesnb; j++)
 		{
 			var lab = 'l'+i+'_'+j;
-			mat.append('<div id="'+lab+'">'+j+'</div>');
-			var line =$('#l'+i+'_'+j);
+			pmat.append('<div id="'+lab+'">'+j+'</div>');
+			cmat.append('<div id="'+lab+'">'+j+'</div>');
+			var pline =pmat.find('#'+lab);
+			var cline =cmat.find('#'+lab);
 			for(k=1; k<= maxstatesnb; k++)
 			{
-				line.append('<input class="matel" checked="checked" type="checkbox" id="c'+i+'_'+j+'_'+k+'"></input>');
+				pline.append('<input selected="" class="c" type="checkbox" id="c'+i+'_'+j+'_'+k+'"/>');
+				cline.append('<select selected=""  id="c'+i+'_'+j+'_'+k+'"/>');
 			}
 		}
 	}
@@ -342,28 +531,26 @@ function showProgress()
   });
 }
 
-$('form').append('<input type="button" class="random" value="Random" />');
-$('form').append('<input type="button" class="compute" value="Check value 1" />');
-generate_statesnb_select();
-generate_initial();
-generate_mats();
-update_mats();
-fill_random();
 
-setInterval(showProgress, 500);
 
-	
 $( ".statesnb" ).change(function() {
    statesnb=this.value;
-   generate_statesnb_select();
    update_initial();
-   update_mats();
+   update_mats(countersnb);
 });
 
 $( ".lettersnb" ).change(function() {
    lettersnb=this.value;
-   generate_statesnb_select();
-   update_mats();
+   update_mats(countersnb);
+});
+
+$( ".countersnb" ).change(function() {
+   update_mats(countersnb);
+});
+
+$( ".auttype" ).change(function() {
+   set_type();
+   update_mats(countersnb);
 });
 
 $(".random").click(function() {
@@ -387,14 +574,24 @@ $(".compute").click(function() {
 		{
 			for(k=1; k <= statesnb; k++)
 			{
-			 var $cell = $('#c'+i+'_'+j+'_'+k);
+			
+			if(auttype == "proba")
+			{
+			 var $cell = $('#probamats').find('#c'+i+'_'+j+'_'+k);
 			 st += $cell.prop('checked') ? "1 " : "_ ";
+			 }
+			 else
+			 {
+			 var $cell = $('#countermats').find('#c'+i+'_'+j+'_'+k);
+			 st += $cell.val()+ " ";
+			 }
 			}
 			st+="\n";
 		}
 		mats.push(st);
 	}
 	var aut = {
+	"type" : (auttype == "proba") ? "p" : countersnb,
 	"statesnb" : statesnb,
 	"lettersnb" : lettersnb,
 	"initial" : initial,
@@ -411,13 +608,6 @@ $(".compute").click(function() {
 		    output(msg );
 		      });
 });
-
-$( "input" ).change(function() {
-  var $input = $( this );
-  output(
-	$input.attr("id") + $input.prop("checked")
-	);
-}).change();
 
 </script>
 <br/>
