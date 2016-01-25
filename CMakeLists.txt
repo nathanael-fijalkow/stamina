@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (Acme++)
 
+option(COMPILE_SAGE_MODULES "Compiles SAGE modules (requires BOOST >= 1.45.0)" OFF)
 
 option(MSVC "Compile for Visual Studio" OFF)
 if(MSVC)
@@ -97,6 +98,7 @@ target_link_libraries (TestAut ${EXTRA_LIBS})
 add_executable (TestStarHeight ${ALL_SOURCES} ${ALL_HEADERS} TestStarHeight.cpp)
 target_link_libraries (TestStarHeight ${EXTRA_LIBS})
 
+if(COMPILE_SAGE_MODULES)
 if(APPLE)
 	include(FindPythonLibs)
 endif()
@@ -109,7 +111,6 @@ if(Boost_FOUND)
   set(Boost_USE_STATIC_RUNTIME OFF)
   find_package(Boost 1.45.0 COMPONENTS python)
 
-
   add_library(acme SHARED ${ALL_SOURCES} ${ALL_HEADERS} PyInterface.cpp)
 if(APPLE)
   target_link_libraries(acme ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
@@ -119,4 +120,5 @@ endif()
 
 elseif(NOT Boost_FOUND)
   message(FATAL_ERROR "Unable to find correct Boost version. Did you set BOOST_ROOT?")
+endif()
 endif()
