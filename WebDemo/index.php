@@ -33,13 +33,13 @@ if(isset($_POST['action']))
 	  }
 	else if($aut["initial"] == '')
 	  {
-	    $msg = "The automaton has no initial state, the value is 0";
+	    $msg = "This automaton has no initial state.";
 	    fwrite($o,$msg);
 	    break;
 	  }
 	else if($aut["final"] == '')
 	  {
-	    $msg = "The automaton has no final state, the value is 0";
+	    $msg = "This automaton has no final state.";
 	    fwrite($o,$msg);
 	    break;
 	  }
@@ -90,7 +90,7 @@ if(isset($_POST['action']))
 	    $chunk  = fread($f,1024);
 	    if($chunk == "")	
 	      break;				
-	    echo str_replace(array("\n","E ","O ","B "),array("<br/>","&epsilon;","&omega;","&infin;"),$chunk);		
+	    echo str_replace(array("\n","E ","O "),array("<br/>","&epsilon;","&omega;"),$chunk);		
 	    $total += strlen($chunk);
 	    if($total > $max)
 	      {
@@ -362,7 +362,7 @@ else
 
     function counters_list()
     {
-      var result = [ ["B","&infin;"], ["O","&omega;"] , ["E","&epsilon;"] ];
+      var result = [ ["B"," "], ["O","&omega;"] , ["E","&epsilon;"] ];
       var coef = '';
       for(var i = 1; i <= countersnb(); i++)
 	{	
