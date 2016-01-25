@@ -1,5 +1,6 @@
 
 #include "Parser.hpp"
+#include "Automata.hpp"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -27,7 +28,7 @@ int lttoi(string s)
     res = stoi(s)+1;
   }
   catch(exception& e) {
-    cerr << "Syntax error at line: " << linenumber << endl;
+    cerr << "Syntax error at line: " << linenumber <<  endl << "Exception: " << string(e.what()) << endl;
     exit(-1);
   }
   return res;
@@ -89,7 +90,11 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
       istringstream iss2(line);
       for(int k=0;k<size;k++) {
 	getfline(iss2,line,' ');
-	mat->coefficients[j][k]=lttoi(line);
+          if(type <= 0)
+              mat->coefficients[j][k]=lttoi(line);
+          else
+              mat->coefficients[j][k]=MultiCounterAut::coef_to_char(line,type);
+          
       }
     }
     ret->matrices[i]=mat;

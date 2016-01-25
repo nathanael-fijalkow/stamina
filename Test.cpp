@@ -311,7 +311,7 @@ int main(int argc, char **argv)
   (cmat[i] == 'R') ? RESET :
   BOT;
   }
-
+*/
   /*
   ExplicitMatrix mata(3);
   mata.coefficients = new char[64] { BOT, EPS };

@@ -292,6 +292,8 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 }
 
 
+
+
 //Multi-counter Automata
 void MultiCounterAut::init(char Nletters,uint Nstates, char Ncounters){
 	NbLetters=Nletters;
@@ -336,16 +338,44 @@ MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
 	
 }
 
-string MultiCounterAut::elementToString(char element)
+char MultiCounterAut::coef_to_char(string coef, int NbCounters)
 {
-	string result = "";
-	if (is_bottom(element)) result = "_ ";
-	else if (is_omega(element)) result = "O ";
-	else if (is_epsilon(element)) result = "E ";
-	else if (is_reset(element)) result = "R" + to_string( get_reset_counter(element));
-	else result = "I" + to_string(get_inc_counter(element));
-	return result;
+    if(coef == "") return 2 * NbCounters + 2;
+    if(coef == "B") return 2 * NbCounters + 2;
+    if(coef == "O") return 2 * NbCounters + 1;
+    if(coef == "E") return NbCounters;
+    if(coef[0]=='R' && coef.size()==2)
+    {
+        char c = coef[1] - '0';
+        if(c >= 0 || c < NbCounters)
+            return c;
+    }
+    if(coef[0]=='I' && coef.size()==2)
+    {
+        char c = coef[1] - '0';
+        if(c >= 0 || c < NbCounters)
+            return (NbCounters + c);
+    }
+    throw runtime_error("coef_to_char: cannot convert '" + coef + "' from string");
 }
+
+string MultiCounterAut::coef_to_string(char element)
+{
+    string result = "";
+    if (is_bottom(element)) result = "_ ";
+    else if (is_omega(element)) result = "O ";
+    else if (is_epsilon(element)) result = "E ";
+    else if (is_reset(element)) result = "R" + to_string( get_reset_counter(element));
+    else result = "I" + to_string(get_inc_counter(element));
+    return result;
+}
+
+char MultiCounterAut::coef_to_char(string coef)
+{
+    return coef_to_char(coef, NbCounters);
+}
+
+
 
 string state_index_to_tuple(int index, int NbStates)
 {
@@ -386,7 +416,7 @@ void MultiCounterAut::print(ostream& st){
 		for(uint i=0;i<NbStates;i++){
 			st << state_index_to_string(i) << " ";
 			for(uint j=0;j<NbStates;j++){
-				st << elementToString(trans[a][i][j]) << " ";
+				st << coef_to_string(trans[a][i][j]) << " ";
 			}
 			st << endl;
 		}
@@ -415,7 +445,7 @@ void MultiCounterEpsAut::print(ostream& st){
 	for (unsigned char a = 0; a<NbLetters; a++){
 		st << "Letter " << (int)a << endl;
 		for (uint i = 0; i<NbStates; i++){
-			st << state_index_to_string(i) << " -- " << elementToString(transdet_action[a][i]) << " --> " << state_index_to_string(transdet_state[a][i]) << endl;
+			st << state_index_to_string(i) << " -- " << coef_to_string(transdet_action[a][i]) << " --> " << state_index_to_string(transdet_state[a][i]) << endl;
 		}
 		st << endl;
 	}
@@ -425,7 +455,7 @@ void MultiCounterEpsAut::print(ostream& st){
 	{
 		st << state_index_to_string(i) << ": ";
 		for (uint j = 0; j<NbStates; j++)
-			st << elementToString(trans_eps[i][j]) << " ";
+			st << coef_to_string(trans_eps[i][j]) << " ";
 		st << endl;
 	}
 }

@@ -78,8 +78,9 @@ public:
 
 	// Constructor
 	MultiCounterAut(char Nletters, uint Nstates, char Ncounters);
+    virtual ~MultiCounterAut(){};
 
-	// number of letters in alphabet, numbered 0,1,2,...
+    // number of letters in alphabet, numbered 0,1,2,...
 	char NbLetters;
 
 	// number of states, numbered 0,1,2,...
@@ -122,11 +123,17 @@ public:
 	bool is_omega(char code){ return code == 2 * NbCounters + 1; }
 	bool is_bottom(char code){ return code == 2 * NbCounters + 2; }
 
+    
 	// This matrix act_prod is of size (2N+3)*(2N+3), it is computed once and for all.
 	vector<vector<char>> act_prod;
 	
 	virtual void print(ostream& st = cout);
-	string elementToString(char element);
+	
+    /* converts string EROI representation to char rrepresentation back end forth */
+    string coef_to_string(char coef);
+    char coef_to_char(string coef);
+
+    static char coef_to_char(string coef, int NbCounters);
 
 protected:
 	string state_index_to_string(int index);

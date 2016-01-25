@@ -24,8 +24,8 @@ using namespace std;
 #define MAX_JOBS 10
 
 vector<bool> finalStates;
-int initialState;
-int size;
+int initialState = 0;
+int autsize = 0;
 
 bool test_witness(const ProbMatrix* m) 
 {
@@ -48,22 +48,23 @@ bool test_witness(const ProbMatrix* m)
 	  cout << i << ": " << finalStates[i] << " " << ones->contains(i) << endl;
        */
 
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < autsize; i++)
 	  if( !finalStates[i]  && ones->contains(i))
 			return false;
 	return true;
 }
 
+
 UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
 {
 	initialState = aut->initialState;
-	size = aut->size;
-	finalStates.resize(size,false);
-	for(int i = 0 ; i < size; i++)
+	autsize = aut->size;
+	finalStates.resize(autsize,false);
+	for(int i = 0 ; i < autsize; i++)
 	  {
 	    auto s = aut->finalStates[i];
 	    //	    cout << i << " fstate: " << s << endl;
-	    if(s>= 0 && s< size)
+	    if(s>= 0 && s< autsize)
 	      finalStates[s] = true;
 	  }
 	UnstableMarkovMonoid* ret = new UnstableMarkovMonoid(aut->size);
@@ -71,7 +72,19 @@ UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
 	for(int i=0;i<aut->alphabet.length();i++)
 		ret->addLetter(aut->alphabet[i],*(aut->matrices[i]));
 	return ret;
-}
+};
+
+
+UnstableMultiMonoid * toUnstableMultiMonoid(ExplicitAutomaton * aut)
+{
+    initialState = aut->initialState;
+    autsize=aut->size;
+    
+    UnstableMultiMonoid * ret = new UnstableMultiMonoid(autsize,aut->type);
+    for(int i=0 ; i < aut->alphabet.length() ; i++)
+        ret->addLetter( aut->alphabet[i] , *(aut->matrices[i]) );
+    return ret;
+};
 
 /*
 passthru() est similaire à la fonction exec() car les deux exécutent la commande command. Si l'argument return_var est présent, le code de statut de réponse UNIX y sera placé. Cette fonction devrait être préférée aux commandes exec() ou system() lorsque le résultat attendu est de type binaire, et doit être passé tel quel à un navigateur. Une utilisation classique de cette fonction est l'exécution de l'utilitaire pbmplus qui peut retourner une image. En fixant le résultat du contenu (Content-Type) à image/gif puis en appelant pbmplus pour obtenir une image gif, vous pouvez créer des scripts PHP qui retournent des images.
@@ -216,6 +229,30 @@ int main(int argc, char **argv)
       if(height == lc)
 	cout << "And it is optimal (loop complexity is equal to the star height)" << endl;
       */
+    }
+  else if (expa->type > 0)
+    {
+      UnstableMultiMonoid * m = toUnstableMultiMonoid(expa);
+      auto expr = m->containsUnlimitedWitness();
+
+      if(expr == NULL)
+	cout << "The monoid has exactly " << m->expr_to_mat.size() << " elements" << endl;
+      else
+	{
+	cout << "The monoid has at least " << m->expr_to_mat.size() << " elements,<br/>";
+      cout << "the computation stopped because an unlimited witness was found." << endl;
+	}
+
+      if(expr == NULL)
+	{
+	  cout << "This automaton is bounded, its monoid contains no unlimited witness." << endl;
+	}
+      else
+	{
+	  cout << "This automaton is NOT bounded, its monoid contains the following unlimited witness:" << endl;
+	  cout << *expr << endl;
+	}
+  	m->print();
     }
   cout << "Computation over " << endl;
 }

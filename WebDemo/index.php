@@ -90,7 +90,7 @@ if(isset($_POST['action']))
 			$chunk  = fread($f,1024);
 			if($chunk == "")	
 				break;				
-			echo str_replace("\n","<br/>",$chunk);		
+			echo str_replace(array("\n","E ","O ","B "),array("<br/>","&epsilon;","&omega;","&infin;"),$chunk);		
 			$total += strlen($chunk);
 			if($total > $max)
 			{
@@ -387,15 +387,12 @@ function next_coef(coef)
 
 function counters_list()
 {
-	var result = [];
+	var result = [ ["B","&infin;"], ["O","&omega;"] , ["E","&epsilon;"] ];
 	var coef = '';
 	for(var i = 1; i <= countersnb; i++)
-		coef += "O";
-	var li = 500;
-	while( (coef != '') && (li-- >0))
-	{
-		result.push(coef);
-		coef = next_coef(coef);
+	{	
+		result.push(['I'+i,'i'+i]);
+		result.push(['R'+i, 'r'+i]);
 	}
 	return result;
 }
@@ -405,7 +402,7 @@ function generate_counters_select()
 	var result = '';
 	var counters = counters_list();
 	for(var i = 0 ; i < counters.length; i++)
-		result += '<option>'+counters[i]+'</option>';
+		result += '<option value='+counters[i][0]+'>'+counters[i][1]+'</option>';
 	return result;
 }
 function update_mats(ncountersnb)

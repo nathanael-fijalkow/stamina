@@ -27,7 +27,7 @@ void ExplicitMatrix::print(std::ostream& os) const
 	for (int i = 0; i < stateNb; i++)
 	{
 		for (int j = 0; j < stateNb; j++)
-			cout << (int) coefficients[i][j] << " ";
+			cout << coefficients[i][j] << " ";
 		cout << endl;
 	}
 }

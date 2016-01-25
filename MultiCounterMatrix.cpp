@@ -89,11 +89,11 @@ void MultiCounterMatrix::print(std::ostream & os, vector<string> state_names) co
 //			os << " " << (int)((rows[i]->coefs[j] == 6) ? 6 : rows[i]->coefs[j]);
 				string result = "";
 				auto element = rows[i]->coefs[j];
-				if (element == 2 * N + 2) result = "_";
-				else if (element == 2 * N + 1) result = "O";
-				else if (element == N) result = "E";
-				else if (element < N) result = "R" + to_string(element);
-				else result = "I" + to_string(element - N - 1);
+				if (element == 2 * N + 2) result = "_ ";
+				else if (element == 2 * N + 1) result = "O ";
+				else if (element == N) result = "E ";
+				else if (element < N) result = "r" + to_string(element);
+				else result = "i" + to_string(element - N - 1);
 				if (result.size() <= 1) result.push_back(' ');
 				os << result << " ";
 		}
