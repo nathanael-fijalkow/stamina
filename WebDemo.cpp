@@ -81,6 +81,15 @@ UnstableMultiMonoid * toUnstableMultiMonoid(ExplicitAutomaton * aut)
     autsize=aut->size;
     
     UnstableMultiMonoid * ret = new UnstableMultiMonoid(autsize,aut->type);
+    ret->initial_states.clear();
+    ret->final_states.clear();
+    ret->initial_states.push_back(initialState);
+    for(int i = 0 ; i < autsize; i++)
+    {
+        auto s = aut->finalStates[i];
+        if(s>= 0 && s< autsize)
+            ret->final_states.push_back(s);
+    }
     for(int i=0 ; i < aut->alphabet.length() ; i++)
         ret->addLetter( aut->alphabet[i] , *(aut->matrices[i]) );
     return ret;
