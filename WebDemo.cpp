@@ -68,7 +68,6 @@ UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
 	      finalStates[s] = true;
 	  }
 	UnstableMarkovMonoid* ret = new UnstableMarkovMonoid(aut->size);
-       	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
 	for(int i=0;i<aut->alphabet.length();i++)
 		ret->addLetter(aut->alphabet[i],*(aut->matrices[i]));
 	return ret;
@@ -114,14 +113,14 @@ the next lines are the transition matrices, one for each letter in the input ord
 
 int main(int argc, char **argv)
 {
-  if(argc <= 1)
+  if(argc <= 2)
     {
-      cout << "Usage " << string(argv[0]) << " [input file] [ (opt) timeout in sec]" << endl;
+      cout << "Usage " << string(argv[0]) << " [compute-monoid,has-value1,is-unbounded] [input file] [ (opt) timeout in sec]" << endl;
       exit(0);
     }
 #ifdef UNIX
   int timeout = 3 * 60;
-  if(argc >= 3)
+  if(argc >= 4)
     try
       {
     timeout = stoi(argv[2]);
@@ -134,9 +133,12 @@ int main(int argc, char **argv)
   sigalarm(tiemout);
 #endif
 
+  string action(argv[1]);
+  bool find_witness = (action != "compute-monoid");
+ 
   ExplicitAutomaton* expa = NULL;
   {
-    ifstream input(argv[1]);
+    ifstream input(argv[2]);
     if(!input)
       {
       cout << "Failed to open input '" << string(argv[1]) << "'" << endl;
@@ -153,7 +155,9 @@ int main(int argc, char **argv)
   
   if(expa->type==PROB)
     {
-      UnstableMarkovMonoid* m = toMarkovMonoid(expa);
+      UnstableMarkovMonoid * m = toMarkovMonoid(expa);
+      if(find_witness)
+       	m->setWitnessTest((bool(*)(const Matrix*))&test_witness);
       auto expr = m->ComputeMonoid();
 
       if(expr == NULL)
@@ -242,7 +246,10 @@ int main(int argc, char **argv)
   else if (expa->type > 0)
     {
       UnstableMultiMonoid * m = toUnstableMultiMonoid(expa);
-      auto expr = m->containsUnlimitedWitness();
+      const ExtendedExpression * expr =
+	find_witness ?
+	m->containsUnlimitedWitness() :
+	m->ComputeMonoid();
 
       if(expr == NULL)
 	cout << "The monoid has exactly " << m->expr_to_mat.size() << " elements" << endl;
@@ -252,6 +259,8 @@ int main(int argc, char **argv)
       cout << "the computation stopped because an unlimited witness was found." << endl;
 	}
 
+      if(find_witness)
+	{
       if(expr == NULL)
 	{
 	  cout << "This automaton is bounded, its monoid contains no unlimited witness." << endl;
@@ -260,6 +269,7 @@ int main(int argc, char **argv)
 	{
 	  cout << "This automaton is NOT bounded, its monoid contains the following unlimited witness:" << endl;
 	  cout << *expr << endl;
+	}
 	}
   	m->print();
     }

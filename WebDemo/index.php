@@ -11,7 +11,9 @@ if(isset($_POST['action']))
     $action = $_POST['action'];
     switch($action)
       {
-      case 'compute':
+      case 'compute-monoid':
+      case 'has-value1':
+      case 'is-bounded':
 	$aut=$_POST['automaton'];
 
 	//starts a new computation
@@ -23,7 +25,6 @@ if(isset($_POST['action']))
 
 	$f = fopen($input,"w+");
 	$o = fopen($output,"w+");
-	fwrite($o,"Parsing data...\n");
 	if($f === FALSE)
 	  {
 	    $msg = "Failed to create input automaton file";
@@ -64,14 +65,11 @@ if(isset($_POST['action']))
 		fwrite($f,$aut["mats"][$i]);
 	      }
 	    fclose($f);
-	    fwrite($o,'The <a href="'.$input.'"> automaton file</a>'."\n"); 
-	    fwrite($o,'The <a href="'.$output.'"> complete log file</a>'."\n"); 
-	    fwrite($o,"******************************************\n");
-	    fwrite($o,"Computation started\n");
-	    fwrite($o,"******************************************\n");
+	    fwrite($o,'The <a href="'.$input.'"> automaton file</a> and '); 
+	    fwrite($o,'the <a href="'.$output.'"> log file</a>'."\n"); 
 	    fclose($o);
 	    echo "Computation started";	
-	    exec("acmeplusplus/build/WebDemo ".$input." >> ".$output. " 2>/dev/null  &");
+	    exec("acmeplusplus/build/WebDemo ".$action." ".$input." >> ".$output. " 2>/dev/null  &");
 	  }
 	break;
       case 'progress':
@@ -109,12 +107,24 @@ if(isset($_POST['action']))
 else
   {
     ?>
-    <head>
-      <script src="jquery-2.2.0.min.js"></script>
-      </head>
-      <body>
-      <h1>Demo page of Acme++</h1>
 
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Acme++ Online</title>
+<style>
+   table, th, td {
+ margin:5px;
+ }
+   body {
+   margin: 10% 10% 10% 10%;
+   }
+</style>
+</head>
+<body margin="10">
+      <script src="jquery-2.2.0.min.js" type="text/javascript"></script>
+<center><h1>Acme++ Online</h1></center>
 
       <p>Welcome on the demo page of Acme++,
       a tool manipulating stabilization monoids in order to solve three algorithmic problems.
@@ -136,51 +146,48 @@ else
 				     The compact data structures used in Acme++, together with optimizations and heuristics,
 				     allow this program to handle automata with several hundreds of states.</p>
 				     <p>
-				     The project source code is available <a href="https://github.com/nathanael-fijalkow/acmeplusplus">on Github</a>.
-				     </p>
-				     <p>The following form allows you to specify a small probabilistic automaton
-				     and compute a presentation of the associated Markov monoid.</p>
+				     The project source code is available <a href="https://github.com/nathanael-fijalkow/acmeplusplus">on Github</a>.<br/>
+Bug reports and requests should be sent to [hugo dot gimbert at cnrs dot fr].</p>
+<hr/>
 				     <form method="post">
 				     <table>
 				     <tr>
 				     <td>
 				     <b>Type of automaton</b>
+
 				     <select class="matchanger" id="auttype">
 				     <option selected="selected" value="counter">with Counters</option>
 				     <option value="proba">Probabilistic</option>
 				     </select>
-				     </tr>
-				     <tr>
-				     <td>
-				     <div id="countersnbdiv">
-				     <b>Number of counters</b>
-				     <select class="matchanger" id="countersnb"/>
-				     </div>
-				     </td>
-				     </tr>
-				     <tr>
-				     <td>
-				     <b>Number of states</b>
-				     <select class="matchanger" name="states" id="statesnb"></select>
-				     <b> letters</b>
+</td></tr><tr><td>
+				     <b>Letters</b>
 				     <select class="matchanger" name="letters" id="lettersnb"></select>
+				     <b>states</b>
+				     <select class="matchanger" name="states" id="statesnb"></select>
+				     <span id="countersnbdiv">
+				     <b>counters</b>
+				     <select class="matchanger" id="countersnb"></select>
+				     </span>
 				     </td></tr>
 				     <tr><td>
-				     <b>Initial states</b>
-				     <div class="initial"></div>
-				     </tr></td>
-				     <tr><td>
-				     <b>Final states</b>
-				     <div class="final"></div>
-				     </tr></td>
-				     <tr>
+				     <table><tr>
+				     <td style="vertical-align:top">
+				     <b>Initial</b>
+				     <span class="initial"></span>
+				     </td><td>&nbsp;</td>
+				     <td style="vertical-align:top">
+				     <b>Final</b>
+				     <span class="final"></span>
+				     </td>
+				     </td><td>&nbsp;</td>
 				     <td>
-				     <div id="probamats" ></div>
-				     <div id="countermats" ></div>
+				     <span id="probamats" ></span>
+				     <span id="countermats" ></span>
 				     </td>
 				     </tr>
+				     </table></td></tr>
 				     <tr>
-				     <td>Density
+				     <td class="density" >Density
 				     <select id="density" />
 				     <?php
 				     for($i=10;$i <=40; $i+=10)
@@ -195,20 +202,22 @@ else
 
 	  </table>
 	  <div id="buttons">
-	  <input type="button" class="random" value="Random" />
-	  <div style="float: left" id="probabdiv">
-	  <input type="button" class="compute" value="Check value 1" />
-	  </div>
-	  <div style="float: left" id="counterbdiv">
-	  <input type="button" class="compute" value="Check boundedness" />
-	  </div>
+	  <input type="button" id="random" value="Random" ></input>
+	  <input type="button" class="compute" id="compute-monoid" value="Compute the monoid" ></input>
+	  <span  id="probabdiv">
+	  <input type="button" class="compute" id="has-value1" value="Check value 1" ></input>
+	  </span>
+	  <span id="counterbdiv">
+	  <input type="button" class="compute" id="is-bounded" value="Check boundedness" ></input>
+	  </span>
 
 
 	  </div>
 	  </form>
 	  <div class="log">
 	  </div>
-	  <h2>Output</h2>
+<hr/>
+	  <h3>Output</h3>
 	  <div class="output">
 	  </div>
 	  <script>
@@ -240,7 +249,7 @@ else
     update();
     fill_random();
 
-    setInterval(showProgress, 500);
+    setInterval(showProgress, 1000);
 
     function generate()
     {
@@ -248,20 +257,16 @@ else
       $('#statesnb').empty();
       for(i=1; i <= maxstatesnb; i++)
 	{
-	  if(i == initialstatesnb)
-	    $('#statesnb').append('<option selected="selected">'+i+'</option>');
-	  else
-	    $('#statesnb').append('<option>'+i+'</option>');
+	  var sell = (i == initialstatesnb) ? 'selected="selected"' : '';
+	  $('#statesnb').append('<option '+sell+'>'+i+'</option>');
 	}
 
       /* Generate lettersnb selector */
       $('#lettersnb').empty();
       for(i=1; i <= maxlettersnb; i++)
 	{
-	  if(i == initiallettersnb)
-	    $('#lettersnb').append('<option selected="selected">'+i+'</option>');
-	  else
-	    $('#lettersnb').append('<option>'+i+'</option>');
+	  var sell = (i == initialstatesnb) ? 'selected="selected"' : '';
+	  $('#lettersnb').append('<option '+sell+'>'+i+'</option>');
 	}
 
       /* Generate countersnb selector */
@@ -280,8 +285,8 @@ else
       $('.final').empty();
       for(i=1; i <= maxstatesnb; i++)
 	{
-	  $('.initial').append('<div style="float: left" id="i'+i+'"><input class="c" type="checkbox">'+i+'</input></div>');
-	  $('.final').append('<div style="float: left" id="f'+i+'"><input class="c" type="checkbox">'+i+'</input></div>');
+	  $('.initial').append('<div  id="i'+i+'">'+i+'<input class="c" type="checkbox"></input></div>');
+	  $('.final').append('<div  id="f'+i+'">'+i+'<input class="c" type="checkbox"></input></div>');
 	}
 
       /* Generate matrix editor */
@@ -396,7 +401,7 @@ else
 	  $('#probamats').show();
 	  $('#probabdiv').show();
 	  $('#counterbdiv').hide();
-	  $('#density').show();
+	  $('.density').show();
 	}
       else
 	{
@@ -405,7 +410,7 @@ else
 	  $('#countermats').show();
 	  $('#probabdiv').hide();
 	  $('#counterbdiv').show();
-	  $('#density').hide();
+	  $('.density').hide();
 	}
       var cselect = '';
       var counters = counters_list();
@@ -480,7 +485,7 @@ else
 	update();
       });
 
-    $(".random").click(function() {
+    $("#random").click(function() {
 	fill_random();
       });
 
@@ -529,7 +534,7 @@ else
 	$.ajax({
 	  method: "POST",
 	      url: "",
-	      data: { "action": "compute", "automaton" : aut }
+	      data: { "action": this.id, "automaton" : aut }
 	  })
 	  .done(function( msg ) {
 	      output(msg );
@@ -543,4 +548,7 @@ else
 	</body>
 	<?php
 	}
+
 ?>
+</body>
+</html>
