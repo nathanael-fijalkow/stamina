@@ -3,8 +3,16 @@ session_start();
 $iid = session_id();
 		
 $dir = $iid."@".$_SERVER['REMOTE_ADDR'];
-$input="automaton.".$dir.".acme";
-$output="computation.".$dir.".log";
+
+$finput="automaton.".$dir.".acme";
+$foutput="computation.".$dir.".log";
+$input="demo/".$finput;
+$output="demo/".$foutput;
+$bin="webdemo";
+$input=$finput;
+$output=$foutput;
+$bin = realpath("acmeplusplus/build/WebDemo");
+
 
 if(isset($_POST['action']))
   {
@@ -69,10 +77,13 @@ if(isset($_POST['action']))
 	    fwrite($o,'the <a href="'.$output.'"> log file</a>'."\n"); 
 	    fclose($o);
 	    echo "Computation started";	
-	    exec("acmeplusplus/build/WebDemo ".$action." ".$input." >> ".$output. " 2>/dev/null  &");
+	    exec("nice ".$bin." ".$action." ".$finput." >> ".$foutput. " 2>/dev/null  &");
 	  }
 	break;
       case 'progress':
+	$size = filesize($output);
+	$max = 10000;
+
 	//retourne le contenu du fichier de sortie
 	$f =fopen($output,"r");
 	if($f ===false)
@@ -81,20 +92,38 @@ if(isset($_POST['action']))
 	    break;
 	  } 
 	$out = "";
-	$total = 0;
-	$max = 100000;
+
+	if($size <= $max)
+	  {
 	while(true)
 	  {
-	    $chunk  = fread($f,1024);
-	    if($chunk == "")	
-	      break;				
+	    $chunk  = fgets($f);
+	    if($chunk === false)
+	      break;
 	    echo str_replace(array("\n","E ","O "),array("<br/>","&epsilon;","&omega;"),$chunk);		
-	    $total += strlen($chunk);
-	    if($total > $max)
+	  }
+	  }
+	else
+	  {
+	    $chunk  = fgets($f);
+	    echo str_replace(array("\n","E ","O "),array("<br/>","&epsilon;","&omega;"),$chunk);		
+	    $chunk  = fgets($f);
+	    echo str_replace(array("\n","E ","O "),array("<br/>","&epsilon;","&omega;"),$chunk);		
+
+	    echo "<br/>*************************************************<br/>";
+	    echo "<br/>The computation is long, output is truncated...";
+	    echo "Here is <a href=\"".$foutput."\">the complete log.</a><br/>";
+	    echo "<br/>*************************************************<br/>";
+
+	    fseek($f, $size - $max);
+	    $chunk  = fgets($f);
+
+	    while(true)
 	      {
-		echo "Computation too long, output truncated.<br/>";
-		echo "Please download the log file for a complete log.<br/>";
-		break;
+	    $chunk  = fgets($f);
+	    if($chunk === false)
+	      break;
+	    echo str_replace(array("\n","E ","O "),array("<br/>","&epsilon;","&omega;"),$chunk);		
 	      }
 	  }
 	fclose($f);
