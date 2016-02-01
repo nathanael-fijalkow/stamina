@@ -61,10 +61,10 @@ protected:
 	// Four C-style matrices of size Vector::GetStateNb() containing all rows and cols, state per state, each has length Vector::GetStateNb(), first row_pluses then row_one then col_pluses then col_ones //
     const Vector ** myvectors;
     
-    const Vector ** row_pluses() const { return myvectors; }
-	const Vector ** row_ones() const { return myvectors + Vector::GetStateNb(); }
-	const Vector ** col_pluses() const { return myvectors + 2*Vector::GetStateNb(); }
-	const Vector ** col_ones() const { return myvectors + 3*Vector::GetStateNb(); }
+    const Vector ** row_ones() const { return myvectors; }
+    const Vector ** row_pluses() const { return myvectors  + Vector::GetStateNb(); }
+	const Vector ** col_ones() const { return myvectors + 2 * Vector::GetStateNb(); }
+    const Vector ** col_pluses() const { return myvectors + 3 * Vector::GetStateNb(); }
 
 	void update_hash()
 	{

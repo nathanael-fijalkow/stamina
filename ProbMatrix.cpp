@@ -153,22 +153,12 @@ ExplicitMatrix* ProbMatrix::toExplicitMatrix() const
 bool ProbMatrix::operator==(const ProbMatrix & mat) const
 {
 	if (mat._hash != _hash) return false;
-
     auto N =Vector::GetStateNb();
-	const Vector ** row = myvectors + N;
-	const Vector ** row1 = mat.myvectors + N;
-	for (; row != myvectors + 2 * N; row++, row1++)
-	{
-		if (*row != *row1) return false;
-	}
-
-    row = myvectors;
-    row1 = myvectors + 3*N;
-	for (; row != myvectors + 4*N; row++, row1++)
-	{
-		if (*row != *row1) return false;
-	}
-
+    const Vector ** row = myvectors;
+    const Vector ** row1 = mat.myvectors;
+    for( ; row  != myvectors + 2*N; row++,row1++)
+        if(*row != * row1)
+            return false;
 	return true;
 };
 
