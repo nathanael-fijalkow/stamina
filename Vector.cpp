@@ -24,8 +24,14 @@ void Vector::init()
 Vector::Vector(const Vector & other)
 {
 	init();
-	memcpy(bits, other.bits, bitsNb * sizeof(size_t));
-	_hash = other.Hash();
+    *this = other;
+}
+
+Vector& Vector::operator=(const Vector & other)
+{
+    memcpy(bits, other.bits, bitsNb * sizeof(size_t));
+    _hash = other.Hash();
+    return *this;
 }
 
 // Third constructor

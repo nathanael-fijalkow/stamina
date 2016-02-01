@@ -53,7 +53,7 @@ public:
 	// Number of states of the matrix is Vector::StateNb
 	// Constructor from state nb
 	Matrix();
-        virtual ~Matrix(){};
+    virtual ~Matrix(){};
 
 	// Print
 	virtual void print(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const = 0;

@@ -39,7 +39,7 @@ public:
 	// Construct new vector, size is fixed by set_size
 	Vector();
 
-	// Second constructor
+	// Copy constructor
 	Vector(const Vector & other);
 
 	// Third constructor
@@ -58,7 +58,6 @@ public:
 
 	// Print
 	void print(std::ostream& os) const;
-
 
 protected:
 
@@ -82,10 +81,9 @@ protected:
 			_hash ^= std::hash_value(*index) + 0x9e3779b9 + (_hash << 6) + (_hash >> 2);
 	};
 
-private:
+    // Assignement operator
+    Vector & operator = (const Vector & other);
 
-	// Equality operator
-	Vector & operator = (const Vector & other);
 
 };
 

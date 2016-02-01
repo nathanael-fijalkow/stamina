@@ -6,19 +6,35 @@ using namespace std;
 // Class Matrix
 void ProbMatrix::allocate()
 {
-	row_pluses = (const Vector **)malloc(Vector::GetStateNb() * sizeof(void *));
-	row_ones = (const Vector **)malloc(Vector::GetStateNb() * sizeof(void *));
-	col_pluses = (const Vector **)malloc(Vector::GetStateNb() * sizeof(void *));
-	col_ones = (const Vector **)malloc(Vector::GetStateNb() * sizeof(void *));
+	myvectors = (const Vector **)malloc(4 * Vector::GetStateNb() * sizeof(void *));
 }
+ProbMatrix::~ProbMatrix()
+{
+    delete myvectors;
+    myvectors = NULL;
+}
+
+//copy constructor and assignment operator
+ProbMatrix::ProbMatrix( const ProbMatrix& other )
+{
+    allocate();
+    *this = other;
+}
+
+ProbMatrix& ProbMatrix::operator=( const ProbMatrix& other )
+{
+    memcpy(myvectors, other.myvectors, 4 * Vector::GetStateNb()  * sizeof(void *));
+    return *this;
+}
+
 
 const Vector *const *const ProbMatrix::getRowOnes() const
 {
-  return this->row_ones;
+  return row_ones();
 }
 const Vector *const *const ProbMatrix::getRowPluses() const
 {
-  return this->row_pluses;
+  return row_pluses();
 }
 
 // Convert an explicit matrix into a matrix
@@ -45,16 +61,16 @@ ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix)
 		}
 
 		unordered_set<Vector>::iterator it = vectors.emplace(r_ones).first;
-		row_ones[i] = &(*it);
+		row_ones()[i] = &(*it);
 
 		it = vectors.emplace(r_pluses).first;
-		row_pluses[i] = &(*it);
+		row_pluses()[i] = &(*it);
 
 		it = vectors.emplace(c_ones).first;
-		col_ones[i] = &(*it);
+		col_ones()[i] = &(*it);
 
 		it = vectors.emplace(c_pluses).first;
-		col_pluses[i] = &(*it);
+		col_pluses()[i] = &(*it);
 	}
 	update_hash();
 }
@@ -66,8 +82,8 @@ void ProbMatrix::print(std::ostream & os, vector<string> state_names) const
 	for (uint i = 0; i < Vector::GetStateNb(); i++)
 	{
 		os << (state_names.size() > i ? state_names[i] : to_string(i))  << ":" << " ";
-		const Vector & ones = *row_ones[i];
-		const Vector & pluses = *row_pluses[i];
+		const Vector & ones = *row_ones()[i];
+		const Vector & pluses = *row_pluses()[i];
 
 		for (uint j = 0; j < Vector::GetStateNb(); j++)
 			os << (ones.contains(j) ? "1" : pluses.contains(j) ? "+" : "_");
@@ -121,8 +137,8 @@ ExplicitMatrix* ProbMatrix::toExplicitMatrix() const
         ExplicitMatrix* ret = new ExplicitMatrix(Vector::GetStateNb());
 	for (uint i = 0; i < Vector::GetStateNb(); i++)
 	{
-	        const Vector & ones = *row_ones[i];
-		const Vector & pluses = *row_pluses[i];
+	        const Vector & ones = *row_ones()[i];
+		const Vector & pluses = *row_pluses()[i];
 
 		for (uint j = 0; j < Vector::GetStateNb(); j++)
 		  (ones.contains(j) ? 
@@ -138,16 +154,17 @@ bool ProbMatrix::operator==(const ProbMatrix & mat) const
 {
 	if (mat._hash != _hash) return false;
 
-	const Vector ** row = row_ones;
-	const Vector ** row1 = mat.row_ones;
-	for (; row != row_ones + Vector::GetStateNb(); row++, row1++)
+    auto N =Vector::GetStateNb();
+	const Vector ** row = myvectors + N;
+	const Vector ** row1 = mat.myvectors + N;
+	for (; row != myvectors + 2 * N; row++, row1++)
 	{
 		if (*row != *row1) return false;
 	}
 
-	row = row_pluses;
-	row1 = mat.row_pluses;
-	for (; row != row_pluses + Vector::GetStateNb(); row++, row1++)
+    row = myvectors;
+    row1 = myvectors + 3*N;
+	for (; row != myvectors + 4*N; row++, row1++)
 	{
 		if (*row != *row1) return false;
 	}
@@ -183,7 +200,7 @@ const Vector * ProbMatrix::recurrence_classes(const Vector * recs) const
 	uint b = 1;
 	for (uint i = 0; i < Vector::GetStateNb(); i++)
 	{
-		auto r = row_ones[i];
+		auto r = row_ones()[i];
 		if ((new_vec[i / (8 * sizeof(uint))] & b) != 0)
 		{
 			for (uint j = 0; j < Vector::GetStateNb(); j++)
@@ -214,7 +231,7 @@ uint ProbMatrix::countLeaks(const Vector * classes) const
 			for (uint j = 0; j < Vector::GetStateNb(); j++)
 			{
 				//				cout << "Checking leaks from state " << i << " to state " << j << endl;
-				if (i != j && classes->contains(j) && row_pluses[i]->contains(j))
+				if (i != j && classes->contains(j) && row_pluses()[i]->contains(j))
 				{
 					answer++;
 #if MONOID_COMPUTATION_VERBOSITY
@@ -232,7 +249,7 @@ bool ProbMatrix::check() const
 {
 	//at least one 1 per line
 	for (uint i = 0; i < Vector::GetStateNb(); i++)
-		if (row_ones[i] == Matrix::zero_vector)
+		if (row_ones()[i] == Matrix::zero_vector)
 			return false;
 	return true;
 }
@@ -247,10 +264,10 @@ Matrix * ProbMatrix::prod(const Matrix * pmat1) const
 
 	for (uint i = 0; i < n; i++)
 	{
-		result->row_ones[i] = sub_prod(mat1.row_ones[i], mat2.col_ones);
-		result->row_pluses[i] = sub_prod(mat1.row_pluses[i], mat2.col_pluses);
-		result->col_ones[i] = sub_prod(mat2.col_ones[i], mat1.row_ones);
-		result->col_pluses[i] = sub_prod(mat2.col_pluses[i], mat1.row_pluses);
+		result->row_ones()[i] = sub_prod(mat1.row_ones()[i], mat2.col_ones());
+		result->row_pluses()[i] = sub_prod(mat1.row_pluses()[i], mat2.col_pluses());
+		result->col_ones()[i] = sub_prod(mat2.col_ones()[i], mat1.row_ones());
+		result->col_pluses()[i] = sub_prod(mat2.col_pluses()[i], mat1.row_pluses());
 	}
 
 	result->update_hash();
@@ -259,9 +276,9 @@ Matrix * ProbMatrix::prod(const Matrix * pmat1) const
 
 // Function checking whether j is recurrent. Only works if this is idempotent
 bool ProbMatrix::recurrent(int j) const{
-	auto r = row_ones[j];
+	auto r = row_ones()[j];
 	for (uint i = 0; i < Vector::GetStateNb(); i++)
-		if (r->contains(i) && !row_ones[i]->contains(j))
+		if (r->contains(i) && !row_ones()[i]->contains(j))
 			return false;
 	return true;
 }
@@ -275,17 +292,17 @@ Matrix * ProbMatrix::stab() const
 
 	for (uint i = 0; i < n; i++)
 	{
-		result->row_ones[i] = purge(row_ones[i], recs);
-		result->row_pluses[i] = row_pluses[i];
+		result->row_ones()[i] = purge(row_ones()[i], recs);
+		result->row_pluses()[i] = row_pluses()[i];
 	}
 
 	for (uint j = 0; j < n; j++)
 	{
 		if (recs->contains(j))
-			result->col_ones[j] = col_ones[j];
+			result->col_ones()[j] = col_ones()[j];
 		else
-			result->col_ones[j] = Matrix::zero_vector;
-		result->col_pluses[j] = col_pluses[j];
+			result->col_ones()[j] = Matrix::zero_vector;
+		result->col_pluses()[j] = col_pluses()[j];
 	}
 	result->update_hash();
 	return result;
