@@ -17,6 +17,9 @@
 
 #ifdef UNIX
 #include <unistd.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
 #endif
 
 using namespace std;
@@ -110,12 +113,20 @@ the fifth line is the final states. Each state should be separated by spaces.
 the next lines are the transition matrices, one for each letter in the input order. A transition matrix is given by actions (1 and _) separated by spaces. Each matrix is preceded by a single character line, the letter (for readability and checking purposes).
 */
 
+#ifdef UNIX
+void signal_callback_handler(int signum)
+{
+  cout << "Computation timeout, CPU is limited on the WebDemo...\n" << endl;
+  exit(0);
+  }
+#endif
 
 int main(int argc, char **argv)
 {
   if(argc <= 2)
     {
-      cout << "Usage " << string(argv[0]) << " [compute-monoid,has-value1,is-unbounded] [input file] [ (opt) timeout in sec]" << endl;
+      cout << "Usage " << string(argv[0]);
+      cout << " [compute-monoid,has-value1,is-unbounded] [input file] [ (opt) timeout in sec]" << endl;
       exit(0);
     }
 #ifdef UNIX
@@ -129,8 +140,9 @@ int main(int argc, char **argv)
       {
 	cout << "Failed to parse " << string(argv[2]) << " as an integer " << endl;
       }
-  cout << "using timeout " << timeout << " sec" << endl;
-  sigalarm(tiemout);
+  cout << "Computation will stop after timeout " << timeout << " sec" << endl;
+  signal(SIGALRM, signal_callback_handler);
+  alarm(timeout);
 #endif
 
   string action(argv[1]);
@@ -141,9 +153,10 @@ int main(int argc, char **argv)
     ifstream input(argv[2]);
     if(!input)
       {
-      cout << "Failed to open input '" << string(argv[1]) << "'" << endl;
+      cout << "Failed to open input '" << string(argv[2]) << "'" << endl;
       exit(0);
     }
+    cout << "Parsing input file..." << endl;
     expa = Parser::parseFile(input);
   }
   
@@ -157,7 +170,14 @@ int main(int argc, char **argv)
     {
       UnstableMarkovMonoid * m = toMarkovMonoid(expa);
       if(find_witness)
+	{
+	  cout << "Looking for a value 1 witness in the Markov monoid..." << endl;
        	m->setWitnessTest((bool(*)(const Matrix*))&test_witness);
+	}
+      else
+	{
+    cout << "Computing the Markov monoid..." << endl;
+	}
       auto expr = m->ComputeMonoid();
 
       if(expr == NULL)
