@@ -14,3 +14,9 @@ The point of ACME++ is that it is much much faster, and does a lot of space opti
 This allows to handle much bigger automata, which is required to solve the star-height problem.
 
 
+A demo page is available at the adress
+http://altarica.labri.fr/acme/
+
+
+
+
