@@ -19,11 +19,13 @@ ProbMatrix::ProbMatrix( const ProbMatrix& other )
 {
     allocate();
     *this = other;
+    update_hash();
 }
 
 ProbMatrix& ProbMatrix::operator=( const ProbMatrix& other )
 {
     memcpy(myvectors, other.myvectors, 4 * Vector::GetStateNb()  * sizeof(void *));
+    update_hash();
     return *this;
 }
 
@@ -152,7 +154,7 @@ ExplicitMatrix* ProbMatrix::toExplicitMatrix() const
 
 bool ProbMatrix::operator==(const ProbMatrix & mat) const
 {
-	if (mat._hash != _hash) return false;
+    if (mat._hash != _hash) return false;
     auto N =Vector::GetStateNb();
     const Vector ** row = myvectors;
     const Vector ** row1 = mat.myvectors;
@@ -300,5 +302,5 @@ Matrix * ProbMatrix::stab() const
 
 bool ProbMatrix::isIdempotent() const
 {
-	return (*this == *(ProbMatrix *)(this->ProbMatrix::prod(this)));
+  	return (*this == *(ProbMatrix *)(this->ProbMatrix::prod(this)));
 }
