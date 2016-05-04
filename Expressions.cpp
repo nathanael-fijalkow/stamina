@@ -135,7 +135,7 @@ using namespace std;
 
 void LetterExpr::print(std::ostream& os) const
 {
-  if(letter < 'A')
+  if(letter < 'a')
 	os << (char)('a' + letter);
   else
 	os << (char) letter;
