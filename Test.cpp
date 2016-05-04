@@ -57,7 +57,7 @@ UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
 	initialState = aut->initialState;
 	size = aut->size;
 	UnstableMarkovMonoid* ret = new UnstableMarkovMonoid(aut->size);
-	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
+//	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
 	for(int i=0;i<aut->alphabet.length();i++)
 		ret->addLetter(aut->alphabet[i],*(aut->matrices[i]));
 	return ret;
@@ -130,293 +130,124 @@ int main(int argc, char **argv)
 
 	if(expa->type==PROB)
 	{
+		
+		cout << endl << endl << "The input automaton is a probabilistic automaton. Stamina will construct the Markov Monoid to check whether it has value 1." << endl << endl ;
+    	
 		UnstableMarkovMonoid* m = toMarkovMonoid(expa);
 		auto expr = m->ComputeMonoid();
-	  
+
+
+		cout << "***************************************" << endl;
+		cout << "***********MAIN RESULTS****************" << endl;
+		cout << "***************************************" << endl << endl;
+
 		pair<int, const ExtendedExpression*> r = m->maxLeakNb();
-		cout << r.first << " leak(s) found" << endl;
-		cout << "The monoid has " << m->expr_to_mat.size() << " elements" << endl;
-		cout << "The automaton has value 1: ";
-		if (expr)
-			cout << "Yes" << endl;
-		else
-			cout << "No" << endl;
-		if(verbose)
+
+		if(r.first == 0){
+			cout << "No leak found: the automaton is leaktight." << endl;
+			if (expr) {
+				cout << "The automaton has value 1; a witness is ";
+				expr->print();
+				cout << endl << endl;
+			}
+			else cout << "No value 1 witness found: the automaton does not have value 1." << endl << endl;
+		}
+		else{
+			cout << "A leak was found: the automaton is not leaktight." << endl;
+			if (expr) {
+				cout << "The automaton has value 1; a witness is ";
+				expr->print();
+				cout << endl << endl;
+			}
+			else cout << "No value 1 witness found: the automaton may or may not have value 1." << endl << endl;
+		}
+
+	
+		if(verbose){
+			cout << "***************************************" << endl;
+			cout << "***********VERBOSE MODE****************" << endl;
+			cout << "***************************************" << endl << endl;
+
 			m->print();
+			cout << endl;
+		}
+
 		if(toOut)
 			ofs << Dot::toDot(expa,m);
 		
 	}
 	else if (expa->type==CLASSICAL)
 	{
-		int height = 0;
+
+		cout << endl << endl << "The input automaton is a classical automaton. Stamina will compute its star height." << endl ;
+		cout << "It first finds an upper bound using the Loop Complexity heuristics, and then proceeds with the star height computation." << endl << endl ;
+
 		ClassicAut* aut = fromExplicitToClassic(expa);
 
+		cout << "************LOOP COMPLEXITY******************" << endl << endl;
 		pair<char,list<uint>> res = LoopComplexity(aut);
-		int lc = (int) res.first;
+		int LC = (int)res.first ;
 		list<uint> order = res.second;
 		const RegExp* regexpr = Aut2RegExp(aut,order);
-		if(!regexpr) {
-		  cout << "This automaton does not accept any words." << endl;
-		  cout << "This automaton has star-height: 0" << endl;
-		  exit(0);
-		}
-		  
 		const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
-		cout << "Automaton with regexp: ";
+
+		cout << "According to the Loop Complexity heuristics, the star-height is at most " << LC << "." << endl;
+		cout << "A regular expression for the language is:  ";
 		regexpr->print();
 		cout << endl;
-		cout << "And loop complexity: " << lc << endl;
-		while(height < lc) {
-			cout << "Checking for height: " << height << endl;
-			MultiCounterAut* baut = toNestedBaut(aut, height);
-			UnstableMultiMonoid monoid(*baut);
-			const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr, *baut);
-			if(!monoid.IsUnlimitedWitness(mat) && 
-			   !monoid.containsUnlimitedWitness())  
-				break;
-			if(monoid.IsUnlimitedWitness(mat))
-			  cout << "We guessed an unlimited witness" << endl;
-			else
-			  cout << "The guess was not good, but we found an unlimited witness" << endl;
-			if(verbose)
-				monoid.print();
-			delete baut;
-			height++;
+		cout << "The Loop Complexity suggests the following unboundedness witness:   ";
+		cout << *sharp_expr << endl << endl;
+		
+		cout << "************STAR HEIGHT COMPUTATION**********" << endl;
+		int h = 0;
+		while (h<LC){
+//			ofstream output("monoid " + to_string(h) + ".txt");
+		
+			cout << endl << "******************************" << endl;
+			cout << "Testing star height " << h << endl;
+			cout << "******************************" << endl;
+	
+    		if(verbose) cout << "First step: computing the automaton with counters." << endl << endl;
+			MultiCounterAut *Baut = toNestedBaut(aut, h);
+		
+			if(verbose) cout << "Second step: checking whether the Loop Complexity suggestion is an unboundedness witness." << endl;
+		
+			UnstableMultiMonoid monoid(*Baut);
+			const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr,*Baut);
+
+			if(monoid.IsUnlimitedWitness(mat)){
+				if(verbose) cout << "--> It is, the star height is not " << h << ", it is larger." << endl;
+			}
+			else{
+				if(verbose){
+					cout << "--> It is not." << endl << endl;
+					cout << "Third step: computing the monoid, and checking for the existence of an unboundedness witness on the fly." << endl << endl;
+				}
+				
+				const ExtendedExpression * expr = monoid.containsUnlimitedWitness();
+
+				if(verbose) monoid.print_summary();
+
+				delete Baut;
+
+				if (expr){
+					if(verbose){
+						cout << "An unlimited witness is ";
+						expr->print();
+						cout << endl;
+					}
+				}
+				else{
+					if(verbose) cout << "The automaton is limited." << endl;
+
+					cout << "RESULTS: the star height is " << h << "." << endl;
+					break;
+				}
+			}
+		h++;
 		}
-		cout << "This automaton has star-height: " << height << endl;
-		if(height == lc)
-		  cout << "And it is optimal (loop complexity is equal to the star height)" << endl;
+		if(h==LC) cout << endl << "RESULTS: the star height is " << LC << ", as predicted by the Loop Complexity heuristics, and a regular expression witnessing it is " << *sharp_expr << "." << endl;
 	}
+
 	ofs.close();
 }
-
-	// ExplicitMatrix mata(1);
-	// mata.coefficients[0][0] = INC;
-	// UnstableMultiMonoid monoid(1,1);
-	// monoid.addLetter('a',mata);
-	// monoid.ComputeMonoid();
-	
-
-
-	//cout << "Acme++ rules" << endl;
-	
-	// ExplicitMatrix mata(3);
-	// mata.coefficients[0] = 0;
-	// mata.coefficients[1] = 1;
-	// mata.coefficients[2] = 2;
-	// mata.coefficients[3] = 3;
-	// mata.coefficients[4] = 2;
-	// mata.coefficients[5] = 1;
-	// mata.coefficients[6] = 2;
-	// mata.coefficients[7] = 1;
-	// mata.coefficients[8] = 0;
-
-	// ExplicitMatrix matb(3);
-	// matb.coefficients[0] = 1;
-	// matb.coefficients[1] = 2;
-	// matb.coefficients[2] = 6;
-	// matb.coefficients[3] = 6;
-	// matb.coefficients[4] = 6;
-	// matb.coefficients[5] = 4;
-	// matb.coefficients[6] = 0;
-	// matb.coefficients[7] = 5;
-	// matb.coefficients[8] = 1;
-	
-	// string amat = "";
-	// amat += "___I__E";
-	// amat += "__R____";
-	// amat += "_I__E__";
-	// amat += "_____E_";
-	// amat += "_I_____";
-	// amat += "_I__E__";
-	// amat += "E_R____";
-
-
-	// string bmat = "";
-	// bmat += "__E____";
-	// bmat += "__E__I_";
-	// bmat += "____I__";
-	// bmat += "__I____";
-	// bmat += "_I_____";
-	// bmat += "E_____I";
-	// bmat += "_______";
-
-	/*
-	  string cmat = "";
-	  cmat += "_R_____";
-	  cmat += "___R___";
-	  cmat += "__E__E_";
-	  cmat += "_______";
-	  cmat += "____I__";
-	  cmat += "__II___";
-	  cmat += "R____RR";
-	*/
-
-	/*
-	  string amat = "";
-	  amat += "___I__E___I__E";
-	  amat += "__R_____I__E__";
-	  amat += "_I__E____R____";
-	  amat += "_____E__I_____";
-	  amat += "_I__E___I_____";
-	  amat += "_____E__I__E__";
-	  amat += "___I__EE_R____";
-	  amat += "___I__E___I__E";
-	  amat += "__R_____I__E__";
-	  amat += "_I__E____R____";
-	  amat += "_____E__I_____";
-	  amat += "_I__E___I_____";
-	  amat += "_____E__I__E__";
-	  amat += "___I__EE_R____";
-
-
-	  string bmat = "";
-	  bmat += "__E__I___E____";
-	  bmat += "____I____E__I_";
-	  bmat += "__I________I__";
-	  bmat += "_I_______I____";
-	  bmat += "E_____I_I_____";
-	  bmat += "__I________I__";
-	  bmat += "______________";
-	  bmat += "__E__I___E____";
-	  bmat += "____I____E__I_";
-	  bmat += "__I________I__";
-	  bmat += "_I_______I____";
-	  bmat += "E_____I_I_____";
-	  bmat += "__I________I__";
-	  bmat += "______________";
-	*/
-
-/*
-  int_vector<ExplicitMatrix> mats;
-  mats.emplace_back( sqrt(amat.size()) );
-  mats.emplace_back( sqrt(amat.size()) );
-  //mats.push_back( sqrt(amat.size()) );
-
-  vector<string> cmats;
-  cmats.push_back(amat);
-  cmats.push_back(bmat);
-  //cmats.push_back(cmat);
-
-  for (int i = 0; i < mats.size(); i++)
-  {
-  auto & mat = mats[i];
-  auto & cmat = cmats[i];
-  for (int i = 0; i< mat.stateNb * mat.stateNb; i++)
-  mat.coefficients[i] =
-  (cmat[i] == '_') ? BOT :
-  (cmat[i] == 'I') ? INC :
-  (cmat[i] == 'E') ? EPS :
-  (cmat[i] == 'R') ? RESET :
-  BOT;
-  }
-*/
-  /*
-  ExplicitMatrix mata(3);
-  mata.coefficients = new char[64] { BOT, EPS };
-  mata.coefficients[1] = EPS;
-  mata.coefficients[2] = INC;
-  mata.coefficients[3] = INC;
-  mata.coefficients[4] = EPS;
-  mata.coefficients[5] = BOT;
-  mata.coefficients[6] = BOT;
-  mata.coefficients[7] = BOT;
-  mata.coefficients[8] = RESET;
-
-  ExplicitMatrix matb(3);
-  matb.coefficients[0] = RESET;
-  matb.coefficients[1] = INC;
-  matb.coefficients[2] = RESET;
-  matb.coefficients[3] = BOT;
-  matb.coefficients[4] = EPS;
-  matb.coefficients[5] = INC;
-  matb.coefficients[6] = RESET;
-  matb.coefficients[7] = BOT;
-  matb.coefficients[8] = INC;
-*/
-/*
-	
-  ExplicitMatrix mata(2);
-  mata.coefficients[0] = INC;
-  mata.coefficients[1] = BOT;
-  mata.coefficients[2] = BOT;
-  mata.coefficients[3] = INC;
-
-  ExplicitMatrix matb(2);
-  matb.coefficients[0] = BOT;
-  matb.coefficients[1] = EPS;
-  matb.coefficients[2] = BOT;
-  matb.coefficients[3] = E;
-*/
-	
-	/*
-	  OneCounterMatrix a(mata);
-	  OneCounterMatrix b(matb);
-	  OneCounterMatrix c(matc);
-	*/
-
-//ExplicitMatrix mata(1);
-//mata.coefficients[0] = RESET;
-//
-//ExplicitMatrix matb(1);
-//matb.coefficients[0] =EPS;
-//
-//ExplicitMatrix matc(1);
-//matc.coefficients[0] = INC;
-//
-//ExplicitMatrix matd(1);
-//matd.coefficients[0] =OM;
-//
-
-// VectorInt::SetSize(3);
-// MultiCounterMatrix a(mata,2);
-// MultiCounterMatrix b(matb,2);
-//OneCounterMatrix c(matc);
-// OneCounterMatrix d(matd);
-
-	// a.print();
-	// cout<<"\n";
-	// b.print();
-		
-	/*
-
-	  ExplicitMatrix mata(2);
-	  mata.coefficients[0] = 2;
-	  mata.coefficients[1] = 2;
-	  mata.coefficients[2] = 0;
-	  mata.coefficients[3] = 2;
-
-	  ExplicitMatrix matb(2);
-	  matb.coefficients[0] = 2;
-	  matb.coefficients[1] = 0;
-	  matb.coefficients[2] = 0;
-	  matb.coefficients[3] = 2;
-
-
-	  ProbMatrix a(mata);
-	  ProbMatrix b(matb);
-
-
-	  UnstableMarkovMonoid monoid(2);
-
-	*/
-
-
-	// 	UnstableMultiMonoid monoid(3,2);
-
-	// monoid.addLetter('a', mata);
-	// monoid.addLetter('b', matb);
-//	monoid.addLetter('c', matc);
-	//   monoid.addLetter('c', matc);
-//	monoid.addLetter('d', matd);
-
-	// monoid.ComputeMonoid();
-	
-	// cout << monoid.expr_to_mat.size() << " elements." << endl;
-	// cout << monoid.rewriteRules.size() << " rewrite rules." << endl;
-	
-//	mats.clear();
-//	cmats.clear();
-
-	// monoid.print() ;

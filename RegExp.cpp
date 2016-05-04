@@ -242,7 +242,7 @@ RegExp *Aut2RegExp(ClassicAut *in, list<state> order)
 		  //if(in->initialstate[s] && in->finalstate[t] && in->trans[let][s][t]) aut->trans[let][init][final] = true;
 	    }
 
-	aut->print();
+	if(debug_aut2reg) aut->print();
 
 	// For every transition (let,s1,s2) add to toReg the element
 	// with index (s1,s2) and the regular expression corresponding
@@ -334,7 +334,7 @@ RegExp *Aut2RegExp(ClassicAut *in, list<state> order)
 		}
 	}
 
-	cout << "over" << endl; 
+/*
 	  for(state s1 = 0; s1 < aut->NbStates; s1++) {
 	    for(state s2 = 0; s2 < aut->NbStates; s2++) {
 			auto spair = make_pair(s1,s2);
@@ -345,6 +345,7 @@ RegExp *Aut2RegExp(ClassicAut *in, list<state> order)
 			}
 		}
 	  }
+*/
 
 	auto i_f = make_pair(init,final);
 	
@@ -356,18 +357,19 @@ RegExp *Aut2RegExp(ClassicAut *in, list<state> order)
 				{if (in->initialstate[s]) {sin=s;break;}}
 			auto in_f=make_pair (sin, final);
 			if(toReg.find(in_f) == toReg.end()) {
-			cout << "Empty language\n";
+			//cout << "Empty language\n";
 			return NULL; }
 			else return toReg[in_f];
 		}
 	
-	// we do not care about epsilon, does not change star height or help finding witness
+/* we do not care about epsilon, does not change star height or help finding witness
 	if(eps_included) {
-		cout << "Epsilon ignored in the expression\n";
+		//cout << "Epsilon ignored in the expression\n";
 		//LetterRegExp* ExpEpsilon = new LetterRegExp(-1);
 		//RegExp* res = new UnionRegExp(ExpEpsilon,toReg[i_f]);
 		//return res;
 	}
+*/
 	return toReg[i_f];
 }	
 

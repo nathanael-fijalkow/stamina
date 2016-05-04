@@ -31,15 +31,13 @@ void Monoid::print_summary() const
 	{
 		cout << "Dimension " << Vector::GetStateNb() << endl;
 		cout << expr_to_mat.size() << " elements" << endl;
-		cout << rewriteRules.size() << " rewrite rules whose " << canonicalRewriteRules.size() << " are canonical." << endl;
+		cout << rewriteRules.size() << " rewrite rules, including " << canonicalRewriteRules.size() << " canonical rules." << endl << endl;
 	}
 }
 
 ostream& operator<<(ostream& st, const Monoid & monoid)
 {
-	st << "***************************************" << endl;
-	st << "Summary " << endl;
-	st << "***************************************" << endl;
+	st << "************SUMMARY*********************" << endl << endl;
   	if (monoid.expr_to_mat.size() == 0)
 		st << "Empty monoid" << endl;
 	else
@@ -48,9 +46,7 @@ ostream& operator<<(ostream& st, const Monoid & monoid)
 		st << monoid.expr_to_mat.size() << " elements" << endl;
 		st << monoid.rewriteRules.size() << " rewrite rules whose " << monoid.canonicalRewriteRules.size() << " are canonical." << endl;
 	}
-	st << "***************************************" << endl;
-	st << "Elements (" << monoid.expr_to_mat.size() << ")" << endl;
-	st << "***************************************" << endl;
+	st << endl << "************ELEMENTS********************" << endl << endl;
 	for (map<const ExtendedExpression *, const Matrix *>::const_iterator it = monoid.expr_to_mat.begin(); it != monoid.expr_to_mat.end(); it++)
 	{
 			it->first->print(st);
@@ -59,9 +55,9 @@ ostream& operator<<(ostream& st, const Monoid & monoid)
 			st << endl;
 	}
 
-	st << "***************************************" << endl;
+	st << endl << "***************************************" << endl;
 	st << "Non-canonical rewrite rules (" << monoid.rewriteRules.size() - monoid.canonicalRewriteRules.size() << ")" << endl;
-	st << "***************************************" << endl;
+	st << "***************************************" << endl << endl;
 	for (map<const ExtendedExpression *, const ExtendedExpression *>::const_iterator it = monoid.rewriteRules.begin(); it != monoid.rewriteRules.end(); it++)
 	{
 		if (monoid.canonicalRewriteRules.find(it->first) == monoid.canonicalRewriteRules.end())
@@ -73,9 +69,9 @@ ostream& operator<<(ostream& st, const Monoid & monoid)
 		}
 	}
 
-	st << "***************************************" << endl;
+	st << endl << "***************************************" << endl;
 	st << "Canonical rewrite rules (" << monoid.canonicalRewriteRules.size() << ")" << endl;
-	st << "***************************************" << endl;
+	st << "***************************************" << endl << endl;
 	for (map<const ExtendedExpression *, const ExtendedExpression *>::const_iterator it = monoid.rewriteRules.begin(); it != monoid.rewriteRules.end(); it++)
 	{
 		if (monoid.canonicalRewriteRules.find(it->first) != monoid.canonicalRewriteRules.end())

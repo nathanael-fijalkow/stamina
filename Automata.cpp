@@ -523,6 +523,8 @@ MultiCounterEpsAut::MultiCounterEpsAut(char Nletters, uint Nstates, char Ncounte
 //We assume each state has an espilon-transtion to itself
 //We assume letters are deterministic in epsaut
 MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
+	bool debug = false;
+
 	uint ns=epsaut->NbStates;
 	char nl=epsaut->NbLetters;
 	char nc=epsaut->NbCounters;
@@ -540,7 +542,7 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
 	int steps = 0;
 	while (new_eps != prev_eps)
 	{
-		cout << "Removing eps transitions step " << ++steps <<  endl;
+		if(debug) cout << "Removing eps transitions step " << ++steps <<  endl;
 		prev_eps=new_eps;
 		new_eps=epsaut->prod_mat(new_eps,eps);
 	}
