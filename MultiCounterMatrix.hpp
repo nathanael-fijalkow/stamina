@@ -31,9 +31,6 @@ protected:
 
 // 2N+2: BOT
 
-	/* the set of all vectors */
-	static std::unordered_set<VectorInt> int_vectors;
-
 	// This is the constant vector with only zero entries
 	static const VectorInt * zero_int_vector;
 
@@ -41,6 +38,10 @@ protected:
 	void init();
 
 public:
+
+	/* the set of all vectors */
+	static std::unordered_set<VectorInt> int_vectors;
+
 
 	// Number of counters
 	static char N;
