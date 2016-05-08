@@ -1,0 +1,25 @@
+% This automaton recognises (a*b*c)*, so star-height is 1
+4
+c
+abc
+0
+0
+
+a
+_ 1 _ _
+_ 1 _ _
+_ _ _ 1
+_ _ _ 1
+
+b
+_ _ 1 _ 
+_ _ 1 _
+_ _ 1 _
+_ _ _ 1
+
+c
+1 _ _ _
+1 _ _ _
+1 _ _ _
+_ _ _ 1
+
