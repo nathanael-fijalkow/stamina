@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
-project (Acme++)
+project (Stamina)
 
 option(COMPILE_SAGE_MODULES "Compiles SAGE modules (requires BOOST >= 1.45.0)" OFF)
 
@@ -81,23 +81,14 @@ foreach (SOURCE ${ALL_SOURCES})
 endforeach (SOURCE)
 
 
-add_executable (AcmeTest ${ALL_SOURCES} ${ALL_HEADERS} Test.cpp)
-target_link_libraries (AcmeTest ${EXTRA_LIBS})
-
-add_executable (OneLeakTest ${ALL_SOURCES} ${ALL_HEADERS} OneLeak.cpp)
-target_link_libraries (OneLeakTest ${EXTRA_LIBS})
+add_executable (StaminaTest ${ALL_SOURCES} ${ALL_HEADERS} Test.cpp)
+target_link_libraries (StaminaTest ${EXTRA_LIBS})
 
 add_executable (WebDemo ${ALL_SOURCES} ${ALL_HEADERS} WebDemo.cpp)
 target_link_libraries (WebDemo ${EXTRA_LIBS})
 
 add_executable (Statistics ${ALL_SOURCES} ${ALL_HEADERS} Statistics.cpp)
 target_link_libraries (Statistics ${EXTRA_LIBS})
-
-add_executable (TestAut ${ALL_SOURCES} ${ALL_HEADERS} TestAut.cpp)
-target_link_libraries (TestAut ${EXTRA_LIBS})
-
-add_executable (TestStarHeight ${ALL_SOURCES} ${ALL_HEADERS} TestStarHeight.cpp)
-target_link_libraries (TestStarHeight ${EXTRA_LIBS})
 
 if(COMPILE_SAGE_MODULES)
 if(APPLE)
