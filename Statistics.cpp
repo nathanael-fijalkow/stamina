@@ -19,7 +19,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 
-	cout << "Acme++ rules" << endl;
+	cout << "Stamina rules" << endl;
 
 	unsigned int seed = time(NULL);
 

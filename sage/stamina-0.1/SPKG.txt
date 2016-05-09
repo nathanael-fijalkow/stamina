@@ -1,0 +1,9 @@
+= stamina =
+== Description ==
+
+Stamina (STAbilisation Monoids IN Automata theory), a tool for computing stabilization monoids
+
+== Changelog ==
+
+=== stmina-0.1 (Jan, 2016) ===
+ * Preliminary version

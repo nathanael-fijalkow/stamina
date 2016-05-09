@@ -168,7 +168,7 @@ string PyInterface::Monoid::toregexp()
 		order.push_front(i);
 	return (Aut2RegExp(automaton,order))->flat;
 }
-BOOST_PYTHON_MODULE(libacme)
+BOOST_PYTHON_MODULE(libstamina)
 {
 	class_<vector<char>>("VChar")
 		.def(vector_indexing_suite<vector<char>>());

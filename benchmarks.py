@@ -8,7 +8,7 @@ import time
 import sys
 import os
 import signal
-tempFile = '/tmp/acme_test'
+tempFile = '/tmp/stamina_test'
 def toform(c):
     if c==0:
         return '_'
@@ -30,8 +30,7 @@ parser.add_argument('-r','--repeat',help='repeat the experiment x times',
 parser.add_argument('-c','--deterministic',help='generate a deterministic automaton',action='store_true')
 parser.add_argument('-d','--density',help='pick density',type=float,default=0)
 parser.add_argument('-s',help='simple picking of transitions',action='store_true')
-parser.add_argument('acme1', help='path to the Acme++ executable')
-parser.add_argument('acme2', help='path to the AcmeML executable')
+parser.add_argument('stamina', help='path to the Stamina executable')
 args = parser.parse_args()
 
 def maybeTimeout(s):
@@ -49,7 +48,7 @@ def maybeTimeout(s):
 
 
 def gen(n,m):
-    output = str(n) + '\n' + 'p' + '\n'
+    output = str(n) + '\n' + 'c' + '\n'
     for i in range(0,m):
         output += chr(ord('a')+i)
     output+='\n'
@@ -68,7 +67,7 @@ def gen(n,m):
             pickprob = random.uniform(args.density,1)
         output+=chr(ord('a')+i)+'\n'
         for j in range(0,n):
-            chosen = random.randint(0,n)
+            chosen = random.randint(0,n-1)
             for k in range(0,n):
                 if k==chosen:
                     output += str(1) + ' '
@@ -94,26 +93,22 @@ for i in range(fr,args.n+1):
         f.write(gen(i,args.m))
         f.close()
 
-        s = subprocess.Popen(['time','-f "%U"','./'+args.acme1,tempFile],
+        s = subprocess.Popen(['time','-f "%U"','./'+args.stamina,tempFile],
                              stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         if maybeTimeout(s):
-            (acme_out,time_out)=s.communicate()
-            monsize = re.search(r'has (\d+)',acme_out).group(1)
-        
-            print 'We picked a monoid of size ' + monsize
+            (stamina_out,time_out)=s.communicate()
+            print stamina_out
+            # if(re.match(r'guessed', stamina_out)):
+            #     print 'We guessed the unlimited witness'
+            # if(re.match(r'good', stamina_out)):
+            #     print 'The guess was not good, but we found one anyway'
+            # match = re.search(r'height: (\d+)',stamina_out)
+            # if(match): 
+            #     starheight = match.group(1)
+            #     print 'Language with starheight ' + starheight
             x1=time_out.replace('"','').strip()
-            print 'Acme++ took ' + x1
+            print 'Stamina took ' + x1
     
-            s = subprocess.Popen(['time','-f "%U"','./'+args.acme2,'-mma',tempFile,'-silent'],
-                             stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-            if maybeTimeout(s):
-                (acme_out,time_out)=s.communicate()
-                if time_out.find('Stack_overflow')!=-1:     
-                    print 'AcmeML had a stack overflow'
-                    x2=str(-1)
-                else:
-                    x2=time_out.replace('"','').strip()
-                    print 'AcmeML took ' + x2
-                if(args.output):
-                    out.write(str(i)+' '+monsize+' '+x1+' '+x2+'\n')
-out.close()
+            if(args.output):
+                out.write(str(i)+' '+starheight+'\n')
+                out.close()
