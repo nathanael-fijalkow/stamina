@@ -190,9 +190,17 @@ int main(int argc, char **argv)
 		list<uint> order = res.second;
 		const RegExp* regexpr = Aut2RegExp(aut,order);
 		const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
-
+		
+		if(sharp_expr==NULL)// empty language
+			{
+			cout <<" The language is empty, aborting"<<endl;
+			ofs.close();
+			return 0;
+			}
+			
+		
 		cout << "According to the Loop Complexity heuristics, the star-height is at most " << LC << "." << endl;
-		cout << "A regular expression for the language is:  ";
+		cout << "A regular expression for the language (omitting epsilon) is:  ";
 		regexpr->print();
 		cout << endl;
 		cout << "The Loop Complexity suggests the following unboundedness witness:   ";
@@ -254,4 +262,5 @@ int main(int argc, char **argv)
 	}
 
 	ofs.close();
+	return 0;
 }
