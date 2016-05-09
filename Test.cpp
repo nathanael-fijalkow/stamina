@@ -193,7 +193,7 @@ int main(int argc, char **argv)
 		
 		if(sharp_expr==NULL)// empty language
 			{
-			cout <<" The language is empty, aborting"<<endl;
+			cout <<"The language is empty, the star height is 0."<<endl;
 			ofs.close();
 			return 0;
 			}
