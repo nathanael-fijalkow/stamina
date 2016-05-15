@@ -1,5 +1,4 @@
 % This automaton recognises b*(b*ab*a)*, so star-height is 2
-% BUG: eps is not the reg expr found... 
 2
 c
 ab

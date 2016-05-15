@@ -105,10 +105,12 @@ if(isset($_POST['action']))
 	  }
 	else
 	  {
+	    for($i = 0; $i < 50; $i++)
+	      {
 	    $chunk  = fgets($f);
-	    echo str_replace(array("\n","E ","O "),array("<br/>","&epsilon;","&omega;"),$chunk);		
-	    $chunk  = fgets($f);
-	    echo str_replace(array("\n","E ","O "),array("<br/>","&epsilon;","&omega;"),$chunk);		
+	    echo str_replace(array("\n","E ","O "),array("<br/>","&epsilon;","&omega;"),$chunk);	    
+	      }
+
 
 	    echo "<br/>*************************************************<br/>";
 	    echo "<br/>The computation is long, output is truncated...";
@@ -141,7 +143,8 @@ else
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Acme++ Online</title>
+<link rel="stylesheet" type="text/css" href="hugo.css" media="screen" />
+<title>Stamina: Stabilisation Monoids IN Automata Theory</title>
 <style>
    table, th, td {
  margin:5px;
@@ -153,18 +156,56 @@ else
 </head>
 <body margin="10">
       <script src="jquery-2.2.0.min.js" type="text/javascript"></script>
-<center><h1>Acme++ Online</h1></center>
 
-      <p>Welcome on the demo page of Acme++,
-      a tool manipulating stabilization monoids in order to solve three algorithmic problems.
+<div class="avmenu">
+<ul>
+<li><a href="#Presentation">Presentation</a></li>
+<li><a href="https://github.com/nathanael-fijalkow/stamina/">Code</a></li>
+<li><a href="#Starheight">Starheight</a></li>
+<li><a href="#Demo">Demo</a></li>
+<li><a href="#Installation">Installation</a></li>
+<li><a href="#Sage">Sage</a></li>
+
+
+</ul>
+</div>
+<div class="containeur" id="Contact">
+    <center><h1>STAMINA: STabilisation Monoids IN Automata Theory</h1></center>
+<br/>
+<br/>
+<h2 id="Presentation">Presentation</h2>
+
+Stamina is a tool implementing algebraic techniques to solve decision problems from automata theory.
+    Most importantly, it is, to the best of our knowledge, the very first implementation of an algorithm solving the
+ <a href="http://en.wikipedia.org/wiki/Star_height_problem">starheight problem</a>!
+<br/>
+
+    It has been written in C++, by <a href="https://www.cs.ox.ac.uk/people/nathanael.fijalkow/">Nathana&euml;l Fijalkow</a>,
+   <a href="http://www.labri.fr/perso/gimbert"/>Hugo Gimbert</a>, 
+Edon Kelmendi and <a href="http://www.liafa.univ-paris-diderot.fr/~dkuperbe/">Denis Kuperberg</a>.
+The code is available <a href="https://github.com/nathanael-fijalkow/stamina/">on Github</a>.
+<br/>
+
+    The core generic algorithm takes as input an automaton and computes its stabilisation monoid,
+which is a generalisation of its transition monoid.
+<br/>
+
+    Stamina is the successor of <a href="?page=acme">ACME</a>, which also implements the transformation of an automaton into a stabilisation monoid. 
+    Thanks to several optimisations, Stamina is much faster and can handle much larger automata,
+which is necessary to solve the starheight problem.
+<br/>
+
+      <p>Stamina may be used to solve
+				     														       these three algorithmic problems:
       </p>
       <ul>
-      <li> Computing the star-height of a regular language,
+													       
+<li> <b>Starheight Problem </b>: compute the starheight of a regular language,
       i.e. the minimal number of nested Kleene stars needed
       for expressing the language with a regular expression.</li>
-		       <li> Deciding boundedness and equivalence
-		       for regular cost functions.</li>
-				     <li>Deciding whether a leaktight probabilistic automaton has value 1,
+		       <li> <b>Boundedness problem </b> : decide boundedness of a 
+		       regular cost function.</li>
+				     <li><b>Value 1 problem </b> : decide whether a leaktight probabilistic automaton has value 1,
 				     i.e. whether the automaton accepts some words
 				     with probability arbitrarily close to 1.</li>
 				     </ul>
@@ -172,12 +213,27 @@ else
 				     These three problems reduce to the computation
 				     of the stabilization monoid associated with the automaton,
 				     which is a challenge since the monoid is exponentially larger than the automaton.
-				     The compact data structures used in Acme++, together with optimizations and heuristics,
+				     The compact data structures used in Stamina, together with optimizations and heuristics,
 				     allow this program to handle automata with several hundreds of states.</p>
 				     <p>
-				     The project source code is available <a href="https://github.com/nathanael-fijalkow/acmeplusplus">on Github</a>.<br/>
-Bug reports and requests should be sent to [hugo dot gimbert at cnrs dot fr].</p>
+
 <hr/>
+<h2 id="Starheight">Starheight computation examples</h2>
+<p>Stamina was able to determine the starheight of the following expressions.</p>
+<table>
+<tr><th>Expression</th><th>Starheight</th><th>Automaton</th><th>Computation Log</th></tr>
+<tr><td>(aa)*</td><td>1</td></tr>
+<tr><td>b*(b*ab*a)*</td><td>2</td></tr>
+<tr><td>(aa(ab)*bb(ab*))*</td><td>2</td></tr>
+				     <tr><td>(a*b*c)*</td><td>1</td></tr>
+				     <tr><td>(b*ab*)^6</td><td>1</td></tr>
+				     <tr><td>(ab + aabb)^*</td><td>1</td></tr>
+</table>
+<hr/>
+<h2 id="Demo">Online demo</h2>
+<p>The following online demo can be used to solve the bounddness problem for automata with counters
+and the value 1 problems for probbailistic automata.
+
 				     <form method="post">
 				     <table>
 				     <tr>
@@ -199,6 +255,8 @@ Bug reports and requests should be sent to [hugo dot gimbert at cnrs dot fr].</p
 				     </span>
 				     </td></tr>
 				     <tr><td>
+					     	  <input type="button" id="random" value="Random automaton" ></input>
+
 				     <table><tr>
 				     <td style="vertical-align:top">
 				     <b>Initial</b>
@@ -231,7 +289,6 @@ Bug reports and requests should be sent to [hugo dot gimbert at cnrs dot fr].</p
 
 	  </table>
 	  <div id="buttons">
-	  <input type="button" id="random" value="Random" ></input>
 	  <input type="button" class="compute" id="compute-monoid" value="Compute the monoid" ></input>
 	  <span  id="probabdiv">
 	  <input type="button" class="compute" id="has-value1" value="Check value 1" ></input>
@@ -245,7 +302,7 @@ Bug reports and requests should be sent to [hugo dot gimbert at cnrs dot fr].</p
 	  </form>
 	  <div class="log">
 	  </div>
-<hr/>
+
 	  <h3>Output</h3>
 	  <div class="output">
 	  </div>
@@ -574,10 +631,70 @@ Bug reports and requests should be sent to [hugo dot gimbert at cnrs dot fr].</p
 	<br/>
 	<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
+<hr/>
+<h2 id="Installation">Installation</h2> 
+The github directory is <a href="https://github.com/nathanael-fijalkow/stamina">here</a>.
+<br/>
+
+    To compile, open a terminal, go to the Stamina directory, type 
+<h4>cmake .</h4>
+and then 
+<h4>make</h4>
+<br/>
+
+The command 
+<h4>./StaminaTest file.txt -o out.dot</h4>
+    reads the automaton from file.txt, and outputs what is computed in out.dot, 
+<a href="https://en.wikipedia.org/wiki/DOT_%28graph_description_language%29">a graphic format</a>.
+<br/>
+
+    If the automaton is a probabilistic automaton, it runs the Markov Monoid algorithm,
+    if it is a classical non-deterministic automaton, it computes its starheight.
+<br/>
+
+	    Line by line description of the input file format for automata:
+<ul>
+   <li> the first line is the size of the automaton (number of states).</li>
+   <li> the second line is the type of the automaton: c for classical, p for probabilistic.</li>
+											       <li> the third line is the alphabet. Each character is a letter, they should not be separated.</li>
+											       <li> the fourth line is the initial states. Each state should be separated by spaces.</li>
+											       <li> the fifth line is the final states. Each state should be separated by spaces.</li>
+											       <li> the next lines are the transition matrices, one for each letter in the input order.
+																			       A transition matrix is given by actions (1 and _) separated by spaces.
+																			       Each matrix is preceded by a single character line, the letter (for readability and checking purposes).</li>
+</ul>
+<br/>
+<hr/>
+<h2 id="Sage">Sage</h2> 
+
+<p>Stamina can be integrated to <a href="http://www.sagemath.org">Sage</a> as a module.</p>
+																			       After compiling Stamina, copy the files stamina.py and libacme.so to sage/stamina-0.1/src/.
+<br/>
+
+																			       To create a Sage package:
+<h4>$ sage --pkg stamina-0.1</h4>
+<br/>
+
+It produces a file stamina-0.1.spkg. It can be installed by
+<h4>$ sage -p stamina-0.1.spkg</h4>
+<br/>
+
+																			       Now run Sage:
+<h4>$ sage</h4>
+																			       <h4>sage: import stamina</h4>
+																			       <h4>sage: aut = Automaton({0:[(1,'a')],1:[(1,'a')]})</h4>
+																			       <h4>sage: aut.state(0).is_initial = True</h4>
+																			       <h4>sage: aut.state(1).is_final = True</h4>
+																			       <h4>sage: m = stamina.to_monoid(aut)</h4>
+																			       <h4>sage: m.has_val1()</h4>
+																			       <h4>sage: m.starheight()</h4>
+<hr/>
+
+<center>Webmaster: Hugo Gimbert [hugo dot gimbert at cnrs dot fr].</center>
+
+</div>
 	</body>
-	<?php
+</html>	<?php
 	}
 
 ?>
-</body>
-</html>
