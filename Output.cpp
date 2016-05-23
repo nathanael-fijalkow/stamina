@@ -1,6 +1,7 @@
 
 #include <sstream>
 #include "Output.hpp"
+
 const string start = "digraph G{\n"
 	"rankdir = LR;overlap = false;\n"
 	"labelloc=\"t\";\n";
@@ -9,6 +10,7 @@ const string finalStyle = "node [shape = doublecircle, color = lightblue, style=
 const string initialFinalStyle = "node [shape = doublecircle, color = navy, style=filled];";
 const string normalStyle = "node [shape = circle, color = lightblue, style = filled];";
 
+int Dot::SH;
 int Dot::size;
 int Dot::initialState;
 const int* Dot::finalStates;
@@ -68,7 +70,10 @@ string Dot::giveStyles ()
 string Dot::toDot(const ExplicitAutomaton* a)
 {
 	string ret=start;
-	ret += "label=\"Automaton\"\n";
+	if(SH == -1)
+		ret += "label=\"Automaton\"\n";
+	else
+		ret += "label=\"Monoid for SH=" + std::to_string(SH) +"\"\n";
 	ret += giveStyles();
 	for(int i=0;i<a->alphabet.length();i++)
 		for(int j=0;j<size;j++)
@@ -76,6 +81,43 @@ string Dot::toDot(const ExplicitAutomaton* a)
 				if( a->matrices[i]->coefficients[j][k] == 2 )
 					ret+=std::to_string(j) + " -> " + std::to_string(k) + " [label = \""+a->alphabet[i]+"\"];\n";
 	ret+="}\n";
+	return ret;
+}
+
+string Dot::toDot(UnstableMultiMonoid* m, const ExtendedExpression* e, const MultiCounterMatrix* mat)
+{
+	string ret; 
+	ostringstream s;
+	int elem;
+	int n = MultiCounterMatrix::N;
+	s << *e;
+  
+	ret += "label=\""+s.str();
+	if(UnstableMultiMonoid::IsUnlimitedWitness(mat))
+		ret+=" unlimitedness witness";
+	ret += "\";\n";
+	ret += initialStyle;
+	for (int s : m->initial_states)
+		ret += std::to_string(s) + ";";
+	ret += "\n" + finalStyle;
+	for (int s : m->final_states)
+		ret += std::to_string(s) + ";";
+	ret += "\n" + normalStyle + "\n";
+	for(int i = 0; i < VectorInt::GetStateNb(); i++) {
+		for (int j =  0; j < VectorInt::GetStateNb(); j++) {
+			elem = mat->get(i,j); 
+			if(elem == 2 * n + 2)
+				continue;
+			ret += std::to_string(i) + " -> " + std::to_string(j);
+			ret += " [label=\"";
+			if (elem == 2 * n + 1) ret += "O";
+			else if (elem == n) ret += "E";
+			else if (elem < n) ret += "r" + to_string(elem);
+			else ret += "i" + to_string(elem - n - 1);
+			ret += "\"];\n";
+		}
+	}
+	ret += "}\n";
 	return ret;
 }
 
@@ -124,15 +166,24 @@ string Dot::toDot(Monoid* m)
 			ret += toDot(u,g.first, (const ProbMatrix*) g.second);
 		}
 	}
+	else if(UnstableMultiMonoid* u = dynamic_cast<UnstableMultiMonoid*>(m))
+	{
+		for(auto & g : u->expr_to_mat)
+		{
+			ret += start;
+			ret += toDot(u,g.first, (const MultiCounterMatrix*) g.second);
+		}
+	}
 	return ret;
 }
 
-string Dot::toDot(const ExplicitAutomaton* a, Monoid* m)
+string Dot::toDot(const ExplicitAutomaton* a, Monoid* m, int sh)
 {
 	string ret;
 	size = a->size;
 	initialState = a->initialState;
 	finalStates = a->finalStates;
+	SH = sh;
 	ret += toDot(a);
 	ret += toDot(m);
 	return ret;

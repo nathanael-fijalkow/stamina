@@ -171,10 +171,8 @@ int main(int argc, char **argv)
 			m->print();
 			cout << endl;
 		}
-
 		if(toOut)
-			ofs << Dot::toDot(expa,m);
-		
+		  ofs << Dot::toDot(expa,m, -1);
 	}
 	else if (expa->type==CLASSICAL)
 	{
@@ -252,7 +250,9 @@ int main(int argc, char **argv)
 					break;
 				}
 			}
-		h++;
+			if(toOut)
+			  ofs << Dot::toDot(expa, &monoid, h);
+			h++;
 		}
 		if(h==LC){
 			cout << endl << "RESULTS: the star height is " << LC << ", as predicted by the Loop Complexity heuristics, and a regular expression witnessing it is ";
@@ -260,7 +260,6 @@ int main(int argc, char **argv)
 			cout << "." << endl;
 		}
 	}
-
 	ofs.close();
 	return 0;
 }

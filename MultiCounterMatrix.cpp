@@ -1,4 +1,3 @@
-
 #include "MultiCounterMatrix.hpp"
 #include <stdlib.h>
 
@@ -78,6 +77,10 @@ std::unordered_set<VectorInt> MultiCounterMatrix::int_vectors;
 // This is the constant vector with only zero entries
 const VectorInt * MultiCounterMatrix::zero_int_vector = NULL;
 
+int MultiCounterMatrix::get(int i, int j) const
+{
+        return (rows[i]->coefs[j]);
+}
 
 //Print MultiCounterMatrix
 void MultiCounterMatrix::print(std::ostream & os, vector<string> state_names) const

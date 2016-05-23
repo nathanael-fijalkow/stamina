@@ -4,18 +4,21 @@
 #include "ExplicitAutomaton.hpp"
 #include "Monoid.hpp"
 #include "MarkovMonoid.hpp"
+#include "MultiMonoid.hpp"
 
 class Dot
 {
 public:
-  static string toDot(const ExplicitAutomaton*,Monoid*);
+  static string toDot(const ExplicitAutomaton*,Monoid*,int);
 private:
+  static int SH;
   static int size;
   static int initialState;
   static const int* finalStates;
   
   static string giveStyles();
   static string toDot(const ExplicitAutomaton* a);
+  static string toDot(UnstableMultiMonoid* m, const ExtendedExpression* e, const MultiCounterMatrix* mat);
   static string toDot(UnstableMarkovMonoid* m,const ExtendedExpression* e,const ProbMatrix* mat);
   static string toDot(Monoid* m);
 

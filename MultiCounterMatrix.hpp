@@ -50,7 +50,7 @@ public:
 	static void set_counter_number(char N);
 
 	/* coefficients getters and setters */
-	string get(int i, int j) const;
+	int get(int i, int j) const;
 
 	// Print
 	void print(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const;
