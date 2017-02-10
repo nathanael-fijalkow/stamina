@@ -374,6 +374,99 @@ RegExp *Aut2RegExp(ClassicAut *in, list<state> order)
 }	
 
 
+//We add a type of RegExp: Union given by a list instead of two sons. Useful for function RegExp-> SharpExprs
+//we do it here because we'll only use it locally
+struct UnionListRegExp : RegExp
+{
+	list<RegExp *> sons;
+	UnionListRegExp(list<RegExp *> elist){
+		sons=elist;
+		}
+	~UnionListRegExp(){
+		for(RegExp *e: sons)
+			delete e;
+	}
+	virtual void print() const {}
+	virtual RegExp* clone() const {}
+};
+
+//dynamic cast
+const UnionListRegExp * isUnionList(const RegExp *expr){ return dynamic_cast<const UnionListRegExp *>(expr); }
+
+//auxiliary functions for regexp->sharpexp
+
+
+//return the list of summand terms in an expression (singleton if not sum)
+list<RegExp *> RegTerms(RegExp *reg){
+	const UnionRegExp *uexp=isUnion(reg);
+	if (uexp!=NULL){ 
+		//binary union;		
+		list<RegExp *> list1=RegTerms(uexp->left);
+		list<RegExp *> list2=RegTerms(uexp->right);
+		list1.insert(list1.end(),list2.begin(),list2.end());
+		return list1;
+	}
+	const UnionListRegExp *lexp=isUnionList(reg);
+	if (lexp!=NULL){ 
+		//union list
+		list<RegExp *> reslist;
+		for(RegExp *e: lexp->sons){
+			list<RegExp *> el=RegTerms(e);
+			reslist.insert(reslist.end(),el.begin(),el.end());
+		}
+		return reslist;
+	}
+	//not a union, return the singleton expression
+	list<RegExp *> reslist;
+	reslist.push_back(reg);
+	return reslist;
+}
+
+//expand subexpressions: a(b+c)->ab+ac
+RegExp *ExpandReg(RegExp *reg){
+	const LetterRegExp *lexp=isLetter(reg);
+	if (lexp!=NULL) {
+		return reg;
+		}
+	const UnionRegExp *uexp=isUnion(reg);
+	if (uexp!=NULL){
+		RegExp *exp1=ExpandReg(uexp->left);
+		RegExp *exp2=ExpandReg(uexp->right);		
+		UnionRegExp *res=new UnionRegExp(exp1,exp2);
+		return res;
+	}
+	const UnionListRegExp *listexp=isUnionList(reg);
+	if (listexp!=NULL){
+		list <RegExp*> newsons;
+		for(RegExp *e: listexp->sons){
+			newsons.push_back(ExpandReg(e));
+		}
+		UnionListRegExp *res=new UnionListRegExp(newsons);
+		return res;
+	}
+	const ConcatRegExp *cexp=isConcat(reg);	
+	if (cexp!=NULL){				
+		list<RegExp *> list1=RegTerms(ExpandReg(cexp->left));
+		list<RegExp *> list2=RegTerms(ExpandReg(cexp->right));
+		list<RegExp *> sonlist;
+		//expand the product of two lists
+		for(RegExp *e : list1){
+				for(RegExp *f : list2){
+						ConcatRegExp *ef=new ConcatRegExp(e,f);	
+						sonlist.push_back(ef);
+				}
+			}
+		UnionListRegExp *res=new UnionListRegExp(sonlist);
+		return res;	
+	}
+	const StarRegExp *sexp=isStar(reg);
+	if (sexp!=NULL){
+		StarRegExp *res=new StarRegExp(ExpandReg(sexp->base));
+		return res;
+	}
+	return NULL;
+}
+
 ExtendedExpression *Reg2Sharp(const RegExp *reg){
 	const LetterRegExp *lexp=isLetter(reg);
 	if (lexp!=NULL) {
