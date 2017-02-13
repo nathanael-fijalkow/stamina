@@ -189,7 +189,7 @@ int main(int argc, char **argv)
 		RegExp* regexpr = Aut2RegExp(aut,order);
 		
 		cout << "According to the Loop Complexity heuristics, the star-height is at most " << LC << "." << endl;
-		cout << "A regular expression for the language (omitting epsilon) is:  ";
+		cout << "A regular expression for the language (omitting a finite number of words) is:  "<<endl;
 		regexpr->print();
 		cout << endl;
 		
@@ -227,6 +227,7 @@ int main(int argc, char **argv)
 			for(ExtendedExpression *sharp_expr: sharplist){
 				const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr,*Baut);
 				cout <<"."<<flush; 
+				if(verbose) {mat->print();cout<<endl<<endl;}
 				if(monoid.IsUnlimitedWitness(mat)){
 					if(verbose) cout << "--> The heuristic found a witness, the star height is not " << h << ", it is larger." << endl;
 					witness_found=true;

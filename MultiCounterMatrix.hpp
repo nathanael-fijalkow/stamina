@@ -59,7 +59,10 @@ public:
 
 	// Constructor
 	MultiCounterMatrix();
-
+	
+	//Constructor for another copy
+	MultiCounterMatrix(const MultiCounterMatrix *);
+	
 	// Constructor from explicit representation
 	MultiCounterMatrix(const ExplicitMatrix &, char N);
 

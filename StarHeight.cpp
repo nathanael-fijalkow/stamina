@@ -254,7 +254,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 	uint N = (ns > 1) ? (myPow(ns, k + 2) - ns) / (ns - 1) : k + 1;
 	MultiCounterEpsAut* EpsBaut=new MultiCounterEpsAut(nl,N,k+1);
 
-	//the last state on the pile is the reminder modulo ns
+	//the last state on the pile is the remainder modulo ns
 
 	//initial states are the ones from SubAut of length 1, i.e. the same
 	for(uint i=0;i<ns;i++){ EpsBaut->initialstate[i]=(Subsetaut->initial==i); }
@@ -285,7 +285,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 
 		/* NEW DEBUG , better labels for edges */
 
-		int x = w / ns - 1;  //\E9tat parent
+		int x = w / ns - 1;  //parent state
 		char action;
 
 		//si state de la forme upp

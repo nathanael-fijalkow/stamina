@@ -13,6 +13,8 @@ MultiCounterMatrix::MultiCounterMatrix()
 	init();
 }
 
+
+
 void MultiCounterMatrix::set_counter_number(char N)
 {
 	MultiCounterMatrix::N = N;
@@ -40,6 +42,16 @@ void MultiCounterMatrix::set_counter_number(char N)
 	*/
 
 
+}
+
+MultiCounterMatrix::MultiCounterMatrix(const MultiCounterMatrix *mat){
+	init();
+	set_counter_number(mat->N);
+	for(int i=0;i<VectorInt::GetStateNb();i++){
+		rows[i]=mat->rows[i];
+		cols[i]=mat->cols[i];
+	}
+	update_hash();
 }
 
 //Constructor from Explicit Matrix
@@ -178,15 +190,23 @@ bool MultiCounterMatrix::isUnlimitedWitness(const vector<int> & initial_states, 
 				found = true;
 		}
 	}
+	if(found) print();
 	return found;
 }
 
-//works only on idempotents
 Matrix * MultiCounterMatrix::stab() const
 {
+	//start by reaching idempotent power.
+	
+	MultiCounterMatrix *emat=new MultiCounterMatrix(this);
+	
+	while(! emat->isIdempotent()){
+		emat = (MultiCounterMatrix *)emat->prod(this);
+	}
+	
 	uint n = VectorInt::GetStateNb();
 	MultiCounterMatrix * result = new MultiCounterMatrix();
-
+	
 	
 	unsigned char * diags; //sharp of the diagonal
 	diags=(unsigned char *)malloc(n*sizeof(char));
@@ -198,7 +218,7 @@ Matrix * MultiCounterMatrix::stab() const
 	//compute the diagonal 
 	//cout << " act:" << (int)act << "\n";
 	for (uint i = 0; i <n; i++){
-			cd=rows[i]->coefs[i];
+			cd=emat->rows[i]->coefs[i];
 			diags[i] = (cd <= N) ? cd :((cd <= 2*N+1) ? 2*N+1 : 2*N+2);
 	}
 	//system("pause");
@@ -210,13 +230,13 @@ Matrix * MultiCounterMatrix::stab() const
 				//look for a possible path
 				unsigned char t=2*N+2;
 				for (uint b = 0; b<n; b++){ 
-					 t = min(t, act_prod[rows[i]->coefs[b]][act_prod[diags[b]][cols[j]->coefs[b]]]); 
+					 t = min(t, act_prod[emat->rows[i]->coefs[b]][act_prod[diags[b]][emat->cols[j]->coefs[b]]]); 
 					 }
 				new_row[j] = t;
 				
 				t=2*N+2;
 				for (uint b = 0; b<n; b++){ 
-					t = min(t, act_prod[rows[j]->coefs[b]][act_prod[diags[b]][cols[i]->coefs[b]]]);
+					t = min(t, act_prod[emat->rows[j]->coefs[b]][act_prod[diags[b]][emat->cols[i]->coefs[b]]]);
 					 }
 				new_col[j] = t;
 			}
@@ -232,7 +252,7 @@ Matrix * MultiCounterMatrix::stab() const
 	free(new_col);
 
 	free(diags);
-	
+	free(emat);
 	result->update_hash();
 	
 	return result;
