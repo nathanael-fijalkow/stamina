@@ -14,7 +14,7 @@ UnstableMultiMonoid::UnstableMultiMonoid(uint dim, uint counter_number) : Unstab
 	MultiCounterMatrix::set_counter_number(counter_number);
 }
 
-//Constructor from automa
+//Constructor from automata
 UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata) : UnstableMonoid(automata.NbStates)
 {
 	initial_states.clear();

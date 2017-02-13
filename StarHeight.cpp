@@ -1,4 +1,3 @@
-
 #include "StarHeight.hpp"
 #include <fstream>
 
@@ -286,7 +285,7 @@ MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
 
 		/* NEW DEBUG , better labels for edges */
 
-		int x = w / ns - 1;  //état parent
+		int x = w / ns - 1;  //\E9tat parent
 		char action;
 
 		//si state de la forme upp

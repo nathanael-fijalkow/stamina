@@ -422,7 +422,7 @@ list<RegExp *> RegTerms(RegExp *reg){
 	return reslist;
 }
 
-//expand subexpressions: a(b+c)->ab+ac
+//expand subexpressions: a(b+c)->ab+ac, no binary union or nested sums in the result.
 RegExp *ExpandReg(RegExp *reg){
 	const LetterRegExp *lexp=isLetter(reg);
 	if (lexp!=NULL) {
@@ -430,9 +430,10 @@ RegExp *ExpandReg(RegExp *reg){
 		}
 	const UnionRegExp *uexp=isUnion(reg);
 	if (uexp!=NULL){
-		RegExp *exp1=ExpandReg(uexp->left);
-		RegExp *exp2=ExpandReg(uexp->right);		
-		UnionRegExp *res=new UnionRegExp(exp1,exp2);
+		list<RegExp *> l1=RegTerms(ExpandReg(uexp->left));
+		list<RegExp *> l2=RegTerms(ExpandReg(uexp->right));		
+		l1.insert(l1.end(),l2.begin(),l2.end());
+		UnionListRegExp *res=new UnionListRegExp(l1);
 		return res;
 	}
 	const UnionListRegExp *listexp=isUnionList(reg);
@@ -456,6 +457,9 @@ RegExp *ExpandReg(RegExp *reg){
 						sonlist.push_back(ef);
 				}
 			}
+		if(sonlist.size()==1){
+			return sonlist.front();
+		}
 		UnionListRegExp *res=new UnionListRegExp(sonlist);
 		return res;	
 	}
@@ -467,40 +471,36 @@ RegExp *ExpandReg(RegExp *reg){
 	return NULL;
 }
 
+//take a normal form expression (sums only under star) and turn it into a sharp expression
 ExtendedExpression *Reg2Sharp(const RegExp *reg){
 	const LetterRegExp *lexp=isLetter(reg);
 	if (lexp!=NULL) {
 		LetterExpr *res= new LetterExpr(lexp->letter);
 		return res;
 		}
+	
 	const UnionRegExp *uexp=isUnion(reg);
 	if (uexp!=NULL){
-		/*multiple sons int maxs=-1,temp;
-		ExtendedExpression  *maxexp;
-		for(i=0;i<uexp->sonsNb;i++){
-			exp=Reg2Sharp(uexp->sons[i]);
-			temp=exp->sharp_height() ;
-			if (temp>maxs) {maxs=temp;maxexp=exp;}
-		}
-		return maxexp;
-		*/
-		ExtendedExpression *exp1=Reg2Sharp(uexp->left);
-		ExtendedExpression *exp2=Reg2Sharp(uexp->right);		
-		char s1=exp1->sharp_height();
-		char s2=exp2->sharp_height();
-		if (s1>=s2) return exp1;
-		else return exp2;
+		cout << "Error in Reg2Sharp: binary Union should have been eliminated"<<endl;
+		return NULL;
 	}
+	
+	//turns a sum a+b+c into a#b#c#
+	const UnionListRegExp *ulexp=isUnionList(reg);
+	if (ulexp!=NULL){
+		ConcatExpr *res=new ConcatExpr(ulexp->sons.size());
+		int i=0;
+		for(RegExp *e : ulexp->sons){
+			ExtendedExpression *exp=new SharpedExpr(Reg2Sharp(e));
+			res->sons[i]=exp;
+			i++;
+		}
+		res->update_hash();
+		return res;
+	}
+	
 	const ConcatRegExp *cexp=isConcat(reg);	
 	if (cexp!=NULL){
-		
-		/*multiple sons
-		for(i=0;i<cexp->sonsNb;i++){
-			exp=Reg2Sharp(cexp->sons[i]);
-			temp=exp->sharp_height() ;
-			if (temp>maxs) {maxs=temp;maxexp=exp;}
-		}
-		*/
 		
 		ExtendedExpression *exp1=Reg2Sharp(cexp->left);
 		ExtendedExpression *exp2=Reg2Sharp(cexp->right);
@@ -508,10 +508,21 @@ ExtendedExpression *Reg2Sharp(const RegExp *reg){
 		return res;	
 		
 	}
+	//turns e* into Reg2Sharp(e)#
 	const StarRegExp *sexp=isStar(reg);
 	if (sexp!=NULL){
 		SharpedExpr *res=new SharpedExpr(Reg2Sharp(sexp->base));
 		return res;
 	}
 	return NULL;
+}
+
+//apply Reg2Sharp to a sum of normal forms expressions and return the list of results.
+list<ExtendedExpression *> Reg2Sharps(RegExp *reg){
+	list<RegExp *> elist=RegTerms(ExpandReg(reg));
+	list<ExtendedExpression *> res;
+	for(RegExp *e: elist){
+		res.push_back(Reg2Sharp(e));
+	}
+	return res;
 }

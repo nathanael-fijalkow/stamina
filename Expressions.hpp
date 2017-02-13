@@ -113,6 +113,12 @@ public:
 
 	// Third constructor: concatenation of two expressions
 	ConcatExpr(const ExtendedExpression * expr_left, const ExtendedExpression * expr_right);
+	
+	//Constructor where just specify the number of sons to do the allocation
+	ConcatExpr(int n){
+		sonsNb=n;
+		sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
+		}
 
 	// This is an assignment operator which performs a memcopy of the field sons
 	ConcatExpr & operator=(const ConcatExpr &);
@@ -131,7 +137,7 @@ public:
 	    return false;
 	  else {
 	      for (uint i = 0; i < sonsNb; i++) {
-			  if (exp.sons[i] != sons[i])
+			  if (exp.sons[i] != sons[i])  //Warning:this tests equality of pointers
 				  return false;
 
 			  /*

@@ -186,23 +186,26 @@ int main(int argc, char **argv)
 		pair<char,list<uint>> res = LoopComplexity(aut);
 		int LC = (int)res.first ;
 		list<uint> order = res.second;
-		const RegExp* regexpr = Aut2RegExp(aut,order);
-		const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
-		
-		if(sharp_expr==NULL)// empty language
-			{
-			cout <<"The language is empty, the star height is 0."<<endl;
-			ofs.close();
-			return 0;
-			}
-			
+		RegExp* regexpr = Aut2RegExp(aut,order);
 		
 		cout << "According to the Loop Complexity heuristics, the star-height is at most " << LC << "." << endl;
 		cout << "A regular expression for the language (omitting epsilon) is:  ";
 		regexpr->print();
 		cout << endl;
-		cout << "The Loop Complexity suggests the following unboundedness witness:   ";
-		cout << *sharp_expr << endl << endl;
+		
+		list<ExtendedExpression*> sharplist = Reg2Sharps(regexpr);
+		
+		if(sharplist.size()==0)// empty language
+			{
+			cout <<"The language is empty, the star height is 0."<<endl;
+			ofs.close();
+			return 0;
+			}
+		cout << "The Loop Complexity suggests the following unboundedness witnesses:   "<<endl;
+		
+		for(ExtendedExpression *sharp_expr: sharplist){
+			cout << *sharp_expr << endl;
+		}
 		
 		cout << "************STAR HEIGHT COMPUTATION**********" << endl;
 		int h = 0;
@@ -216,17 +219,22 @@ int main(int argc, char **argv)
     		if(verbose) cout << "First step: computing the automaton with counters." << endl << endl;
 			MultiCounterAut *Baut = toNestedBaut(aut, h);
 		
-			if(verbose) cout << "Second step: checking whether the Loop Complexity suggestion is an unboundedness witness." << endl;
+			if(verbose) cout << "Second step: checking whether the Loop Complexity suggestions are unboundedness witnesses." << endl;
 		
 			UnstableMultiMonoid monoid(*Baut);
-			const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr,*Baut);
-
-			if(monoid.IsUnlimitedWitness(mat)){
-				if(verbose) cout << "--> It is, the star height is not " << h << ", it is larger." << endl;
+			
+			bool witness_found=false;
+			for(ExtendedExpression *sharp_expr: sharplist){
+				const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr,*Baut);
+				cout <<"."<<flush; 
+				if(monoid.IsUnlimitedWitness(mat)){
+					if(verbose) cout << "--> The heuristic found a witness, the star height is not " << h << ", it is larger." << endl;
+					witness_found=true;
+				}
 			}
-			else{
+			if(!witness_found){
 				if(verbose){
-					cout << "--> It is not." << endl << endl;
+					cout << "-->Heuristic found no witness." << endl << endl;
 					cout << "Third step: computing the monoid, and checking for the existence of an unboundedness witness on the fly." << endl << endl;
 				}
 				
