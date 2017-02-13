@@ -230,6 +230,7 @@ int main(int argc, char **argv)
 				if(monoid.IsUnlimitedWitness(mat)){
 					if(verbose) cout << "--> The heuristic found a witness, the star height is not " << h << ", it is larger." << endl;
 					witness_found=true;
+					break;
 				}
 			}
 			if(!witness_found){
