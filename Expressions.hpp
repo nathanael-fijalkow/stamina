@@ -49,6 +49,10 @@ public:
 
 	// Equality operator
 	virtual bool operator == (const ExtendedExpression & exp) const;
+        bool operator != (const ExtendedExpression & exp) const
+        {
+           return (! (*this == exp));
+        }
 
 	//print to an output stream
 	virtual void print(std::ostream & os = std::cout) const = 0;
@@ -137,7 +141,7 @@ public:
 	    return false;
 	  else {
 	      for (uint i = 0; i < sonsNb; i++) {
-			  if (exp.sons[i] != sons[i])  //Warning:this tests equality of pointers
+			  if (*exp.sons[i] != *sons[i])
 				  return false;
 
 			  /*

@@ -95,7 +95,7 @@ bool ExtendedExpression::operator == (const ExtendedExpression & exp) const
 		if (cexpr != NULL)
 			return (*cexpr == *(ConcatExpr *)pexp);
 		else
-			return *(LetterExpr *)cexpr == *(LetterExpr *)pexp;
+			return *(LetterExpr *)this == *(LetterExpr *)pexp;
 	}
 }
 
