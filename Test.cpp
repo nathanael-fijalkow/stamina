@@ -226,8 +226,8 @@ int main(int argc, char **argv)
 			bool witness_found=false;
 			for(ExtendedExpression *sharp_expr: sharplist){
 				const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr,*Baut);
-				cout <<"."<<flush; 
-				if(verbose) {mat->print();cout<<endl<<endl;}
+				if (verbose) cout <<"."<<flush; 
+				//if(verbose) {mat->print();cout<<endl<<endl;}
 				if(monoid.IsUnlimitedWitness(mat)){
 					if(verbose) cout << "--> The heuristic found a witness, the star height is not " << h << ", it is larger." << endl;
 					witness_found=true;

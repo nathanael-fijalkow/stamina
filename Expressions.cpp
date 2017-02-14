@@ -26,22 +26,22 @@ ConcatExpr::ConcatExpr(const ExtendedExpression * expr_left, const ExtendedExpre
 	const ConcatExpr * ConcatExprLeft = isConcatExpr(expr_left);
 	const ConcatExpr * ConcatExprRight = isConcatExpr(expr_right);
 
-	int subtrees_nb_right = (ConcatExprRight != NULL) ? ConcatExprRight->sonsNb : 1;
-	sonsNb = subtrees_nb_right + ((ConcatExprLeft != NULL) ? ConcatExprLeft->sonsNb : 1);
+	int subtrees_nb_left = (ConcatExprLeft != NULL) ? ConcatExprLeft->sonsNb : 1;
+	sonsNb = subtrees_nb_left + ((ConcatExprRight != NULL) ? ConcatExprRight->sonsNb : 1);
 
 	/* temporary array used to create all infixes */
 	sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
 
 	/* copy the expressions in the array*/
-	if (ConcatExprRight != NULL)
-		memcpy(sons, ConcatExprRight->sons, ConcatExprRight->sonsNb * sizeof(void*));
-	else
-		sons[0] = expr_right;
-
 	if (ConcatExprLeft != NULL)
-		memcpy(sons + subtrees_nb_right, ConcatExprLeft->sons, ConcatExprLeft->sonsNb * sizeof(void*));
+		memcpy(sons, ConcatExprLeft->sons, ConcatExprLeft->sonsNb * sizeof(void*));
 	else
-		sons[subtrees_nb_right] = expr_left;
+		sons[0] = expr_left;
+
+	if (ConcatExprRight != NULL)
+		memcpy(sons + subtrees_nb_left, ConcatExprRight->sons, ConcatExprRight->sonsNb * sizeof(void*));
+	else
+		sons[subtrees_nb_left] = expr_right;
 
 	update_hash();
 }

@@ -155,6 +155,7 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 #if VERBOSE_AUTOMATA_COMPUTATION
 	printf("Initial state created:%d\n",Subaut->initial);
 #endif
+	Subaut->initialstate[Subaut->initial]=true;
 
 	//final states are subsets where all states are final. This is because we actually powerset the automaton for the complement.
 	uint k;

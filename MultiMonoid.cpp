@@ -110,11 +110,18 @@ const Matrix * UnstableMultiMonoid::ExtendedExpression2Matrix(const ExtendedExpr
 		if(isConcatExpr(expr))
 		{
 			const Matrix * mat = ExtendedExpression2Matrix(cexpr->sons[0], automata);
-			for (uint i = 1; i < cexpr->sonsNb; i++) mat = mat->prod(ExtendedExpression2Matrix(cexpr->sons[i], automata));
+			
+			for (uint i = 1; i < cexpr->sonsNb; i++) {
+				mat = mat->prod(ExtendedExpression2Matrix(cexpr->sons[i], automata));
+			}
 			return mat;
 		}
 		else
 		{
+			if(!isSharpedExpr(expr)){
+				cout<<"ERROR in UnstableMultiMonoid::ExtendedExpression2Matrix: Expression of unknown type"<<endl;
+				return NULL;
+			}
 			const Matrix * mat = ExtendedExpression2Matrix(sexpr->son, automata);
 			return mat->stab();
 		}

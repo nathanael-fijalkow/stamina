@@ -54,6 +54,9 @@ public:
 
 	// Print
 	void print(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const;
+	
+	// Print columns
+	void print_col(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const;
 
     ExplicitMatrix* toExplicitMatrix() const;
 

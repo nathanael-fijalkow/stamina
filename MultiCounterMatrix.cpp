@@ -115,6 +115,30 @@ void MultiCounterMatrix::print(std::ostream & os, vector<string> state_names) co
 		os << endl;
 	}
 }
+
+//Print MultiCounterMatrix according to columns (transpose the matrix)
+void MultiCounterMatrix::print_col(std::ostream & os, vector<string> state_names) const
+{
+	for (uint i = 0; i < VectorInt::GetStateNb(); i++){
+		os << ( state_names.size() > i ? state_names[i] : to_string(i)) << ":" << " ";
+		for (uint j = 0; j < VectorInt::GetStateNb(); j++)
+		{
+//			os << " " << (int)((rows[i]->coefs[j] == 6) ? 6 : rows[i]->coefs[j]);
+				string result = "";
+				auto element = cols[i]->coefs[j];
+				if (element == 2 * N + 2) result = "_ ";
+				else if (element == 2 * N + 1) result = "O ";
+				else if (element == N) result = "E ";
+				else if (element < N) result = "r" + to_string(element);
+				else result = "i" + to_string(element - N - 1);
+				if (result.size() <= 1) result.push_back(' ');
+				os << result << " ";
+		}
+		os << endl;
+	}
+}
+
+
 ExplicitMatrix* MultiCounterMatrix::toExplicitMatrix() const
 {
         ExplicitMatrix* ret = new ExplicitMatrix(VectorInt::GetStateNb());
@@ -190,7 +214,7 @@ bool MultiCounterMatrix::isUnlimitedWitness(const vector<int> & initial_states, 
 				found = true;
 		}
 	}
-	if(found) print();
+	//if(found) print();
 	return found;
 }
 
