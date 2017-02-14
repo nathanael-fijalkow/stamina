@@ -532,11 +532,6 @@ list<ExtendedExpression *> Reg2Sharps(RegExp *reg){
 	list<ExtendedExpression *> res;
 	for(RegExp *e: elist){
 		res.push_back(Reg2Sharp(e));
-		//debug
-		e->print();
-		cout<<endl;
-		res.back()->print();
-		cout<<endl<<endl;
 	}
 	return res;
 }
