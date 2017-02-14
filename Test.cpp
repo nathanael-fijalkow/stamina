@@ -265,7 +265,7 @@ int main(int argc, char **argv)
 			h++;
 		}
 		if(h==LC){
-			cout << endl << "RESULTS: the star height is " << LC << ", as predicted by the Loop Complexity heuristics, and a regular expression witnessing it is ";
+			cout << endl << "RESULTS: the star height is " << LC << ", matching the Loop Complexity, and a regular expression witnessing it is ";
 			regexpr->print();
 			cout << "." << endl;
 		}
