@@ -106,6 +106,8 @@ public:
 	// It is a C-style array of size sonsNb
 	// The rightmost son is stored at the beginning of the array,
 	// the leftmost at address sons + sonsNb - 1
+	
+	//denis : reversing this convention to put the "normal" order instead.
 	const ExtendedExpression ** sons;
 
 protected:

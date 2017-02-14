@@ -144,8 +144,9 @@ void LetterExpr::print(std::ostream& os) const
 
 void ConcatExpr::print(std::ostream& os) const
 {
-	for (uint i = sonsNb ; i > 0; i--)
-		sons[i -1]->print(os);
+	//was reversed, put the normal order again
+	for (uint i = 0 ; i <sonsNb; i++)
+		sons[i]->print(os);
 }
 
 void SharpedExpr::print(std::ostream& os) const

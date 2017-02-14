@@ -386,12 +386,21 @@ struct UnionListRegExp : RegExp
 		for(RegExp *e: sons)
 			delete e;
 	}
-	virtual void print() const {}
+	virtual void print() const {
+		bool f=true;
+		cout<<"(";
+		for(RegExp *e : sons){
+			if (f) f=false; else cout<<"+";
+			e->print();
+			}
+		cout<<")";
+	}
 	virtual RegExp* clone() const {}
 };
 
 //dynamic cast
 const UnionListRegExp * isUnionList(const RegExp *expr){ return dynamic_cast<const UnionListRegExp *>(expr); }
+
 
 //auxiliary functions for regexp->sharpexp
 
@@ -523,6 +532,11 @@ list<ExtendedExpression *> Reg2Sharps(RegExp *reg){
 	list<ExtendedExpression *> res;
 	for(RegExp *e: elist){
 		res.push_back(Reg2Sharp(e));
+		//debug
+		e->print();
+		cout<<endl;
+		res.back()->print();
+		cout<<endl<<endl;
 	}
 	return res;
 }

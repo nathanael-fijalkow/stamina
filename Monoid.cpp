@@ -203,10 +203,10 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 
 	/* We constitute all possible infixes (for the . operator) of the concatenation of the expressions,
 	to check for reducibility according to the current rewrite rules*/
-			// we compute the index that separates right sons (at the beginning of new_expr.sons)
-			//from left sons (at the end of new_expr.sons)
-			const ConcatExpr * ConcatExprRight = isConcatExpr(elt_right);
-			int subtrees_nb_right = (ConcatExprRight != NULL) ? ConcatExprRight->sonsNb : 1;
+			// we compute the index that separates right sons (now at the end of new_expr.sons)
+			//from left sons (now at the beginning of new_expr.sons)
+			const ConcatExpr * ConcatExprLeft = isConcatExpr(elt_left);
+			int subtrees_nb_left = (ConcatExprLeft != NULL) ? ConcatExprLeft->sonsNb : 1;
 
 
 
@@ -220,12 +220,12 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 	const uint subtrees_nb = new_expr.sonsNb;
 
 
-	for (int right_idx = subtrees_nb_right - 1; right_idx >= 0; right_idx--)
+	for (int left_idx = subtrees_nb_left - 1; left_idx >= 0; left_idx--)
 	{
-		for (uint left_idx = subtrees_nb_right; left_idx < subtrees_nb; left_idx++)
+		for (uint right_idx = subtrees_nb_left; right_idx < subtrees_nb; right_idx++)
 		{
-			new_expr.sons = subtrees + right_idx;
-			new_expr.sonsNb = left_idx - right_idx + 1;
+			new_expr.sons = subtrees + left_idx;
+			new_expr.sonsNb = right_idx - left_idx + 1;
 			new_expr.update_hash();
 			
 
