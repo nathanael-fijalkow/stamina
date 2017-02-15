@@ -15,10 +15,19 @@ GraphAut::GraphAut(ClassicAut *aut){
 	trans.resize(NbStates,0);
 	char a;
 	uint i,j;
+	bool msg=true;
 	for(a=0;a<aut->NbLetters;a++){
 		for(i=0;i<NbStates;i++){
+			bool found=false;
 			for(j=0;j<NbStates;j++){
-				if(aut->trans[a][i][j]) trans[i]=addin(trans[i], j);
+				if(aut->trans[a][i][j]){
+					if (found && msg) {
+						cout<<"WARNING: the input automaton is not deterministic, make sure you gave as input the dual of a non-deterministic automaton for the 						complement language. The Loop Complexity heuristic is less likely to work."<<endl<<endl;
+						msg=false;
+					}
+					trans[i]=addin(trans[i], j);
+					found=true;
+				}
 			}
 		}
 	}
