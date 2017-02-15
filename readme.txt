@@ -34,6 +34,8 @@ the fourth line is the initial states. Each state should be separated by spaces.
 the fifth line is the final states. Each state should be separated by spaces.
 the next lines are the transition matrices, one for each letter in the input order. A transition matrix is given by actions (1 and _) separated by spaces. Each matrix is preceded by a single character line, the letter (for readability and checking purposes).
 
+Careful: if the input is a classical automaton for star-height computation, it has to be either deterministic, or to be the dual (accepting states reversed) of a non-deterministic automaton for the complement language.
+
 ************
 Sage Library
 ************
