@@ -1,5 +1,4 @@
 % This automaton recognises (aa)*, so star-height is 1
-% BUG: finds aa + aa(aa)*aa
 2
 c
 a
