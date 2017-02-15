@@ -15,7 +15,7 @@ GraphAut::GraphAut(ClassicAut *aut){
 	trans.resize(NbStates,0);
 	char a;
 	uint i,j;
-	bool msg=true;
+	bool msg=true, msgcomplete=true;
 	for(a=0;a<aut->NbLetters;a++){
 		for(i=0;i<NbStates;i++){
 			bool found=false;
@@ -30,6 +30,11 @@ GraphAut::GraphAut(ClassicAut *aut){
 					trans[i]=addin(trans[i], j);
 					found=true;
 				}
+			}
+			if(!found && msgcomplete){
+				cout<<"WARNING: the input automaton is not complete !"<<endl;
+				cout<<"This can cause the algorithm to fail. Please add a sink state."<<endl<<endl;
+				msgcomplete=false;
 			}
 		}
 	}
