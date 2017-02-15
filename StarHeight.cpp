@@ -22,7 +22,9 @@ GraphAut::GraphAut(ClassicAut *aut){
 			for(j=0;j<NbStates;j++){
 				if(aut->trans[a][i][j]){
 					if (found && msg) {
-						cout<<"WARNING: the input automaton is not deterministic, make sure you gave as input the dual of a non-deterministic automaton for the complement language. The Loop Complexity heuristic is less likely to work."<<endl<<endl;
+						cout<<"WARNING: the input automaton is not deterministic !"<<endl;
+						cout<<"The star-height algorithm with non-deterministic input for the complement language is not implemented yet."<<endl;
+						cout<<"We let the algorithm run but it is not to be trusted."<<endl<<endl;
 						msg=false;
 					}
 					trans[i]=addin(trans[i], j);
