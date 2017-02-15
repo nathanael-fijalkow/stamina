@@ -33,7 +33,16 @@ public:
 	map<char, vector<vector<bool>>> trans;
 
 	void addLetter(char c, ExplicitMatrix m);
-
+	
+	//test wether the automaton is deterministic
+	bool isdet();
+	
+	//test whether the automaton is complete
+	bool iscomplete();
+	
+	//add a rejecting sink
+	void addsink();
+	
 	virtual void print(ostream& st = cout);
 
 protected:

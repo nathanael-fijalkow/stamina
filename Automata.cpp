@@ -27,6 +27,72 @@ ClassicAut::ClassicAut(char Nletters,uint Nstates)
 }
 
 
+//test wether the automaton is deterministic
+bool ClassicAut::isdet(){
+	for (int a=0;a<NbLetters;a++){
+		for(int i=0;i<NbStates;i++){
+			bool found=false;
+			for(int j=0;j<NbStates;j++){
+				if(trans[a][i][j]){
+					if (found) return false;
+					found=true;
+				}
+			}
+		}
+	}
+	return true;	
+}
+	
+//test whether the automaton is complete
+bool ClassicAut::iscomplete(){
+	for (int a=0;a<NbLetters;a++){
+		for(int i=0;i<NbStates;i++){
+			bool found=false;
+			for(int j=0;j<NbStates;j++){
+				if(trans[a][i][j]) {
+					found=true;
+					break;
+				}
+			}
+			if (!found) return false;
+		}
+	}
+	return true;	
+}
+
+	
+//add a rejecting sink
+void ClassicAut::addsink(){
+	NbStates++;
+	
+	initialstate.resize(NbStates, false);	
+	finalstate.resize(NbStates, false);
+		
+	for(int a=0;a<NbLetters;a++)
+	{
+		trans[a].resize(NbStates);
+		for(int i=0;i<NbStates-1;i++){
+			trans[a][i].resize(NbStates);
+			bool found=false;
+			for(int j=0;j<NbStates-1;j++){
+				if(trans[a][i][j]) {
+					found=true;
+					break;
+				}
+			}
+			//add transition to sink if there was none
+			trans[a][i][NbStates-1]=(!found);
+		}
+		//transitions from NbStates
+		trans[a][NbStates-1].resize(NbStates);
+		for(int j=0;j<NbStates-2;j++){
+				trans[a][NbStates-1][j]=false;
+		}
+		//self-loop of sink state
+		trans[a][NbStates-1][NbStates-1]=true;
+			
+	}
+}
 
 
 //classical Automata with Epsilon-transitions

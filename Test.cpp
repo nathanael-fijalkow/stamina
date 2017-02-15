@@ -181,6 +181,19 @@ int main(int argc, char **argv)
 		cout << "It first finds an upper bound using the Loop Complexity heuristics, and then proceeds with the star height computation." << endl << endl ;
 
 		ClassicAut* aut = fromExplicitToClassic(expa);
+		
+		if(! aut->isdet()){
+			cout<<"The input automaton is non-deterministic."<<endl;
+			cout<<"This functionality is not implemented yet for star-height"<<endl;
+			cout<<"Exiting"<<endl;
+			ofs.close();
+			return 0;
+		}
+		
+		if(! aut->iscomplete()){
+			cout<<"The input automaton is not complete, adding sink state."<<endl<<endl;
+			aut->addsink();
+		}
 
 		cout << "************LOOP COMPLEXITY******************" << endl << endl;
 		pair<char,list<uint>> res = LoopComplexity(aut);
