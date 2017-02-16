@@ -541,6 +541,7 @@ ExtendedExpression *Reg2Sharp(const RegExp *reg, bool balance){
 		//we only sharp the non-maximal factors
 		
 		//not used for now, but may be improved and used in the future
+		// for now it is not clear which is better, they seem to work in the same cases
 		i=0;
 		for(RegExp *e : ulexp->sons){
 			ExtendedExpression *exp=Reg2Sharp(e,balance);
@@ -574,7 +575,7 @@ list<ExtendedExpression *> Reg2Sharps(RegExp *reg){
 	list<RegExp *> elist=RegTerms(ExpandReg(reg));
 	list<ExtendedExpression *> res;
 	for(RegExp *e: elist){
-		//only unbalanced heuristic for now
+		//only unbalanced heuristic for now, but not clear which is better
 		res.push_back(Reg2Sharp(e,false));
 	}
 	return res;
