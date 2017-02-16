@@ -545,7 +545,7 @@ ExtendedExpression *Reg2Sharp(const RegExp *reg, bool balance){
 		i=0;
 		for(RegExp *e : ulexp->sons){
 			ExtendedExpression *exp=Reg2Sharp(e,balance);
-			if (exp->sharp_height==maxsh) res->sons[i]=exp; //remove the sharp from non-maximal factors
+			if (exp->sharp_height==maxsh) res->sons[i]=exp; //remove the sharp from maximal factors
 			i++;
 		}
 		return res;
