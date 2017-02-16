@@ -9,6 +9,7 @@
 LetterExpr::LetterExpr(char letter) : letter(letter)
 {
 	_hash = std::hash_value(letter);
+	sharp_height=0;
 };
 
 // Second constructor: a copy constructor which performs a memcopy of the field sons
@@ -17,6 +18,11 @@ ConcatExpr::ConcatExpr(const ConcatExpr & other) : sonsNb(other.sonsNb)
 	_hash = other._hash;
 	sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
 	memcpy(sons,other.sons,sonsNb * sizeof(void *));
+	char m=0;
+	for(int i=0;i<sonsNb;i++){
+		if (sons[i]->sharp_height>m) m=sons[i]->sharp_height;
+	}
+	sharp_height=m;
 }
 
 // Concatenation constructor: creates the concatenation of two expressions
@@ -42,7 +48,11 @@ ConcatExpr::ConcatExpr(const ExtendedExpression * expr_left, const ExtendedExpre
 		memcpy(sons + subtrees_nb_left, ConcatExprRight->sons, ConcatExprRight->sonsNb * sizeof(void*));
 	else
 		sons[subtrees_nb_left] = expr_right;
-
+	
+	if (expr_left->sharp_height > expr_right->sharp_height)
+		sharp_height=expr_left->sharp_height;
+	else
+		sharp_height=expr_right->sharp_height;
 	update_hash();
 }
 
@@ -55,6 +65,7 @@ ConcatExpr & ConcatExpr::operator=(const ConcatExpr & other)
 		_hash = other._hash;
 		sons = (const ExtendedExpression **)malloc(sonsNb * sizeof(void *));
 		memcpy(sons, other.sons, sonsNb * sizeof(void *));
+		sharp_height=other.sharp_height;
 	}	
 	return *this;
 }
@@ -74,6 +85,7 @@ void ConcatExpr::addLeftSon(const ExtendedExpression * new_son)
 SharpedExpr::SharpedExpr(const ExtendedExpression * son) : son(son)
 {
 	_hash = std::hash_value(son->Hash());
+	sharp_height=1+son->sharp_height;
 }
 
 
@@ -109,7 +121,7 @@ const LetterExpr * isLetterExpr(const ExtendedExpression * expr){ return dynamic
 
 
 //Sharp-height
-
+/*
 char LetterExpr::sharp_height() const
 {
 	return 0;
@@ -129,7 +141,7 @@ char SharpedExpr::sharp_height() const
 {
 	return 1+son->sharp_height();
 }
-
+*/
 // Printing functions
 using namespace std;
 

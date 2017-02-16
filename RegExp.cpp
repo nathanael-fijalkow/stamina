@@ -149,6 +149,7 @@ RegExp* StarRegExp::clone() const
 LetterRegExp::LetterRegExp(char a)
 {
 	letter = a;
+	starheight=0;
 	flat = string(1,'a' + a);
 }
 
@@ -157,6 +158,7 @@ ConcatRegExp::ConcatRegExp(RegExp *e1, RegExp *e2)
 	left = e1;
 	right = e2;
 	flat = (e1->flat) + (e2->flat);
+	starheight=max(e1->starheight,e2->starheight);
 }
 
 ConcatRegExp::~ConcatRegExp() 
@@ -169,6 +171,7 @@ UnionRegExp::UnionRegExp(RegExp *e1, RegExp *e2)
 	left = e1;
 	right = e2;
 	flat = "(" + e1->flat + "+" + e2->flat + ")";
+	starheight=max(e1->starheight,e2->starheight);
 }
 UnionRegExp::~UnionRegExp() 
 {
@@ -179,6 +182,7 @@ UnionRegExp::~UnionRegExp()
 StarRegExp::StarRegExp(RegExp *e1)
 {
 	base = e1;
+	starheight=1+e1->starheight;
 	if(isLetter(e1))
 		flat = e1->flat + "*";
 	else
@@ -381,7 +385,12 @@ struct UnionListRegExp : RegExp
 	list<RegExp *> sons;
 	UnionListRegExp(list<RegExp *> elist){
 		sons=elist;
+		int m=0;
+		for(RegExp *e:sons){
+			max(m,e->starheight);
 		}
+		starheight=m;
+	}
 	~UnionListRegExp(){
 		for(RegExp *e: sons)
 			delete e;
@@ -481,8 +490,20 @@ RegExp *ExpandReg(RegExp *reg){
 	return NULL;
 }
 
+
+//to compare expression according to star-height
+struct less_than_sh
+{
+    inline bool operator() (const RegExp *e1, const RegExp *e2)
+    {
+        return (e1->starheight < e2->starheight);
+    }
+};
+
+
 //take a normal form expression (sums only under star) and turn it into a sharp expression
-ExtendedExpression *Reg2Sharp(const RegExp *reg){
+//the boolean specifies if we do balancing or not, e.g. (a+bb*)*->(a#bb#)#
+ExtendedExpression *Reg2Sharp(const RegExp *reg, bool balance){
 	const LetterRegExp *lexp=isLetter(reg);
 	if (lexp!=NULL) {
 		LetterExpr *res= new LetterExpr(lexp->letter);
@@ -496,29 +517,45 @@ ExtendedExpression *Reg2Sharp(const RegExp *reg){
 	}
 	
 	//turns a sum a+b+c into a#b#c#
+	//possibly with balancing
 	const UnionListRegExp *ulexp=isUnionList(reg);
 	if (ulexp!=NULL){
 		ConcatExpr *res=new ConcatExpr(ulexp->sons.size());
 		int i=0;
-		//heuristic: apply # only on the expressions of non-maximal height.
-		//Except in the case where they all have the maximal height
-		//TODO
+		bool all_equal=true;
+		int maxsh=-1;
 		for(RegExp *e : ulexp->sons){
-		
-		for(RegExp *e : ulexp->sons){
-			ExtendedExpression *exp=new SharpedExpr(Reg2Sharp(e));
-			res->sons[i]=exp;
+			ExtendedExpression *exp=Reg2Sharp(e,balance);
+			res->sons[i]=new SharpedExpr(exp); //we just # everything for the non-balanced version
 			i++;
+			char esh=exp->sharp_height;
+			if (esh>maxsh){
+				if (maxsh!=-1)
+					all_equal=false;
+				maxsh=esh;
+			}
 		}
 		res->update_hash();
+		if(all_equal || !balance) return res;
+		//we now have to balance the sharps, and not sharp the terms of maximal starheight
+		//we only sharp the non-maximal factors
+		
+		//not used for now, but may be improved and used in the future
+		i=0;
+		for(RegExp *e : ulexp->sons){
+			ExtendedExpression *exp=Reg2Sharp(e,balance);
+			if (exp->sharp_height==maxsh) res->sons[i]=exp; //remove the sharp from non-maximal factors
+			i++;
+		}
 		return res;
+		
 	}
 	
 	const ConcatRegExp *cexp=isConcat(reg);	
 	if (cexp!=NULL){
 		
-		ExtendedExpression *exp1=Reg2Sharp(cexp->left);
-		ExtendedExpression *exp2=Reg2Sharp(cexp->right);
+		ExtendedExpression *exp1=Reg2Sharp(cexp->left,balance);
+		ExtendedExpression *exp2=Reg2Sharp(cexp->right,balance);
 		ConcatExpr *res=new ConcatExpr(exp1,exp2);
 		return res;	
 		
@@ -526,7 +563,7 @@ ExtendedExpression *Reg2Sharp(const RegExp *reg){
 	//turns e* into Reg2Sharp(e)#
 	const StarRegExp *sexp=isStar(reg);
 	if (sexp!=NULL){
-		SharpedExpr *res=new SharpedExpr(Reg2Sharp(sexp->base));
+		SharpedExpr *res=new SharpedExpr(Reg2Sharp(sexp->base,balance));
 		return res;
 	}
 	return NULL;
@@ -537,7 +574,8 @@ list<ExtendedExpression *> Reg2Sharps(RegExp *reg){
 	list<RegExp *> elist=RegTerms(ExpandReg(reg));
 	list<ExtendedExpression *> res;
 	for(RegExp *e: elist){
-		res.push_back(Reg2Sharp(e));
+		//only unbalanced heuristic for now
+		res.push_back(Reg2Sharp(e,false));
 	}
 	return res;
 }

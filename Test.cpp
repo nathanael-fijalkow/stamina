@@ -214,14 +214,14 @@ int main(int argc, char **argv)
 			ofs.close();
 			return 0;
 			}
-			/*
+		
 		if (verbose){
 			cout << "The Loop Complexity suggests the following unboundedness witnesses:   "<<endl;
 			
 			for(ExtendedExpression *sharp_expr: sharplist){
 				cout << *sharp_expr << endl;
 			}
-		}*/
+		}
 		
 		cout << "************STAR HEIGHT COMPUTATION**********" << endl;
 		int h = 0;

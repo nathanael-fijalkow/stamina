@@ -17,6 +17,7 @@ using namespace std;
 
 struct RegExp
 {
+	int starheight; //store the starheight
 	virtual ~RegExp() {}
 	virtual void print() const=0;
 	virtual RegExp* clone() const=0;

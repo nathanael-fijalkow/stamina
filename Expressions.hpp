@@ -57,8 +57,8 @@ public:
 	//print to an output stream
 	virtual void print(std::ostream & os = std::cout) const = 0;
 	
-	// Sharp-height
-	virtual char sharp_height () const = 0;
+	// Sharp-height (constant not function)
+	char sharp_height;// () const = 0;
 
 protected:
 
@@ -90,7 +90,7 @@ public:
 	virtual void print(std::ostream& os = std::cout) const;
 	
 	// Sharp-height
-	virtual char sharp_height () const;
+	//virtual char sharp_height=0;// () const;
 
 };
 
@@ -170,7 +170,7 @@ public:
 	virtual void print(std::ostream& os = std::cout) const;
 	
 	// Sharp-height
-	virtual char sharp_height () const;
+	//virtual char sharp_height;// () const;
 
 	// Function that computes the hash, using the formula used in the Boost library
 	void update_hash()
@@ -208,7 +208,7 @@ public:
 	virtual void print(std::ostream & os) const;
 	
 	// Sharp-height
-	virtual char sharp_height () const;
+	//virtual char sharp_height;// () const;
 };
 
 // Defines default hash for the class of extendedExpression
