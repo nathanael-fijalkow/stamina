@@ -396,6 +396,7 @@ struct UnionListRegExp : RegExp
 		cout<<")";
 	}
 	virtual RegExp* clone() const {}
+	
 };
 
 //dynamic cast
@@ -499,6 +500,11 @@ ExtendedExpression *Reg2Sharp(const RegExp *reg){
 	if (ulexp!=NULL){
 		ConcatExpr *res=new ConcatExpr(ulexp->sons.size());
 		int i=0;
+		//heuristic: apply # only on the expressions of non-maximal height.
+		//Except in the case where they all have the maximal height
+		//TODO
+		for(RegExp *e : ulexp->sons){
+		
 		for(RegExp *e : ulexp->sons){
 			ExtendedExpression *exp=new SharpedExpr(Reg2Sharp(e));
 			res->sons[i]=exp;

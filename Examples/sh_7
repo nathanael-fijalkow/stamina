@@ -1,0 +1,22 @@
+% this automaton computes (bb*ca+ca)*. Star-height is 1 with the expression (b+bc+ca)*
+3
+c
+abc
+0
+0
+
+a
+_ _ _
+1 _ _
+_ _ _
+
+b
+_ _ 1
+_ _ _
+_ _ 1
+
+c
+_ 1 _
+_ _ _
+_ 1 _
+
