@@ -225,10 +225,32 @@ int main(int argc, char **argv)
 		
 		cout <<endl<< "************STAR HEIGHT COMPUTATION**********" << endl;
 		int h = 0;
-		if(verbose) cout << "Computing the subset automaton..." << endl;
+		if(verbose) cout << "Computing the Subset Automaton..." << endl;
 		//We start by computing the subset automaton of aut
 		//It has deterministic letters
 		ClassicEpsAut* Subsetaut=toSubsetAut(aut);
+		
+		uint ns=Subsetaut->NbStates;
+		char nl=Subsetaut->NbLetters;
+	
+		if(verbose){
+		printf("Subset Automaton Built, %d states\n\n",ns);
+		}
+	
+		// /* minimisation part, optional if we have doubts
+	
+		if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
+		Subsetaut=SubMin(Subsetaut);
+		
+		ns=Subsetaut->NbStates;
+		nl=Subsetaut->NbLetters;
+		
+		if(verbose){
+		printf("Minimal Subset Automaton Built, %d states\n\n",ns);
+		//Subsetaut->print();
+		//ofstream file("subset_automaton_min.txt");
+		//Subsetaut->print(file);
+		}
 		
 		while (h<LC){
 //			ofstream output("monoid " + to_string(h) + ".txt");

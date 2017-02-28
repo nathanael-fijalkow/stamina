@@ -239,22 +239,6 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 	uint ns=Subsetaut->NbStates;
 	char nl=Subsetaut->NbLetters;
 	
-	if(debug){
-		printf("Subset Automaton Built, %d states\n\n",ns);
-		Subsetaut->print();
-		ofstream file("subset_automaton.txt");
-		Subsetaut->print(file);
-	}
-	
-	// /* minimisation part, optional if we have doubts
-	Subsetaut=SubMin(Subsetaut);
-	
-	ns=Subsetaut->NbStates;
-	
-	if(debug){
-		printf("Minimized Subset Automaton Computed, %d states\n\n", ns);
-		Subsetaut->print();
-	}
 	// */
 
 	//states of the resulting automaton are words of Q* of length in [1,k+1]
