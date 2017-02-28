@@ -223,8 +223,13 @@ int main(int argc, char **argv)
 			}
 		}
 		
-		cout << "************STAR HEIGHT COMPUTATION**********" << endl;
+		cout <<endl<< "************STAR HEIGHT COMPUTATION**********" << endl;
 		int h = 0;
+		if(verbose) cout << "Computing the subset automaton..." << endl;
+		//We start by computing the subset automaton of aut
+		//It has deterministic letters
+		ClassicEpsAut* Subsetaut=toSubsetAut(aut);
+		
 		while (h<LC){
 //			ofstream output("monoid " + to_string(h) + ".txt");
 		
@@ -233,7 +238,7 @@ int main(int argc, char **argv)
 			cout << "******************************" << endl;
 	
     		if(verbose) cout << "First step: computing the automaton with counters." << endl << endl;
-			MultiCounterAut *Baut = toNestedBaut(aut, h);
+			MultiCounterAut *Baut = toNestedBaut(Subsetaut, h);
 		
 			if(verbose) cout << "Second step: checking whether the Loop Complexity suggestions are unboundedness witnesses." << endl;
 		

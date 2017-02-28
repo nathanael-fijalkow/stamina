@@ -231,15 +231,11 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut){
 	return pair<char, list<uint>>(lc, gaut->order);
 }
 		
-MultiCounterAut* toNestedBaut(ClassicAut *aut, char k){
+MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 
 	bool debug = false;
 
-	if(debug) cout << "Computing the subset automaton..." << endl;
-	//We start by computing the subset automaton of aut
-	//It has deterministic letters
-	ClassicEpsAut* Subsetaut=toSubsetAut(aut);
-	
+
 	uint ns=Subsetaut->NbStates;
 	char nl=Subsetaut->NbLetters;
 	
