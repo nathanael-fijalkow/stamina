@@ -247,7 +247,11 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 	
 	if(debug) cout << "Computing the multicounter epsilon automaton..." << endl;
 
-	uint N = (ns > 1) ? (myPow(ns, k + 2) - ns) / (ns - 1) : k + 1;
+	uint N = ns;
+	for (uint i=0;i<k;i++){
+		N=N*ns+ns;
+	}
+	if (ns==0) N=k + 1;
 	MultiCounterEpsAut* EpsBaut=new MultiCounterEpsAut(nl,N,k+1);
 
 	//the last state on the pile is the remainder modulo ns
