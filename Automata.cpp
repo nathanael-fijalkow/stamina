@@ -204,7 +204,7 @@ bool bit(uint n,uint k){ return (n >> k) & 1;}
 
 //build a subset automaton, by taking the powerset automaton and adding epsilon-transitions.
 //We assume that we come from a deterministic automaton.
-//It also works if a nondeterminstic automaton for the complement language is given, with final states reversed.
+//It also works if a nondeterministic automaton for the complement language is given, with final states reversed.
 ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 	uint n=aut->NbStates;
 	uint nspow=TwoPow(n); //new number of states

@@ -233,7 +233,7 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut){
 		
 MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 
-	bool debug = false;
+	bool debug = true;
 
 
 	uint ns=Subsetaut->NbStates;
@@ -245,13 +245,14 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 	//there are n+n^2+...+n^(k+1)=(n^(k+2)-n)/(n-1)
 	//there are k+1 counters
 	
-	if(debug) cout << "Computing the multicounter epsilon automaton..." << endl;
-
 	uint N = ns;
 	for (uint i=0;i<k;i++){
 		N=N*ns+ns;
 	}
 	if (ns==0) N=k + 1;
+	
+	if(debug) cout << "Computing the multicounter epsilon automaton... (" <<N<<" states)"<< endl;
+	
 	MultiCounterEpsAut* EpsBaut=new MultiCounterEpsAut(nl,N,k+1);
 
 	//the last state on the pile is the remainder modulo ns
@@ -268,7 +269,7 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 	
 	//TRANSITION table
 	
-	if(debug) cout << "Removing epsilon transitions..." << endl;
+	if(debug) cout << "Adding transitions..." << endl;
 
 	uint l,bound;
 
@@ -318,22 +319,24 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 			EpsBaut->trans_eps[i][nouv] = action; /* l - 1; */
 
 	}
-
+/*
 	if(debug){
 		cout << "****************************************" << endl << "MultiCounterEpsAut " << endl << "****************************************" << endl;
 		EpsBaut->print();
 		ofstream file("multicountereps_automaton.txt");
 		EpsBaut->print(file);
 	}
+*/
+	if(debug) cout << "Removing epsilon transitions..." << endl;
 
 	auto epsremoved = EpsRemoval(EpsBaut);
-
+/*
 	if(debug){
 		cout << "****************************************" << endl << "Epsilon removed " << endl << "****************************************" << endl;
 		epsremoved->print();
 		ofstream file("epsremoved_automaton.txt");
 		epsremoved->print(file);
-	}
+	}*/
 
 	return epsremoved;
 }
