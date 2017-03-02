@@ -343,16 +343,21 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 	}
      */
 
+    ofstream file("multicountereps_automaton.txt");
+    trans_eps_mat.print(file);
+    
 	if(debug) cout << "Removing epsilon transitions..." << endl;
 
 	auto epsremoved = EpsRemoval(EpsBaut);
 /*
 	if(debug){
 		cout << "****************************************" << endl << "Epsilon removed " << endl << "****************************************" << endl;
-		epsremoved->print();
-		ofstream file("epsremoved_automaton.txt");
-		epsremoved->print(file);
+        ofstream file2("epsremoved_automaton.txt");
+		epsremoved->print(file2);
 	}*/
+
+    ofstream file2("epsremoved_automaton.txt");
+    epsremoved->print(file2);
 
 	return epsremoved;
 }

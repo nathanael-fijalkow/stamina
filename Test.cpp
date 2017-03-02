@@ -246,10 +246,10 @@ int main(int argc, char **argv)
 		nl=Subsetaut->NbLetters;
 		
 		if(verbose){
-		printf("Minimal Subset Automaton Built, %d states\n\n",ns);
+            printf("Minimal Subset Automaton Built, %d states\n\n",ns);
 		//Subsetaut->print();
-		//ofstream file("subset_automaton_min.txt");
-		//Subsetaut->print(file);
+            ofstream file("subset_automaton_min.txt");
+            Subsetaut->print(file);
 		}
 		
 		while (h<LC){
@@ -274,6 +274,8 @@ int main(int argc, char **argv)
 				if(monoid.IsUnlimitedWitness(mat)){
 					if(verbose) cout << "--> The heuristic found a witness, the star height is not " << h << ", it is larger." << endl;
 					witness_found=true;
+                    ofstream f("unlimited_witness_sh_" +   to_string(h) + ".txt");
+                    f << *mat;
 					break;
 				}
 			}
@@ -285,6 +287,7 @@ int main(int argc, char **argv)
 				
 				const ExtendedExpression * expr = monoid.containsUnlimitedWitness();
 
+                
 				if(verbose) monoid.print_summary();
                 if(verbose) monoid.print();
 
@@ -295,13 +298,18 @@ int main(int argc, char **argv)
 						cout << "An unlimited witness is ";
 						expr->print();
 						cout << endl;
+                        ofstream f("unlimited_witness_sh_" +   to_string(h) + ".txt");
+                        f << *expr;
 					}
 				}
 				else{
 					if(verbose) cout << "The automaton is limited." << endl;
-
 					cout << "RESULTS: the star height is " << h << "." << endl;
-					break;
+
+                    ofstream f("limited_monoid.txt");
+                    f << monoid;
+                    
+                    break;
 				}
 			}
 			if(toOut)
