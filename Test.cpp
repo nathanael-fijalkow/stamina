@@ -79,7 +79,7 @@ ClassicAut* fromExplicitToClassic(ExplicitAutomaton* aut)
 int main(int argc, char **argv)
 {
 
-	int opt,verbose=0,toOut=0;
+	int opt,verbose=1,toOut=0;
 	ifstream ifs;
 	ofstream ofs; 
 	string outputFilename;
@@ -286,6 +286,7 @@ int main(int argc, char **argv)
 				const ExtendedExpression * expr = monoid.containsUnlimitedWitness();
 
 				if(verbose) monoid.print_summary();
+                if(verbose) monoid.print();
 
 				delete Baut;
 

@@ -40,12 +40,12 @@ UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : UnstableMonoid(dim)
 };
 
 
-Matrix * UnstableMarkovMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
+const Matrix * UnstableMarkovMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
 {
 	return new ProbMatrix(mat);
 }
 
-pair <Matrix *, bool> UnstableMarkovMonoid::addMatrix(Matrix * mat)
+pair <Matrix *, bool> UnstableMarkovMonoid::addMatrix(const Matrix * mat)
 {
 	ProbMatrix * mmat = (ProbMatrix *)mat;
 	auto it = matrices.emplace(*mmat);

@@ -247,7 +247,7 @@ bool ProbMatrix::check() const
 }
 
 // Function computing the product of two matrices
-Matrix * ProbMatrix::prod(const Matrix * pmat1) const
+const Matrix * ProbMatrix::prod(const Matrix * pmat1) const
 {
 	const ProbMatrix & mat1 = *this;
 	const ProbMatrix & mat2 = *(ProbMatrix *)pmat1;
@@ -276,7 +276,7 @@ bool ProbMatrix::recurrent(int j) const{
 }
 
 // Function computing the stabilization. mat is assumed to be idempotent
-Matrix * ProbMatrix::stab() const
+const Matrix * ProbMatrix::stab() const
 {
 	const Vector * recs = recurrent_states();
 	uint n = Vector::GetStateNb();

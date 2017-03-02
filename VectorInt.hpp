@@ -6,17 +6,16 @@
 #include <vector>
 #include <set>
 
+class VectorInt;
+
 
 // Class of vectors
 class VectorInt
 {
 public:
-
+    
 	//set Vector size
-	static void SetSize(uint size)
-	{
-		entriesNb = size;
-	}
+    static void SetSize(uint size);
 
 	static uint GetStateNb()
 	{
@@ -82,6 +81,7 @@ private:
 
 };
 
+
 /* Defines default hash for the class of Vector */
 namespace std
 {
@@ -101,5 +101,8 @@ namespace std
 			}
 		};
 }
+
+/* the set of all vectors */
+static std::unordered_set<VectorInt> int_vectors;
 
 #endif

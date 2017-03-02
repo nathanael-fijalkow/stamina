@@ -20,6 +20,7 @@ public:
 	// Print
 	void print(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const;
 
+    //the caller is responsible for releasing the memory
     ExplicitMatrix* toExplicitMatrix() const;
 
 
@@ -30,11 +31,11 @@ public:
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns
 	//The caller is in charge of deleting the returned object
-	Matrix * prod(const Matrix  *) const;
+	const Matrix * prod(const Matrix  *) const;
 
 	// compute stabilisation
 	//The caller is in charge of deleting the returned object
-	Matrix * stab() const;
+	const Matrix * stab() const;
 
 	// computes the list of recurrent states.
 	const Vector * recurrent_states() const;

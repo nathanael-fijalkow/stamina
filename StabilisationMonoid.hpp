@@ -17,10 +17,10 @@ public:
 	unordered_set <OneCounterLargeMatrix> large_matrices;
 
 protected:
-	pair <Matrix *, bool> addMatrix(Matrix * mat);
+	pair <Matrix *, bool> addMatrix(const Matrix * mat);
 
 	/* converts an explicit matrix */
-	Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
+	virtual const Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const = 0;
 
 };
 

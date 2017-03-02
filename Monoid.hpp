@@ -111,10 +111,10 @@ protected:
 	bool(*test)(const Matrix *);
 
 	/* returns a pair with the Matrix inserted or an already known matrix and a bool indicating whether the matrix was already known */
-	virtual pair <Matrix *, bool> addMatrix(Matrix * mat) = 0;
+	virtual pair <Matrix *, bool> addMatrix(const Matrix * mat) = 0;
 
 	/* converts an explicit matrix */
-	virtual Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const = 0;
+	virtual const Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const = 0;
 
 	UnstableMonoid() : cnt(0), _sharp_height(0) {};
 
@@ -136,7 +136,7 @@ protected:
 	{
 		cout << expr_to_mat.size() << " elements ";
 		cout << "and " << rewriteRules.size() << " rules and " 
-		     << Matrix::vectors.size() + MultiCounterMatrix::int_vectors.size() 
+		     << Matrix::vectors.size() + MultiCounterMatrix::vectors.size() 
 		     << " vectors and " << i << " expressions to process." << endl;
 		cnt = MAX_MONOID_SIZE / 10;
 

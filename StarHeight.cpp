@@ -233,7 +233,7 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut){
 		
 MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 
-	bool debug = true;
+	bool debug = false;
 
 
 	uint ns=Subsetaut->NbStates;
@@ -275,7 +275,17 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 
 	l=1;//length of the sequence
 	bound=ns;//next time the length increases
-	for(uint i=0;i<N;i++){ 
+
+    ExplicitMatrix trans_eps_mat(VectorInt::GetStateNb()); //stores eps trans
+    trans_eps_mat.clear();
+    for(int i = 0 ; i < ns; i++)
+        for(int j = 0; j <ns ; j++)
+            trans_eps_mat.coefficients[i][j] = EpsBaut->bottom();
+    
+    
+   // trans_eps_mat.print();
+    
+	for(uint i=0;i<N;i++){
 		if(i==bound)
 		{
 			l++;
@@ -300,33 +310,39 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 
 		for (unsigned char a = 0; a < nl; a++)
 		{
-			if (Subsetaut->transdet[a][p] < ns)
-				EpsBaut->transdet_state[a][i] = w + Subsetaut->transdet[a][p];
-			else
-				EpsBaut->transdet_state[a][i] = N;
-			EpsBaut->transdet_action[a][i] = action;
+            auto c = (Subsetaut->transdet[a][p] < ns)
+            ? w + Subsetaut->transdet[a][p]
+            : EpsBaut->epsilon();
+            
+            EpsBaut->set_transdet_state(a,i, c);
+			EpsBaut->set_transdet_action(a,i, action);
 		}
 		for (uint q = 0; q < ns; q++)
 			if (Subsetaut->trans_eps[p][q])
-				EpsBaut->trans_eps[i][w + q] = action;
+				trans_eps_mat.coefficients[i][w + q] = action;
 
 		int nouv = (ns > 1) ? (i + 1) * ns + p : i + 1;
-		if (l < k + 1) EpsBaut->trans_eps[i][nouv] = action; /*  EpsBaut->reset(l); */
+		if (l < k + 1)
+            trans_eps_mat.coefficients[i][nouv] = action; /*  EpsBaut->reset(l); */
 
 		nouv = (ns > 1) ? x - (x % ns) + p : i - 1;
 		//creates a reset 
 		if (l > 1)
-			EpsBaut->trans_eps[i][nouv] = action; /* l - 1; */
+			trans_eps_mat.coefficients[i][nouv] = action; /* l - 1; */
 
 	}
-/*
+    //trans_eps_mat.print();
+    EpsBaut->set_trans_eps(trans_eps_mat);
+
+    /*
 	if(debug){
 		cout << "****************************************" << endl << "MultiCounterEpsAut " << endl << "****************************************" << endl;
 		EpsBaut->print();
 		ofstream file("multicountereps_automaton.txt");
-		EpsBaut->print(file);
+		trans_eps_mat.print(file);
 	}
-*/
+     */
+
 	if(debug) cout << "Removing epsilon transitions..." << endl;
 
 	auto epsremoved = EpsRemoval(EpsBaut);

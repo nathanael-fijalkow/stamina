@@ -30,13 +30,13 @@ public:
 	static vector<int> final_states;
 
 	//Converts a given ExtendedExpression into the corresponding Matrix
-	const Matrix * ExtendedExpression2Matrix(const ExtendedExpression * expr, const MultiCounterAut & automata);
+	const MultiCounterMatrix * ExtendedExpression2Matrix(const ExtendedExpression * expr, const MultiCounterAut & automata);
 
 protected:
-	pair <Matrix *, bool> addMatrix(Matrix * mat);
+	pair <Matrix *, bool> addMatrix(const Matrix * mat);
 
 	/* converts an explicit matrix */
-	Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
+	const MultiCounterMatrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
 
 };
 

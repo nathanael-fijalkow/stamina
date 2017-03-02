@@ -38,17 +38,11 @@ protected:
 	void init();
 
 public:
-
-	/* the set of all vectors */
-	static std::unordered_set<VectorInt> int_vectors;
-
-
-	// Number of counters
-	static char N;
-
 	/* called once each time a new monoid is created, given th enumber of counters*/
-	static void set_counter_number(char N);
+	static void set_counter_and_states_number(char counterNumber, uint statesNumber);
 
+    const MultiCounterMatrix * operator*(const MultiCounterMatrix & other) const;
+    
 	/* coefficients getters and setters */
 	int get(int i, int j) const;
 
@@ -58,6 +52,7 @@ public:
 	// Print columns
 	void print_col(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const;
 
+    //the caller is responsible for releasing the memory
     ExplicitMatrix* toExplicitMatrix() const;
 
 	// Constructor
@@ -71,12 +66,12 @@ public:
 
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns
-	// The caller is in charge of deleting the returned object
-	Matrix * prod(const Matrix  *) const;
+    //The caller is in charge of deleting the returned object    
+	const MultiCounterMatrix * prod(const Matrix  *) const;
 
 	// compute stabilisation
-	// The caller is in charge of deleting the returned object
-	Matrix * stab() const;
+    //The caller is in charge of deleting the returned object
+	const MultiCounterMatrix * stab() const;
 
 	// Function checking whether a matrix is idempotent
 	bool isIdempotent() const;
@@ -95,7 +90,13 @@ public:
 
 	bool isUnlimitedWitness(const vector<int> & inital_states, const vector<int> & final_states) const;
 
+    static  unsigned char const get_act_prod(uint i, uint j) { return act_prod[i][j]; };
+
+    static char counterNb() { return N; }
 protected:
+    // Number of counters
+    static char N;
+    
 	// C-style arrays of size VectorInt::GetStateNb() containing all rows
 	const VectorInt ** rows;
 	// C-style arrays of size VectorInt::GetStateNb() containing all cols

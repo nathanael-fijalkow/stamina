@@ -359,6 +359,9 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 }
 
 
+void MultiCounterAut::set_trans(char a, const MultiCounterMatrix & mat) {
+    trans[a] = mat;
+}
 
 
 //Multi-counter Automata
@@ -367,36 +370,10 @@ void MultiCounterAut::init(char Nletters,uint Nstates, char Ncounters){
 	NbStates=Nstates;
 	NbCounters=Ncounters;
 	
+    MultiCounterMatrix::set_counter_and_states_number(NbCounters, Nstates);
+    
 	initialstate.resize(Nstates, false);
 	finalstate.resize(Nstates, false);
-	
-	for(int a=0;a<Nletters;a++){
-		trans[a].resize(Nstates);
-		for(int i=0;i<Nstates;i++){
-			trans[a][i].resize(Nstates, 2 * Ncounters + 2);
-		}
-	}
-	
-	char N=Ncounters;
-	act_prod.resize(2 * N + 3);
-	for (uint i = 0; i < (2 * N + 3); i++){
-		act_prod[i].resize(2 * N + 3);
-		for (uint j = 0; j < (2 * N + 3); j++){
-			act_prod[i][j] =
-				/* rule for infinite */
-				(is_bottom(i) || is_bottom(j)) ? bottom()
-				/* rule for unbounded */
-				: (is_omega(i) || is_omega(j)) ? omega()
-				/* rule for unbounded */
-				: ((is_reset(i) && is_reset(j)) || (is_inc(i) && is_inc(j))) ? (i < j ? i : j)
-				: (i <= N && N < j && i < j - N) ? i
-				: (i <= N && N < j && i >= j - N) ? j
-				: (j <= N && N < i && j < i - N) ? j
-				: /*(j <= N & N < i & j > i - N) ?*/ i;
-//			cout << elementToString(i) << "." << elementToString(j) << "=" << elementToString(act_prod[i][j]) << endl;
-		}
-	}
-	
 }
 
 //Constructor
@@ -404,6 +381,11 @@ MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
 	init(Nletters,Nstates,Ncounters);
 	
 }
+
+MultiCounterAut::~MultiCounterAut()
+{
+};
+
 
 char MultiCounterAut::coef_to_char(string coef, int NbCounters)
 {
@@ -483,12 +465,65 @@ void MultiCounterAut::print(ostream& st){
 		for(uint i=0;i<NbStates;i++){
 			st << state_index_to_string(i) << " ";
 			for(uint j=0;j<NbStates;j++){
-				st << coef_to_string(trans[a][i][j]) << " ";
+				st << coef_to_string(trans[a].get(i,j)) << " ";
 			}
 			st << endl;
 		}
 		st << endl;
 	}
+}
+
+void MultiCounterEpsAut::set_transdet_state(char letter, uint state, uint val)
+{
+    if(letter >= NbLetters || state >= NbStates)
+        throw runtime_error("Bad access to transdet_state");
+    _transdet_state[letter * NbStates + state] = val;
+}
+
+void MultiCounterEpsAut::set_transdet_action(char letter, uint state, char val)
+{
+    if(letter >= NbLetters || state >= NbStates)
+        throw runtime_error("Bad access to transdet_state");
+    _transdet_action[letter * NbStates + state] = val;
+}
+
+void MultiCounterEpsAut::set_trans_eps(const ExplicitMatrix & mat)
+{
+    _trans_eps = new MultiCounterMatrix(mat, NbCounters);
+}
+
+const MultiCounterMatrix & MultiCounterEpsAut::get_trans_eps() const
+{
+    return _trans_eps;
+}
+
+uint MultiCounterEpsAut::transdet_state(char letter, uint state) const
+{
+    if(letter >= NbLetters || state >= NbStates)
+        throw runtime_error("Bad access to transdet_state");
+    return _transdet_state[letter * NbStates + state];
+}
+
+char MultiCounterEpsAut::transdet_action(char letter, uint state) const
+{
+    if(letter >= NbLetters || state >= NbStates)
+        throw runtime_error("Bad access to transdet_action");
+    return _transdet_action[letter * NbStates + state];
+}
+
+uint * MultiCounterEpsAut::transdet_states(char letter) const
+{
+    if(letter >= NbLetters)
+        throw runtime_error("Bad access to transdet_states");
+    return _transdet_state + letter * NbStates;
+}
+
+char * MultiCounterEpsAut::transdet_actions(char letter) const
+{
+    if(letter >= NbLetters)
+        throw runtime_error("Bad access to transdet_actions");
+    return _transdet_action + letter * NbStates;
+    
 }
 
 void MultiCounterEpsAut::print(ostream& st){
@@ -512,80 +547,82 @@ void MultiCounterEpsAut::print(ostream& st){
 	for (unsigned char a = 0; a<NbLetters; a++){
 		st << "Letter " << (int)a << endl;
 		for (uint i = 0; i<NbStates; i++){
-			st << state_index_to_string(i) << " -- " << coef_to_string(transdet_action[a][i]) << " --> " << state_index_to_string(transdet_state[a][i]) << endl;
+			st << state_index_to_string(i) << " -- "
+            << coef_to_string(transdet_action(a,i)) << " --> "
+            << state_index_to_string(transdet_state(a,i)) << endl;
 		}
 		st << endl;
 	}
 
-	st << "Epsilon" << endl;
-	for (uint i = 0; i<NbStates; i++)
+    
+    st << "Epsilon" << endl;
+    for (uint i = 0; i<NbStates; i++)
 	{
 		st << state_index_to_string(i) << ": ";
 		for (uint j = 0; j<NbStates; j++)
-			st << coef_to_string(trans_eps[i][j]) << " ";
+			st << coef_to_string(_trans_eps.get(i,j)) << " ";
 		st << endl;
 	}
-}
-
-//product of matrices. No need to optimize as in the monoid because this won't be done too many times.
-vector<vector<char>> MultiCounterAut::prod_mat(vector<vector<char>> mat1, vector<vector<char>> mat2)
-{
-	char best_act;
-	vector<vector<char>> res(NbStates);
-	for(uint i=0;i<NbStates;i++){
-		res[i].resize(NbStates);
-		for(uint j=0;j<this->NbStates;j++){
-			//compute res[i][j]
-			best_act=2*NbCounters+2;
-			for(uint k=0;k<NbStates;k++){
-				best_act=min( best_act , act_prod[mat1[i][k]][mat2[k][j]]);
-			}
-			res[i][j]=best_act;
-		}
-	}
-	return res;
 }
 
 
 //product of a deterministic transition table with a matrix 
-//matrix product
-vector<vector<char>> prod_mat(vector<vector<char>> mat1, vector<vector<char>> mat2);
-
-vector<vector<char>> MultiCounterAut::prod_det_mat(vector<uint> det_state, vector<char> det_act, vector<vector<char>> mat2){
-	vector<vector<char>> res(NbStates);
+MultiCounterMatrix * MultiCounterAut::prod_det_mat(
+                                                   uint *  det_state,
+                                                   char *  det_act,
+                                                   const MultiCounterMatrix * mat2)
+{
+    ExplicitMatrix res(NbStates);
 	for(uint i=0;i<NbStates;i++){
-		res[i].resize(NbStates);
 		uint k = det_state[i];
 		uint act = det_act[i];
 		for (uint j = 0; j<NbStates; j++){
 			//compute res[i][j]
 			if (k < NbStates)
-				res[i][j] = act_prod[act][mat2[k][j]]; //if k=NbStates it means no transition
+                res.coefficients[i][j] = MultiCounterMatrix::get_act_prod(act,mat2->get(k,j)); //if k=NbStates it means no transition
 			else
 				;//throw runtime_error("Problem in prod_det_mat: k should be less than NbStates");
 		}
 	}
-	return res;
+	return new MultiCounterMatrix(res, NbCounters);
+}
+
+MultiCounterEpsAut::~MultiCounterEpsAut()
+{
+    free(_transdet_state);
+    free(_transdet_action);
+    _transdet_state = NULL;
+    _transdet_action = NULL;
 }
 
 //classical Automata with Epsilon-transitions
-MultiCounterEpsAut::MultiCounterEpsAut(char Nletters, uint Nstates, char Ncounters) : MultiCounterAut(Nletters, Nstates, Ncounters)
+MultiCounterEpsAut::MultiCounterEpsAut(
+                                       char Nletters,
+                                       uint Nstates,
+                                       char Ncounters
+                                       )
+    : MultiCounterAut(Nletters, Nstates, Ncounters)
 {
-	trans_eps.resize(Nstates);
-	for (int i = 0; i < Nstates; i++)
-		trans_eps[i].resize(Nstates, 2 * Ncounters + 2);
+    uint s = Nletters * Nstates;
 
+    _transdet_state = (uint *) malloc(s * sizeof(uint));
+    memset(_transdet_state, Nstates, s); //initialize with Nstates, meaning "no transition"
 
-	transdet_state.resize(Nletters);
-	for (unsigned char a = 0; a < Nletters; a++)
-		transdet_state[a].resize(Nstates, Nstates);//initialize with Nstates, meaning "no transition"
+    _transdet_action = (char *) malloc(s * sizeof(char));
+    memset(_transdet_action, MultiCounterAut::bottom(), s); //initialize with Nstates, meaning "no transition"
+    
+    ExplicitMatrix m(Nstates);
+    for(int i = 0 ; i < Nstates; i++)
+        for(int j = 0; j < Nstates; j++)
+            m.coefficients[i][j] = (i==j)
+            ? MultiCounterAut::epsilon()
+            : MultiCounterAut::bottom();
+    set_trans_eps(m);
 
-	transdet_action.resize(Nletters);
-	for (unsigned char a = 0; a < Nletters; a++)
-		transdet_action[a].resize(Nstates, 2 * Ncounters + 2);
+    //_trans_eps = MultiCounterMatrix(&m);
 }
 
- 
+
 //Epsilon removal in MultiCounter Automata
 //We assume each state has an espilon-transtion to itself
 //We assume letters are deterministic in epsaut
@@ -602,23 +639,57 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
 	aut->initialstate=epsaut->initialstate;
 	aut->finalstate=epsaut->finalstate;
 	
-	//stabilize epsilon-transitions 
-	auto & eps=epsaut->trans_eps;
-	auto new_eps = epsaut->prod_mat(eps, eps);
-	auto & prev_eps = eps;
-	int steps = 0;
-	while (new_eps != prev_eps)
-	{
-		if(debug) cout << "Removing eps transitions step " << ++steps <<  endl;
-		prev_eps=new_eps;
-		new_eps=epsaut->prod_mat(new_eps,eps);
-	}
-	
+	//stabilize epsilon-transitions
+    
+    auto eps = epsaut->get_trans_eps();
+    //we dont want to delete eps
+    auto prev_eps = (const MultiCounterMatrix *) new MultiCounterMatrix(eps);
+    auto new_eps = eps * &eps;
+    //new_eps->print();
+    int steps = 0;
+    while (! (*new_eps == *prev_eps))
+    {
+        /*
+        if(debug) {
+            cout << "Removing eps transitions step " << ++steps <<  endl;
+            cout << "prev_eps" << endl;
+            prev_eps->print();
+            cout << endl;
+            cout << "new_eps" << endl;
+            new_eps->print();
+            cout << endl;
+        }
+         */
+        delete prev_eps;
+        prev_eps = new_eps;
+        new_eps =  (*new_eps) * &eps;
+    }
+    delete prev_eps;
+    
 	//update matrices of each letter : new_a=e*ae*
 	for(char a=0;a<nl;a++){
-		auto ae = epsaut->prod_det_mat(epsaut->transdet_state[a],epsaut->transdet_action[a],new_eps);
-		aut->trans[a]=epsaut->prod_mat(new_eps,ae);
+		auto ae = epsaut->prod_det_mat(
+                                       epsaut->transdet_states(a),
+                                       epsaut->transdet_actions(a),
+                                       new_eps
+                                       );
+        auto trans = (*new_eps) * (*ae);
+
+        if(debug) {
+            cout << "New eps " << endl;
+            new_eps->print();
+            cout << "AE " << endl;
+            ae->print();
+            cout << "trans " << endl;
+            trans->print();
+        }
+        aut->set_trans(a, trans );
+
+        //cleanup
+        delete trans;
+        delete ae;
 	}
+    delete new_eps;
 	
 	return aut;
 }

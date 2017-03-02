@@ -13,12 +13,27 @@ MultiCounterMatrix::MultiCounterMatrix()
 	init();
 }
 
-
-
-void MultiCounterMatrix::set_counter_number(char N)
+const MultiCounterMatrix * MultiCounterMatrix::operator*(const MultiCounterMatrix & other) const
 {
-	MultiCounterMatrix::N = N;
-	act_prod = (unsigned char **)malloc((2 * N + 3)  *  sizeof(char*));
+    return (const MultiCounterMatrix *) prod(&other);
+}
+
+void MultiCounterMatrix::set_counter_and_states_number(char N, uint NbSt)
+{
+    
+    if(MultiCounterMatrix::N == N && VectorInt::GetStateNb() == NbSt && act_prod)
+        return;
+
+    VectorInt::SetSize(NbSt);
+    
+    MultiCounterMatrix::N = N;
+
+    if(act_prod) {
+        free(act_prod);
+        act_prod = NULL;
+    }
+    
+	act_prod = (unsigned char **) malloc((2 * N + 3)  *  sizeof(char*));
 	for (uint i = 0; i < (2 * N + 3); i++){
 		act_prod[i] = (unsigned char *)malloc((2 * N + 3)  *  sizeof(char));
 		for (uint j = 0; j < (2 * N + 3); j++){
@@ -46,7 +61,6 @@ void MultiCounterMatrix::set_counter_number(char N)
 
 MultiCounterMatrix::MultiCounterMatrix(const MultiCounterMatrix *mat){
 	init();
-	set_counter_number(mat->N);
 	for(int i=0;i<VectorInt::GetStateNb();i++){
 		rows[i]=mat->rows[i];
 		cols[i]=mat->cols[i];
@@ -58,7 +72,10 @@ MultiCounterMatrix::MultiCounterMatrix(const MultiCounterMatrix *mat){
 MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N)
 {
 	init();
-	VectorInt::SetSize(explMatrix.stateNb);
+
+    if(VectorInt::GetStateNb() != explMatrix.stateNb)
+        throw runtime_error("States number mismatch please call set_counter_and_states_number first");
+    
 	this->N = N;
 	for (uint i = 0; i < VectorInt::GetStateNb(); i++)
 	{
@@ -70,7 +87,7 @@ MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N
 			row[j] = explMatrix.coefficients[i][j];
 			col[j] = explMatrix.coefficients[j][i];
 		}
-		auto it1 = int_vectors.emplace(row);
+        auto it1 = int_vectors.emplace(row);
 		auto it = it1.first;
 		rows[i] = &(*it);
 		it = int_vectors.emplace(col).first;
@@ -82,9 +99,6 @@ MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N
 char MultiCounterMatrix::N = 0;
 
 unsigned char ** MultiCounterMatrix::act_prod = NULL;
-
-/* the set of all vectors */
-std::unordered_set<VectorInt> MultiCounterMatrix::int_vectors;
 
 // This is the constant vector with only zero entries
 const VectorInt * MultiCounterMatrix::zero_int_vector = NULL;
@@ -141,10 +155,11 @@ void MultiCounterMatrix::print_col(std::ostream & os, vector<string> state_names
 
 ExplicitMatrix* MultiCounterMatrix::toExplicitMatrix() const
 {
+    print();
         ExplicitMatrix* ret = new ExplicitMatrix(VectorInt::GetStateNb());
-	for (uint i = 0; i < VectorInt::GetStateNb(); i++){
-		for (uint j = 0; j < VectorInt::GetStateNb(); j++)
-		  ret->coefficients[i][j]=rows[i]->coefs[j];
+        for (uint i = 0; i < VectorInt::GetStateNb(); i++){
+            for (uint j = 0; j < VectorInt::GetStateNb(); j++)
+                ret->coefficients[i][j]=rows[i]->coefs[j];
 	}
 	return ret;
 }
@@ -163,13 +178,16 @@ bool MultiCounterMatrix::operator==(const MultiCounterMatrix & mat) const
 const VectorInt * MultiCounterMatrix::sub_prod_int(const VectorInt * vec, const VectorInt ** mat_cols)
 {
 	unsigned char * new_vec = (unsigned char *)malloc(VectorInt::GetStateNb() * sizeof(char));
-	memset(new_vec, 0, (VectorInt::GetStateNb() * sizeof(char)));
+	//memset(new_vec, 0, (VectorInt::GetStateNb() * sizeof(char)));
 
 	for (int j = VectorInt::GetStateNb() - 1; j >= 0; j--)
 	{
 		unsigned char min_curr = 2 * N + 2;
-		for (uint i = 0; i < VectorInt::GetStateNb(); i++)
-			min_curr = min(min_curr, act_prod[ vec->coefs[i] ][ mat_cols[j]->coefs[i] ] );
+        for (uint i = 0; i < VectorInt::GetStateNb(); i++) {
+            auto a = vec->coefs[i];
+            auto b = mat_cols[j]->coefs[i];
+			min_curr = min(min_curr, act_prod[ a ][ b ] );
+        }
 		new_vec[j] = min_curr;
 	}
 
@@ -178,7 +196,7 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(const VectorInt * vec, const 
 	return &(*it);
 }
 
-Matrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
+const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
 {
 	const MultiCounterMatrix & mat1 = *this;
 	const MultiCounterMatrix & mat2 = *(MultiCounterMatrix *)pmat1;
@@ -218,7 +236,7 @@ bool MultiCounterMatrix::isUnlimitedWitness(const vector<int> & initial_states, 
 	return found;
 }
 
-Matrix * MultiCounterMatrix::stab() const
+const MultiCounterMatrix * MultiCounterMatrix::stab() const
 {
 	//start by reaching idempotent power.
 	

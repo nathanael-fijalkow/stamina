@@ -39,12 +39,14 @@ public:
 	ExplicitMatrix(uint stateNb);
 	ExplicitMatrix(const ExplicitMatrix&);
 
+    virtual ~ExplicitMatrix(){};
 	//Random matrix
 	static ExplicitMatrix  * random(uint stateNb);
 
 	// Printing
 	virtual void print(std::ostream& os = std::cout) const;
 	
+    void clear();
 
 };
 
@@ -60,16 +62,17 @@ public:
 	// Print
 	virtual void print(std::ostream& os = std::cout, vector<string> state_names = vector<string>()) const = 0;
 
+    //the caller is responsible for releasing the memory
     virtual ExplicitMatrix* toExplicitMatrix() const = 0;
 
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns
-	//The caller is in charge of deleting the returned object
-	virtual Matrix * prod(const Matrix  *) const = 0;
+    //The caller is in charge of deleting the returned object
+	virtual const Matrix * prod(const Matrix  *) const = 0;
 
 	// compute stabilisation
 	//The caller is in charge of deleting the returned object
-	virtual Matrix * stab() const = 0;
+	virtual const Matrix * stab() const = 0;
 
 	// Function returning the hash
 	HashMat hash() const { return _hash; };
