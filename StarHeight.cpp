@@ -231,7 +231,7 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut){
 	return pair<char, list<uint>>(lc, gaut->order);
 }
 		
-MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
+MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 
 	bool debug = true;
 
@@ -343,7 +343,7 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 	}
      */
 
-    ofstream file("multicountereps_automaton.txt");
+    ofstream file("multicountereps_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
     trans_eps_mat.print(file);
     
 	if(debug) cout << "Removing epsilon transitions..." << endl;
@@ -356,7 +356,7 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 		epsremoved->print(file2);
 	}*/
 
-    ofstream file2("epsremoved_automaton.txt");
+    ofstream file2("epsremoved_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
     epsremoved->print(file2);
 
 	return epsremoved;

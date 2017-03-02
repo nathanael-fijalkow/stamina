@@ -248,7 +248,7 @@ int main(int argc, char **argv)
 		if(verbose){
             printf("Minimal Subset Automaton Built, %d states\n\n",ns);
 		//Subsetaut->print();
-            ofstream file("subset_automaton_min.txt");
+            ofstream file("subset_aut_min_stnb_" + to_string(VectorInt::GetStateNb()) + ".txt");
             Subsetaut->print(file);
 		}
 		
@@ -274,7 +274,7 @@ int main(int argc, char **argv)
 				if(monoid.IsUnlimitedWitness(mat)){
 					if(verbose) cout << "--> The heuristic found a witness, the star height is not " << h << ", it is larger." << endl;
 					witness_found=true;
-                    ofstream f("unlimited_witness_sh_" +   to_string(h) + ".txt");
+                    ofstream f("unlimited_witness_sh_" +  to_string(h) + ".txt");
                     f << *mat;
 					break;
 				}
@@ -306,7 +306,7 @@ int main(int argc, char **argv)
 					if(verbose) cout << "The automaton is limited." << endl;
 					cout << "RESULTS: the star height is " << h << "." << endl;
 
-                    ofstream f("limited_monoid.txt");
+                    ofstream f("limited_monoid_sh_" + to_string(h) + ".txt");
                     f << monoid;
                     
                     break;
