@@ -127,6 +127,8 @@ protected:
 	//used in the product of MultiCounter
 	static const VectorInt * sub_prod2(const VectorInt * vec1, const VectorInt ** mat1, const VectorInt * vec2, const VectorInt ** mat2);
 
+    //Cached value of is_idempotent
+    char is_idempotent;
 };
 
 namespace std

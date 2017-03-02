@@ -653,7 +653,6 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
         if(debug || VectorInt::GetStateNb() > 100 || (steps % 100 == 99)) {
             cout << "Removing eps transitions step " << steps <<  endl;
         }
-
         delete prev_eps;
         prev_eps = new_eps;
         new_eps =  (*new_eps) * &eps;

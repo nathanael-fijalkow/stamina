@@ -1,11 +1,13 @@
 #include "MultiCounterMatrix.hpp"
 #include <stdlib.h>
+#include <chrono>
 
 //Constructor
 void MultiCounterMatrix::init()
 {
     rows = (const VectorInt **)malloc(VectorInt::GetStateNb() * sizeof(VectorInt*));
     cols = (const VectorInt **)malloc(VectorInt::GetStateNb() * sizeof(VectorInt*));
+    is_idempotent = -1;
 }
 
 MultiCounterMatrix::MultiCounterMatrix()
@@ -214,12 +216,15 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
 
 const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
 {
+    auto start = std::chrono::high_resolution_clock::now();
+    
     const MultiCounterMatrix & mat1 = *this;
     const MultiCounterMatrix & mat2 = *(MultiCounterMatrix *)pmat1;
     
     MultiCounterMatrix * result = new MultiCounterMatrix();
     
     auto stnb = VectorInt::GetStateNb();
+    
     
     unsigned char * buffer = (unsigned char *)malloc( 2 * stnb * sizeof(char));
     
@@ -232,6 +237,13 @@ const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
     }
     free(buffer);
     result->update_hash();
+    
+    auto end = std::chrono::high_resolution_clock::now();
+    if(stnb > 40) {
+        cout << "prod dim " << stnb << " in "
+        << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << endl;
+    }
+
     return result;
 }
 
@@ -239,7 +251,7 @@ const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
 
 bool MultiCounterMatrix::isIdempotent() const
 {
-    return (*this == *(MultiCounterMatrix *)(this->MultiCounterMatrix::prod(this)));
+    return (*this == *(MultiCounterMatrix *)(this->MultiCounterMatrix::prod(this))) ? 1 : 0;
 };
 
 bool MultiCounterMatrix::isUnlimitedWitness(const vector<int> & initial_states, const vector<int> & final_states) const
@@ -263,14 +275,24 @@ bool MultiCounterMatrix::isUnlimitedWitness(const vector<int> & initial_states, 
 const MultiCounterMatrix * MultiCounterMatrix::stab() const
 {
     //start by reaching idempotent power.
+    auto start = std::chrono::high_resolution_clock::now();
+
     
-    MultiCounterMatrix *emat=new MultiCounterMatrix(this);
-    
-    while(! emat->isIdempotent()){
-        emat = (MultiCounterMatrix *)emat->prod(this);
+    const MultiCounterMatrix * emat = new MultiCounterMatrix(this);
+    while(true){
+        auto new_emat = (*emat) * (*emat);
+        if(*new_emat == *emat)
+        {
+            delete new_emat;
+            break;
+        }
+        auto to_delete = emat;
+        emat = new_emat;
+        delete to_delete;
     }
     
     uint n = VectorInt::GetStateNb();
+
     MultiCounterMatrix * result = new MultiCounterMatrix();
     
     
@@ -291,15 +313,16 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
     
     for (uint i = 0; i <n; i++){
         auto rowi = emat->rows[i]->coefs;
-        auto coli = emat->cols[i]->coefs;
         memset(new_row, bottom(), n*sizeof(char));
-        memset(new_col, bottom(), n*sizeof(char));
         for (uint j = 0; j<n; j++){
             auto colj = emat->cols[j]->coefs;
-            auto rowj = emat->rows[j]->coefs;
             //look for a possible path
-            auto t = bottom();
-            for (uint b = 0; b<n; b++){
+            auto t = act_prod
+                [ rowi[0] ]
+                [ act_prod[diags[0]][colj[0]] ]
+                ;
+            for (uint b = 1; b<n; b++){
+                if(t == 0) break;
                 t = min(t,
                         act_prod
                         [ rowi[b] ]
@@ -307,9 +330,24 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
                         );
             }
             new_row[j] = t;
+        }
+        auto it = int_vectors.emplace(new_row).first;
+        result->rows[i] = &(*it);
+        //if(i % 32 == 0) cout << "Stab row " << i << endl;
+    }
+    
+    for (uint i = 0; i <n; i++){
+        auto coli = emat->cols[i]->coefs;
+        memset(new_col, bottom(), n*sizeof(char));
+        for (uint j = 0; j<n; j++){
+            auto rowj = emat->rows[j]->coefs;
+            //look for a possible path
             
-            t=bottom();
-            for (uint b = 0; b<n; b++){ 
+            auto t = act_prod[rowj[0]]
+                [act_prod[diags[0]][coli[0]]];
+            
+            for (uint b = 1; b<n; b++){
+                if(t == 0) break;
                 t = min(t,
                         act_prod[rowj[b]]
                         [act_prod[diags[b]][coli[b]]]
@@ -317,20 +355,22 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
             }
             new_col[j] = t;
         }
-        
-        auto it = int_vectors.emplace(new_row).first;
-        result->rows[i] = &(*it);
-        it = int_vectors.emplace(new_col).first;
+        auto it = int_vectors.emplace(new_col).first;
         result->cols[i] = &(*it);
-        cout << "Stab row/col " << i << endl;        
+        //if(i % 32 == 0) cout << "Stab col " << i << endl;
     }
-    
     free(new_row);
     free(new_col);
     
     free(diags);
-    free(emat);
+    delete(emat);
     result->update_hash();
     
+    auto end = std::chrono::high_resolution_clock::now();
+    if(n > 40) {
+        cout << "stab dim " << n << " in "
+        << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << endl;
+    }
+
     return result;
 }
