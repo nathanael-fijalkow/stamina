@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <chrono>
 
+#define TIME_BENCHMARKS 0
+
 //Constructor
 void MultiCounterMatrix::init()
 {
@@ -216,7 +218,9 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
 
 const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
 {
+#if TIME_BENCHMARKS
     auto start = std::chrono::high_resolution_clock::now();
+#endif
     
     const MultiCounterMatrix & mat1 = *this;
     const MultiCounterMatrix & mat2 = *(MultiCounterMatrix *)pmat1;
@@ -238,11 +242,13 @@ const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
     free(buffer);
     result->update_hash();
     
+#if TIME_BENCHMARKS
     auto end = std::chrono::high_resolution_clock::now();
-    if(stnb > 40) {
+    if(false && stnb > 40) {
         cout << "prod dim " << stnb << " in "
         << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << endl;
     }
+#endif
 
     return result;
 }
@@ -275,8 +281,9 @@ bool MultiCounterMatrix::isUnlimitedWitness(const vector<int> & initial_states, 
 const MultiCounterMatrix * MultiCounterMatrix::stab() const
 {
     //start by reaching idempotent power.
+#if TIME_BENCHMARKS
     auto start = std::chrono::high_resolution_clock::now();
-
+#endif
     
     const MultiCounterMatrix * emat = new MultiCounterMatrix(this);
     while(true){
@@ -365,12 +372,14 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
     free(diags);
     delete(emat);
     result->update_hash();
-    
+
+#if TIME_BENCHMARKS
     auto end = std::chrono::high_resolution_clock::now();
     if(n > 40) {
         cout << "stab dim " << n << " in "
         << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << endl;
     }
-
+#endif
+    
     return result;
 }
