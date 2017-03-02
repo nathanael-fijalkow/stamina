@@ -233,7 +233,7 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut){
 		
 MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 
-	bool debug = false;
+	bool debug = true;
 
 
 	uint ns=Subsetaut->NbStates;
@@ -280,7 +280,7 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
     trans_eps_mat.clear();
     for(int i = 0 ; i < ns; i++)
         for(int j = 0; j <ns ; j++)
-            trans_eps_mat.coefficients[i][j] = EpsBaut->bottom();
+            trans_eps_mat.coefficients[i][j] = MultiCounterMatrix::bottom();
     
     
    // trans_eps_mat.print();
@@ -302,17 +302,17 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 		//si state de la forme upp
 		if (l>1 && (x%ns == p))
 		{ //alors reset
-			action = EpsBaut->reset(l-1);
+			action = MultiCounterMatrix::reset(l-1);
 		}
 		else{ //sinon increment
-			action = EpsBaut->inc(l-1);
+			action = MultiCounterMatrix::inc(l-1);
 		}
 
 		for (unsigned char a = 0; a < nl; a++)
 		{
             auto c = (Subsetaut->transdet[a][p] < ns)
             ? w + Subsetaut->transdet[a][p]
-            : EpsBaut->epsilon();
+            : MultiCounterMatrix::epsilon();
             
             EpsBaut->set_transdet_state(a,i, c);
 			EpsBaut->set_transdet_action(a,i, action);

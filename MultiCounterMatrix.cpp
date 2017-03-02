@@ -18,16 +18,15 @@ const MultiCounterMatrix * MultiCounterMatrix::operator*(const MultiCounterMatri
     return (const MultiCounterMatrix *) prod(&other);
 }
 
-void MultiCounterMatrix::set_counter_and_states_number(char N, uint NbSt)
+void MultiCounterMatrix::set_counter_and_states_number(char NbCounters, uint NbStates)
 {
-    
-    if(MultiCounterMatrix::N == N && VectorInt::GetStateNb() == NbSt && act_prod)
+    if(MultiCounterMatrix::N == NbCounters && VectorInt::GetStateNb() == NbStates && act_prod)
         return;
 
-    VectorInt::SetSize(NbSt);
+    VectorInt::SetSize(NbStates);
     
-    MultiCounterMatrix::N = N;
-
+    MultiCounterMatrix::N = NbCounters;
+    
     if(act_prod) {
         free(act_prod);
         act_prod = NULL;
@@ -38,24 +37,26 @@ void MultiCounterMatrix::set_counter_and_states_number(char N, uint NbSt)
 		act_prod[i] = (unsigned char *)malloc((2 * N + 3)  *  sizeof(char));
 		for (uint j = 0; j < (2 * N + 3); j++){
 			act_prod[i][j] =
-				(i == 2 * N + 2 || j == 2 * N + 2) ? 2 * N + 2
-				: (i == 2 * N + 1 || j == 2 * N + 1) ? 2 * N + 1
-				: ((i <= N & j <= N) || (N < i & N < j)) ? ( i< j ? i : j)
-				: (i <= N & N < j & i < j - N) ? i
-				: (i <= N & N < j & i >= j - N) ? j
-				: (j <= N & N < i & j < i - N) ? j
-				: /*(j <= N & N < i & j > i - N) ?*/ i;
+				(i == bottom() || j == bottom())
+                    ? bottom()
+                    : (i == omega() || j == omega())
+                        ? omega()
+                        : ((i <= epsilon() & j <= epsilon()) || (epsilon() < i & epsilon() < j))
+                            ? min(i,j)
+                            : (i <= epsilon() & epsilon() < j & i < j - epsilon() )
+                                ? i
+                                : (i <= epsilon() & epsilon() < j & i >= j - epsilon() )
+                                    ? j
+                                    : (j <= epsilon() & epsilon() < i & j < i - epsilon() )
+                                        ? j
+                                        :  i;
 		}
 	}
 
-/*	for (uint i = 0; i < (2 * N + 3); i++){
-		for (uint j = 0; j < (2 * N + 3); j++){
-			cout << (int)  act_prod[i][j] << " ";
-		}
-		cout << endl;
-	}
-	*/
-
+    //set_zero_vector
+    vector<char> nullvec(NbStates, bottom());
+    auto it = int_vectors.emplace(nullvec).first;
+    zero_int_vector = &(*it);
 
 }
 
@@ -87,8 +88,7 @@ MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N
 			row[j] = explMatrix.coefficients[i][j];
 			col[j] = explMatrix.coefficients[j][i];
 		}
-        auto it1 = int_vectors.emplace(row);
-		auto it = it1.first;
+        auto it = int_vectors.emplace(row).first;
 		rows[i] = &(*it);
 		it = int_vectors.emplace(col).first;
 		cols[i] = &(*it);
@@ -155,7 +155,6 @@ void MultiCounterMatrix::print_col(std::ostream & os, vector<string> state_names
 
 ExplicitMatrix* MultiCounterMatrix::toExplicitMatrix() const
 {
-    print();
         ExplicitMatrix* ret = new ExplicitMatrix(VectorInt::GetStateNb());
         for (uint i = 0; i < VectorInt::GetStateNb(); i++){
             for (uint j = 0; j < VectorInt::GetStateNb(); j++)
@@ -175,24 +174,41 @@ bool MultiCounterMatrix::operator==(const MultiCounterMatrix & mat) const
 	return true;
 };
 
-const VectorInt * MultiCounterMatrix::sub_prod_int(const VectorInt * vec, const VectorInt ** mat_cols)
+const VectorInt * MultiCounterMatrix::sub_prod_int(
+                                                   const VectorInt * vec,
+                                                   const VectorInt ** mat_cols,
+                                                   unsigned char * buffer
+                                                   )
 {
-	unsigned char * new_vec = (unsigned char *)malloc(VectorInt::GetStateNb() * sizeof(char));
+    if(vec == zero_int_vector) {
+        return zero_int_vector;
+    }
+    
 	//memset(new_vec, 0, (VectorInt::GetStateNb() * sizeof(char)));
-
+    auto stnb = VectorInt::GetStateNb();
+    
 	for (int j = VectorInt::GetStateNb() - 1; j >= 0; j--)
 	{
-		unsigned char min_curr = 2 * N + 2;
-        for (uint i = 0; i < VectorInt::GetStateNb(); i++) {
-            auto a = vec->coefs[i];
-            auto b = mat_cols[j]->coefs[i];
-			min_curr = min(min_curr, act_prod[ a ][ b ] );
+        if(mat_cols[j] == zero_int_vector) {
+            buffer[j] = bottom();
+        } else {
+            //compute and store in second part of buffer
+            auto ab = vec->coefs;
+            auto ae = vec->coefs + stnb;
+            auto bb = mat_cols[j]->coefs;
+//            auto buf = buffer + stnb;
+            auto min_curr = bottom();
+            for (; ab < ae; ) {
+                auto a = act_prod[ *ab++ ][ *bb++ ];
+                if(a < min_curr) min_curr = a;
+                if(a == 0)
+                    break;
+            }
+            buffer[j] = min_curr;
         }
-		new_vec[j] = min_curr;
 	}
 
-	auto it = int_vectors.emplace(new_vec).first;
-	free(new_vec);
+	auto it = int_vectors.emplace(buffer).first;
 	return &(*it);
 }
 
@@ -203,10 +219,18 @@ const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
 
 	MultiCounterMatrix * result = new MultiCounterMatrix();
 
-	for (uint i = 0; i < VectorInt::GetStateNb(); i++){
-		result->rows[i] = sub_prod_int(mat1.rows[i], mat2.cols);
-		result->cols[i] = sub_prod_int(mat2.cols[i], mat1.rows);
+    auto stnb = VectorInt::GetStateNb();
+    
+    unsigned char * buffer = (unsigned char *)malloc( 2 * stnb * sizeof(char));
+
+    for (uint i = 0; i < stnb; i++){
+        //if(i % 1024 == 256) cout << "Computing MultiCounterMatrix product line " << i << endl;
+        result->rows[i] =
+            sub_prod_int(mat1.rows[i], mat2.cols, buffer);
+		result->cols[i] =
+            sub_prod_int(mat2.cols[i], mat1.rows, buffer);
 	}
+    free(buffer);
 	result->update_hash();
 	return result;
 }

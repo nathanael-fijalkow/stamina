@@ -31,11 +31,28 @@ protected:
 
 // 2N+2: BOT
 
-	// This is the constant vector with only zero entries
+	// This is the constant vector with only bottom entries
 	static const VectorInt * zero_int_vector;
 
 	/* initializer */
 	void init();
+
+public:
+    /* encoding of coefficients as integers */
+    static char inc(char counter){ return counter + N + 1; }
+    static char reset(char counter){ return counter; }
+    static char epsilon() { return N;}
+    static char omega() { return 2 * N + 1; }
+    static char bottom() { return 2 * N + 2; }
+    
+    /* returns -1 if code is not an increment and the corrsponding counter otherwise*/
+    static bool is_inc(char code) { return (code > N && code <= 2 * N) ; }
+    static bool is_reset(char code){ return code < N; }
+    static char get_inc_counter(char code) { return  is_inc(code) ? code - N - 1 : -1; }
+    static char get_reset_counter(char code){ return is_reset(code) ?  code : -1; }
+    static bool is_epsilon(char code){ return code == N; }
+    static bool is_omega(char code){ return code == 2 * N + 1; }
+    static bool is_bottom(char code){ return code == 2 * N + 2; }
 
 public:
 	/* called once each time a new monoid is created, given th enumber of counters*/
@@ -103,7 +120,7 @@ protected:
 	const VectorInt ** cols;
 
 	// Function used in the product
-	static const VectorInt * sub_prod_int(const VectorInt *, const VectorInt **);
+	static const VectorInt * sub_prod_int(const VectorInt *, const VectorInt **, unsigned char * buffer);
 
 	static const VectorInt * sub_prodor(const VectorInt *, const VectorInt **, const VectorInt *);
 

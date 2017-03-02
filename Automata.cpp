@@ -411,11 +411,11 @@ char MultiCounterAut::coef_to_char(string coef, int NbCounters)
 string MultiCounterAut::coef_to_string(char element)
 {
     string result = "";
-    if (is_bottom(element)) result = "_ ";
-    else if (is_omega(element)) result = "O ";
-    else if (is_epsilon(element)) result = "E ";
-    else if (is_reset(element)) result = "R" + to_string( get_reset_counter(element));
-    else result = "I" + to_string(get_inc_counter(element));
+    if ( MultiCounterMatrix::is_bottom(element)) result = "_ ";
+    else if (MultiCounterMatrix::is_omega(element)) result = "O ";
+    else if (MultiCounterMatrix::is_epsilon(element)) result = "E ";
+    else if (MultiCounterMatrix::is_reset(element)) result = "R" + to_string( MultiCounterMatrix::get_reset_counter(element));
+    else result = "I" + to_string(MultiCounterMatrix::get_inc_counter(element));
     return result;
 }
 
@@ -609,14 +609,14 @@ MultiCounterEpsAut::MultiCounterEpsAut(
     memset(_transdet_state, Nstates, s); //initialize with Nstates, meaning "no transition"
 
     _transdet_action = (char *) malloc(s * sizeof(char));
-    memset(_transdet_action, MultiCounterAut::bottom(), s); //initialize with Nstates, meaning "no transition"
+    memset(_transdet_action, MultiCounterMatrix::bottom(), s); //initialize with Nstates, meaning "no transition"
     
     ExplicitMatrix m(Nstates);
     for(int i = 0 ; i < Nstates; i++)
         for(int j = 0; j < Nstates; j++)
             m.coefficients[i][j] = (i==j)
-            ? MultiCounterAut::epsilon()
-            : MultiCounterAut::bottom();
+            ? MultiCounterMatrix::epsilon()
+            : MultiCounterMatrix::bottom();
     set_trans_eps(m);
 
     //_trans_eps = MultiCounterMatrix(&m);
@@ -649,17 +649,11 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
     int steps = 0;
     while (! (*new_eps == *prev_eps))
     {
-        /*
-        if(debug) {
-            cout << "Removing eps transitions step " << ++steps <<  endl;
-            cout << "prev_eps" << endl;
-            prev_eps->print();
-            cout << endl;
-            cout << "new_eps" << endl;
-            new_eps->print();
-            cout << endl;
+        steps++;
+        if(debug || VectorInt::GetStateNb() > 100 || (steps % 100 == 99)) {
+            cout << "Removing eps transitions step " << steps <<  endl;
         }
-         */
+
         delete prev_eps;
         prev_eps = new_eps;
         new_eps =  (*new_eps) * &eps;
