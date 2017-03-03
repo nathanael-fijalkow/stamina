@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <chrono>
 
-#define TIME_BENCHMARKS 1
+#define TIME_BENCHMARKS 0
 
 //Constructor
 void MultiCounterMatrix::init()
