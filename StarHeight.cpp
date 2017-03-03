@@ -344,7 +344,7 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k){
      */
 
     ofstream file("multicountereps_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
-    trans_eps_mat.print(file);
+    EpsBaut->print(file);
     
 	if(debug) cout << "Removing epsilon transitions..." << endl;
 
