@@ -233,7 +233,9 @@ int main(int argc, char **argv)
 		char nl=Subsetaut->NbLetters;
 	
 		if(verbose){
-		printf("Subset Automaton Built, %d states\n\n",ns);
+            printf("Subset Automaton Built, %d states\n\n",ns);
+            ofstream file("subset_aut.txt");
+            Subsetaut->print(file);
 		}
 	
 		// /* minimisation part, optional if we have doubts
@@ -246,9 +248,9 @@ int main(int argc, char **argv)
 		nl=Subsetaut->NbLetters;
 		
 		if(verbose){
-            printf("Minimal Subset Automaton Built, %d states\n\n",ns);
-		//Subsetaut->print();
-            ofstream file("subset_aut_min_stnb_" + to_string(VectorInt::GetStateNb()) + ".txt");
+            printf("Pruned Subset Automaton Built, %d states\n\n",ns);
+            //Subsetaut->print();
+            ofstream file("subset_aut_pruned.txt");
             Subsetaut->print(file);
 		}
         int h = 1;
@@ -300,7 +302,11 @@ int main(int argc, char **argv)
 				const ExtendedExpression * expr = monoid.containsUnlimitedWitness();
 
                 
-				if(verbose) monoid.print_summary();
+                if(verbose) {
+                    monoid.print_summary();
+                    ofstream f("monoid_sh_" + to_string(h) + ".txt");
+                    f << monoid;
+                }
                 //if(verbose) monoid.print();
 
 				delete Baut;
@@ -317,10 +323,6 @@ int main(int argc, char **argv)
 				else{
 					if(verbose) cout << "The automaton is limited." << endl;
 					cout << "RESULTS: the star height is " << h << "." << endl;
-
-                    ofstream f("limited_monoid_sh_" + to_string(h) + ".txt");
-                    f << monoid;
-                    
                     break;
 				}
 			}
