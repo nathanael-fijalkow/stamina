@@ -89,7 +89,7 @@ string Dot::toDot(UnstableMultiMonoid* m, const ExtendedExpression* e, const Mul
 	string ret; 
 	ostringstream s;
 	int elem;
-	int n = MultiCounterMatrix::N;
+	int n = MultiCounterMatrix::counterNb();
 	s << *e;
   
 	ret += "label=\""+s.str();

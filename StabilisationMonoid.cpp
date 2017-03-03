@@ -10,7 +10,7 @@ UnstableStabMonoid::UnstableStabMonoid(uint dim) : UnstableMonoid(dim)
 
 }
 
-Matrix * UnstableStabMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
+const Matrix * UnstableStabMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
 {
 	if (Matrix::UseCentralizedVectorStorage())
 		return new OneCounterLargeMatrix(mat);
@@ -18,7 +18,7 @@ Matrix * UnstableStabMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) c
 		return new OneCounterSmallMatrix(mat);
 }
 
-pair <Matrix *, bool> UnstableStabMonoid::addMatrix(Matrix * mat)
+pair <Matrix *, bool> UnstableStabMonoid::addMatrix(const Matrix * mat)
 {
 	if (Matrix::UseCentralizedVectorStorage())
 	{

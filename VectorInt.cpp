@@ -20,6 +20,15 @@ VectorInt::VectorInt()
   init();
 }
 
+//set Vector size
+void VectorInt::SetSize(uint size)
+{
+    if(entriesNb != size) {
+        int_vectors.clear();
+        entriesNb = size;
+    }
+}
+
 
 // Second constructor
 VectorInt::VectorInt(const VectorInt & other)

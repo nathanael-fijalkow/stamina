@@ -404,7 +404,9 @@ struct UnionListRegExp : RegExp
 			}
 		cout<<")";
 	}
-	virtual RegExp* clone() const {}
+	virtual RegExp* clone() const {
+        throw runtime_error("Clone() should not be called on type UnionListRegExp");
+    }
 	
 };
 

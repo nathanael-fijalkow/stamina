@@ -79,7 +79,7 @@ ClassicAut* fromExplicitToClassic(ExplicitAutomaton* aut)
 int main(int argc, char **argv)
 {
 
-	int opt,verbose=0,toOut=0;
+	int opt,verbose=1,toOut=0;
 	ifstream ifs;
 	ofstream ofs; 
 	string outputFilename;
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
 			}
 		
 		if (verbose){
-			cout << "The Loop Complexity suggests the following unboundedness witnesses:   "<<endl;
+			cout << "The Loop Complexity suggests the following unlimitedness witnesses:   "<<endl;
 			
 			for(ExtendedExpression *sharp_expr: sharplist){
 				cout << *sharp_expr << endl;
@@ -224,7 +224,6 @@ int main(int argc, char **argv)
 		}
 		
 		cout <<endl<< "************STAR HEIGHT COMPUTATION**********" << endl;
-		int h = 0;
 		if(verbose) cout << "Computing the Subset Automaton..." << endl;
 		//We start by computing the subset automaton of aut
 		//It has deterministic letters
@@ -247,12 +246,12 @@ int main(int argc, char **argv)
 		nl=Subsetaut->NbLetters;
 		
 		if(verbose){
-		printf("Minimal Subset Automaton Built, %d states\n\n",ns);
+            printf("Minimal Subset Automaton Built, %d states\n\n",ns);
 		//Subsetaut->print();
-		//ofstream file("subset_automaton_min.txt");
-		//Subsetaut->print(file);
+            ofstream file("subset_aut_min_stnb_" + to_string(VectorInt::GetStateNb()) + ".txt");
+            Subsetaut->print(file);
 		}
-		
+        int h = 1;
 		while (h<LC){
 //			ofstream output("monoid " + to_string(h) + ".txt");
 		
@@ -263,11 +262,19 @@ int main(int argc, char **argv)
     		if(verbose) cout << "First step: computing the automaton with counters." << endl << endl;
 			MultiCounterAut *Baut = toNestedBaut(Subsetaut, h);
 		
-			if(verbose) cout << "Second step: checking whether the Loop Complexity suggestions are unboundedness witnesses." << endl;
-		
-			UnstableMultiMonoid monoid(*Baut);
-			
-			bool witness_found=false;
+            UnstableMultiMonoid monoid(*Baut);
+            
+            /*
+            cout << "DEBUG: computing monoid for sh=" << h << endl;
+            monoid.ComputeMonoid();
+            ofstream f("limited_monoid_sh_" + to_string(h) + ".txt");
+                f << monoid;
+            h++;
+            continue;
+            */
+            bool witness_found=false;
+            
+             if(verbose) cout << "Second step: checking whether the Loop Complexity suggestions are unlimitedness witnesses." << endl;
 			for(ExtendedExpression *sharp_expr: sharplist){
 				break; //not using heuristic
 				const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr,*Baut);
@@ -276,18 +283,25 @@ int main(int argc, char **argv)
 				if(monoid.IsUnlimitedWitness(mat)){
 					if(verbose) cout << "--> The heuristic found a witness, the star height is not " << h << ", it is larger." << endl;
 					witness_found=true;
+                    ofstream f("unlimited_witness_sh_" +  to_string(h) + ".txt");
+                    f << *mat;
 					break;
 				}
 			}
+             if(verbose && !witness_found)
+                cout << "-->Heuristic found no witness." << endl << endl;
+             
+             
 			if(!witness_found){
 				if(verbose){
-					cout << "-->Heuristic found no witness." << endl << endl;
-					cout << "Third step: computing the monoid, and checking for the existence of an unboundedness witness on the fly." << endl << endl;
+					cout << "Third step: computing the monoid, and checking for the existence of an unlimitedness witness on the fly." << endl << endl;
 				}
 				
 				const ExtendedExpression * expr = monoid.containsUnlimitedWitness();
 
+                
 				if(verbose) monoid.print_summary();
+                //if(verbose) monoid.print();
 
 				delete Baut;
 
@@ -296,13 +310,18 @@ int main(int argc, char **argv)
 						cout << "An unlimited witness is ";
 						expr->print();
 						cout << endl;
+                        ofstream f("unlimited_witness_sh_" +   to_string(h) + ".txt");
+                        f << *expr;
 					}
 				}
 				else{
 					if(verbose) cout << "The automaton is limited." << endl;
-
 					cout << "RESULTS: the star height is " << h << "." << endl;
-					break;
+
+                    ofstream f("limited_monoid_sh_" + to_string(h) + ".txt");
+                    f << monoid;
+                    
+                    break;
 				}
 			}
 			if(toOut)

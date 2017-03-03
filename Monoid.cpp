@@ -263,7 +263,7 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 		const ConcatExpr * new_expr = &*concatExpressions.emplace(elt_left, elt_right).first;
 
 		/* We compute the matrix */
-		Matrix * mat = expr_to_mat[elt_left]->prod(expr_to_mat[elt_right]);
+		auto mat = expr_to_mat[elt_left]->prod(expr_to_mat[elt_right]);
 
 		/* we check if the matrix is already known */
 		auto result = addMatrix(mat);
@@ -426,7 +426,7 @@ const ExtendedExpression * UnstableMonoid::sharpify_expression(const ExtendedExp
 	const Matrix * mat_e = expr_to_mat[elt];
 
 	if (is_idempotent(mat_e)){
-		Matrix * mat = mat_e->stab();
+		auto mat = mat_e->stab();
 
 		auto result = addMatrix(mat);
 		unordered_set<SharpedExpr>::iterator it = sharpExpressions.emplace(elt).first;

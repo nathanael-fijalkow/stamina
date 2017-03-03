@@ -10,8 +10,7 @@ UnstableMultiMonoid::UnstableMultiMonoid(uint dim, uint counter_number) : Unstab
 	initial_states.clear();
 	final_states.clear();
 
-	VectorInt::SetSize(dim);
-	MultiCounterMatrix::set_counter_number(counter_number);
+	MultiCounterMatrix::set_counter_and_states_number(counter_number, dim);
 }
 
 //Constructor from automata
@@ -20,14 +19,17 @@ UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata) : Uns
 	initial_states.clear();
 	final_states.clear();
 
-	VectorInt::SetSize(automata.NbStates);
-	MultiCounterMatrix::set_counter_number(automata.NbCounters);
+    MultiCounterMatrix::set_counter_and_states_number(automata.NbCounters, automata.NbStates);
 	
 	for (unsigned char letter = 0; letter < automata.NbLetters; letter++)
 	{
+        /*
 		ExplicitMatrix mat(automata.NbStates);
-		mat.coefficients = automata.trans.at(letter);
-		addLetter(letter, mat);
+		mat.coefficients =
+         */
+        auto mat = automata.get_trans(letter).toExplicitMatrix();
+		addLetter(letter, *mat);
+        free(mat);
 	}
 
 	for (int i = 0; i < automata.NbStates; i++)
@@ -50,6 +52,7 @@ const ExtendedExpression * UnstableMultiMonoid::containsUnlimitedWitness()
 	return ComputeMonoid();
 }
 
+
 vector<int> UnstableMultiMonoid::initial_states;
 vector<int> UnstableMultiMonoid::final_states;
 
@@ -61,12 +64,12 @@ bool UnstableMultiMonoid::IsUnlimitedWitness(const Matrix * matrix)
 
 
 
-Matrix * UnstableMultiMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
+const MultiCounterMatrix * UnstableMultiMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
 {
-	return new MultiCounterMatrix(mat,MultiCounterMatrix::N);
+	return new MultiCounterMatrix(mat,MultiCounterMatrix::counterNb());
 }
 
-pair <Matrix *, bool> UnstableMultiMonoid::addMatrix(Matrix * mat)
+pair <Matrix *, bool> UnstableMultiMonoid::addMatrix(const Matrix * mat)
 {
 	MultiCounterMatrix * mmat = (MultiCounterMatrix *)mat;
 	auto it = matrices.emplace(*mmat);
@@ -94,25 +97,26 @@ ostream& operator<<(ostream& st, const UnstableMultiMonoid & monoid)
 	return st;
 }
 
-const Matrix * UnstableMultiMonoid::ExtendedExpression2Matrix(const ExtendedExpression * expr,const MultiCounterAut & automata)
+const MultiCounterMatrix * UnstableMultiMonoid::ExtendedExpression2Matrix(const ExtendedExpression * expr,const MultiCounterAut & automata)
 {
 	const LetterExpr * lexpr = isLetterExpr(expr);
 	const ConcatExpr * cexpr = isConcatExpr(expr);
 	const SharpedExpr * sexpr = isSharpedExpr(expr);
 
 	if(isLetterExpr(expr)){
-		ExplicitMatrix mat(automata.NbStates);
-		mat.coefficients = automata.trans.at(lexpr->letter);
-		return addLetter(lexpr->letter, mat);
+		auto mat = automata.get_trans(lexpr->letter).toExplicitMatrix();
+        auto res = addLetter(lexpr->letter, *mat);
+        delete mat;
+        return (const MultiCounterMatrix*) res;
 	}
 	else
 	{
 		if(isConcatExpr(expr))
 		{
-			const Matrix * mat = ExtendedExpression2Matrix(cexpr->sons[0], automata);
+			const MultiCounterMatrix * mat = ExtendedExpression2Matrix(cexpr->sons[0], automata);
 			
 			for (uint i = 1; i < cexpr->sonsNb; i++) {
-				mat = mat->prod(ExtendedExpression2Matrix(cexpr->sons[i], automata));
+				mat = (*mat) * ExtendedExpression2Matrix(cexpr->sons[i], automata);
 			}
 			return mat;
 		}
@@ -122,7 +126,7 @@ const Matrix * UnstableMultiMonoid::ExtendedExpression2Matrix(const ExtendedExpr
 				cout<<"ERROR in UnstableMultiMonoid::ExtendedExpression2Matrix: Expression of unknown type"<<endl;
 				return NULL;
 			}
-			const Matrix * mat = ExtendedExpression2Matrix(sexpr->son, automata);
+			const MultiCounterMatrix * mat = ExtendedExpression2Matrix(sexpr->son, automata);
 			return mat->stab();
 		}
 	}
