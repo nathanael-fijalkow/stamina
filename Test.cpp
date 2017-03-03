@@ -240,7 +240,8 @@ int main(int argc, char **argv)
 		// /* minimisation part, optional if we have doubts
 	
 		if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
-		Subsetaut=SubMin(Subsetaut);
+		Subsetaut=SubPrune(Subsetaut);
+		//Subsetaut=SubMin(Subsetaut); optional for now, to test later
 		
 		ns=Subsetaut->NbStates;
 		nl=Subsetaut->NbLetters;
@@ -268,6 +269,7 @@ int main(int argc, char **argv)
 			
 			bool witness_found=false;
 			for(ExtendedExpression *sharp_expr: sharplist){
+				break; //not using heuristic
 				const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr,*Baut);
 				if (verbose) cout <<"."<<flush; 
 				//if(verbose) {mat->print();cout<<endl<<endl;}

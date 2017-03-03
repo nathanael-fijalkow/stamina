@@ -277,6 +277,109 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 }
 
 
+//pruning of subset automata: remove non-accessible and non co-accessible states
+ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
+	uint N=aut->NbStates;
+	uint nl=aut->NbLetters;
+	
+	/* reachability algorithm, inspired from "DFA_minimization" Wikipedia page */
+	unordered_set<uint> reachable; // reachable states
+	unordered_set<uint> new_states;
+	reachable.insert(aut->initial);
+	new_states.insert(aut->initial); //only initial state at first.
+	while(! new_states.empty()){
+		unordered_set<uint> temp;
+		for (auto q: new_states){
+		 //cout <<" treating state "<<q<<endl;
+			for(char a=0;a<nl;a++){
+				uint p=aut->transdet[a][q]; // treat a-successors
+				//cout <<" succ "<<p<<endl;
+				if(reachable.find(p)==reachable.end()){ //if not already in reachable
+					temp.insert(aut->transdet[a][q]);
+					reachable.insert(p);
+				}
+			}
+			//treat epsilon-successors
+			for (uint p=0;p<N;p++){ //not efficient, sparse matrix for epsilons later ?
+				if (aut->trans_eps[q][p] && reachable.find(p)==reachable.end()){
+					temp.insert(p); //add new eps-successors
+					reachable.insert(p);
+				}
+			}
+		}
+		new_states=temp;
+	}
+	
+	cout<<reachable.size()<<" reachable states"<<endl;
+	
+    /* Same  with co-reachability */
+    unordered_set<uint> coreachable; // reachable and coreachable states
+    new_states.clear(); //should be useless
+    for (uint p: reachable){ //start from final reachable states
+    	if(aut->finalstate[p]) {
+    		coreachable.insert(p);
+    		new_states.insert(p);
+    	}
+    }
+    //same with transitions in reverse order, so no more determinism
+    while(! new_states.empty()){
+		unordered_set<uint> temp;
+		for (uint q: new_states){
+			//treat epsilon-successors
+			for (uint p:reachable){ //iterate only over reachable p
+				if (aut->trans_eps[p][q] && coreachable.find(p)==coreachable.end()){
+					temp.insert(p); //add new eps-predecessors
+					coreachable.insert(p);
+				}
+				for(char a=0;a<nl;a++){
+					if (aut->transdet[a][p]==q && coreachable.find(p)==coreachable.end()){
+						temp.insert(p); //add new a-predecessors
+						coreachable.insert(p);
+					}
+				}
+			}
+		}
+		new_states=temp;
+	}
+    
+    //now restric aut to reachable and co-reachable (valid) states
+    
+    vector<uint> names(N); //-1 stands for not valid
+    //rename valid states
+    uint nb_pruned=0;
+    vector<uint> original; //correspondance in the other way
+    for(auto p:coreachable){
+    	names[p]=nb_pruned;
+    	original.push_back(p);
+    	nb_pruned++;
+    }
+  	 cout<<nb_pruned<<" states after pruning"<<endl;
+  	ClassicEpsAut *PruneAut=new ClassicEpsAut(nl,nb_pruned);	
+  	
+  	//initial and final states
+	PruneAut->initial=names[aut->initial];
+	
+	for(uint i=0;i<nb_pruned;i++){
+		PruneAut->finalstate[i]=aut->finalstate[original[i]];
+	}
+	
+	//det transitions
+	for(unsigned char a=0;a<aut->NbLetters;a++){
+		for(uint n=0;n<nb_pruned;n++){
+			PruneAut->transdet[a][n]=names[aut->transdet[a][original[n]]];
+		}
+	}
+	
+	//epsilon transitions
+	for(uint i=0;i<nb_pruned;i++){
+		for(uint j=0;j<nb_pruned;j++){
+			PruneAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
+		}
+	}
+	
+	return PruneAut;
+}
+
 //Minimization of subset automata
 ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 	uint N=aut->NbStates;
