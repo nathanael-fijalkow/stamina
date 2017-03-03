@@ -216,7 +216,7 @@ int main(int argc, char **argv)
 			}
 		
 		if (verbose){
-			cout << "The Loop Complexity suggests the following unboundedness witnesses:   "<<endl;
+			cout << "The Loop Complexity suggests the following unlimitedness witnesses:   "<<endl;
 			
 			for(ExtendedExpression *sharp_expr: sharplist){
 				cout << *sharp_expr << endl;
@@ -262,7 +262,7 @@ int main(int argc, char **argv)
     		if(verbose) cout << "First step: computing the automaton with counters." << endl << endl;
 			MultiCounterAut *Baut = toNestedBaut(Subsetaut, h);
 		
-			if(verbose) cout << "Second step: checking whether the Loop Complexity suggestions are unboundedness witnesses." << endl;
+			if(verbose) cout << "Second step: checking whether the Loop Complexity suggestions are unlimitedness witnesses." << endl;
 		
 			UnstableMultiMonoid monoid(*Baut);
 			
@@ -282,7 +282,7 @@ int main(int argc, char **argv)
 			if(!witness_found){
 				if(verbose){
 					cout << "-->Heuristic found no witness." << endl << endl;
-					cout << "Third step: computing the monoid, and checking for the existence of an unboundedness witness on the fly." << endl << endl;
+					cout << "Third step: computing the monoid, and checking for the existence of an unlimitedness witness on the fly." << endl << endl;
 				}
 				
 				const ExtendedExpression * expr = monoid.containsUnlimitedWitness();

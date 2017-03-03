@@ -428,6 +428,17 @@ char MultiCounterAut::coef_to_char(string coef)
 
 string state_index_to_tuple(int index, int NbStates)
 {
+    index++;
+    int n = (int) log2(NbStates + 1) - 1;
+    string res = "{";
+    for(int i = 0; i < n ; i++) {
+        if(1 & (index >> i) )
+            res += to_string(i) + " ";
+    }
+    if((res.size() - 1) < 2 * n)
+        res += string(2 * n - res.size() + 1,' ');
+    res += "}";
+/*
 	int N = (int)sqrt(NbStates);
 	string res = "";
 	if (index < N)
@@ -438,6 +449,7 @@ string state_index_to_tuple(int index, int NbStates)
 		res = "{" + to_string(index / N) + "," + to_string(index % N) + "}";
 	}
 	res.resize(7, ' ');
+ */
 	return res;
 }
 
@@ -544,25 +556,31 @@ void MultiCounterEpsAut::print(ostream& st){
 /*	uint** transdet_state;
 	char** transdet_action;*/
 
+    st << "Epsilon" << endl;
+    for (uint i = 0; i<NbStates; i++)
+    {
+        st << state_index_to_string(i) << ": ";
+        for (uint j = 0; j<NbStates; j++)
+            st << coef_to_string(_trans_eps.get(i,j)) << " ";
+        st << endl;
+    }
+
 	for (unsigned char a = 0; a<NbLetters; a++){
 		st << "Letter " << (int)a << endl;
-		for (uint i = 0; i<NbStates; i++){
-			st << state_index_to_string(i) << " -- "
-            << coef_to_string(transdet_action(a,i)) << " --> "
-            << state_index_to_string(transdet_state(a,i)) << endl;
-		}
-		st << endl;
+        for (uint i = 0; i<NbStates; i++)
+        {
+            st << state_index_to_string(i) << ": ";
+            for (uint j = 0; j<NbStates; j++)
+                st << ( (j == transdet_state(a,i))
+                       ? coef_to_string(transdet_action(a,i))
+                       : "  " )
+                       << " ";
+            st << endl;
+        }
+        st << endl;
 	}
 
     
-    st << "Epsilon" << endl;
-    for (uint i = 0; i<NbStates; i++)
-	{
-		st << state_index_to_string(i) << ": ";
-		for (uint j = 0; j<NbStates; j++)
-			st << coef_to_string(_trans_eps.get(i,j)) << " ";
-		st << endl;
-	}
 }
 
 
