@@ -22,7 +22,7 @@ public:
 
 	//Returns null if no witness, otherwise a witness
 	const ExtendedExpression * containsUnlimitedWitness();
-
+    
 	static bool IsUnlimitedWitness(const Matrix * matrix);
 
 	/* inital states of the automaton used for construction */

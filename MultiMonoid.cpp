@@ -52,6 +52,7 @@ const ExtendedExpression * UnstableMultiMonoid::containsUnlimitedWitness()
 	return ComputeMonoid();
 }
 
+
 vector<int> UnstableMultiMonoid::initial_states;
 vector<int> UnstableMultiMonoid::final_states;
 

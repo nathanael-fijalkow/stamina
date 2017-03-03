@@ -224,7 +224,6 @@ int main(int argc, char **argv)
 		}
 		
 		cout <<endl<< "************STAR HEIGHT COMPUTATION**********" << endl;
-		int h = 0;
 		if(verbose) cout << "Computing the Subset Automaton..." << endl;
 		//We start by computing the subset automaton of aut
 		//It has deterministic letters
@@ -251,7 +250,7 @@ int main(int argc, char **argv)
             ofstream file("subset_aut_min_stnb_" + to_string(VectorInt::GetStateNb()) + ".txt");
             Subsetaut->print(file);
 		}
-		
+        int h = 1;
 		while (h<LC){
 //			ofstream output("monoid " + to_string(h) + ".txt");
 		
@@ -262,11 +261,19 @@ int main(int argc, char **argv)
     		if(verbose) cout << "First step: computing the automaton with counters." << endl << endl;
 			MultiCounterAut *Baut = toNestedBaut(Subsetaut, h);
 		
-			if(verbose) cout << "Second step: checking whether the Loop Complexity suggestions are unlimitedness witnesses." << endl;
-		
-			UnstableMultiMonoid monoid(*Baut);
-			
-			bool witness_found=false;
+            UnstableMultiMonoid monoid(*Baut);
+            
+            /*
+            cout << "DEBUG: computing monoid for sh=" << h << endl;
+            monoid.ComputeMonoid();
+            ofstream f("limited_monoid_sh_" + to_string(h) + ".txt");
+                f << monoid;
+            h++;
+            continue;
+            */
+            bool witness_found=false;
+            
+             if(verbose) cout << "Second step: checking whether the Loop Complexity suggestions are unlimitedness witnesses." << endl;
 			for(ExtendedExpression *sharp_expr: sharplist){
 				const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr,*Baut);
 				if (verbose) cout <<"."<<flush; 
@@ -279,9 +286,12 @@ int main(int argc, char **argv)
 					break;
 				}
 			}
+             if(verbose && !witness_found)
+                cout << "-->Heuristic found no witness." << endl << endl;
+             
+             
 			if(!witness_found){
 				if(verbose){
-					cout << "-->Heuristic found no witness." << endl << endl;
 					cout << "Third step: computing the monoid, and checking for the existence of an unlimitedness witness on the fly." << endl << endl;
 				}
 				
@@ -289,7 +299,7 @@ int main(int argc, char **argv)
 
                 
 				if(verbose) monoid.print_summary();
-                if(verbose) monoid.print();
+                //if(verbose) monoid.print();
 
 				delete Baut;
 

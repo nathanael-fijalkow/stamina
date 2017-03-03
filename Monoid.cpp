@@ -5,7 +5,7 @@
 #include "ProbMatrix.hpp"
 
 //level 0 no verbosity 1 main steps 2 details
-#define MONOID_COMPUTATION_VERBOSITY 1
+#define MONOID_COMPUTATION_VERBOSITY 0
 
 // Print
 void Monoid::print(ostream& st) const

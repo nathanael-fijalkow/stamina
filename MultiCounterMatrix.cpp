@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <chrono>
 
-#define TIME_BENCHMARKS 0
+#define TIME_BENCHMARKS 1
 
 //Constructor
 void MultiCounterMatrix::init()
@@ -15,11 +15,6 @@ void MultiCounterMatrix::init()
 MultiCounterMatrix::MultiCounterMatrix()
 {
     init();
-}
-
-const MultiCounterMatrix * MultiCounterMatrix::operator*(const MultiCounterMatrix & other) const
-{
-    return (const MultiCounterMatrix *) prod(&other);
 }
 
 void MultiCounterMatrix::set_counter_and_states_number(char NbCounters, uint NbStates)
@@ -78,24 +73,32 @@ MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N
 {
     init();
     
-    if(VectorInt::GetStateNb() != explMatrix.stateNb)
+    auto stnb = VectorInt::GetStateNb();
+    
+    if(stnb != explMatrix.stateNb)
         throw runtime_error("States number mismatch please call set_counter_and_states_number first");
     
     this->N = N;
-    for (uint i = 0; i < VectorInt::GetStateNb(); i++)
+    for (uint i = 0; i < stnb; i++)
     {
-        vector<char> row(VectorInt::GetStateNb());
-        vector<char> col(VectorInt::GetStateNb());
+        unsigned char * row = (unsigned char *) malloc(stnb);
+        unsigned char * col = (unsigned char *) malloc(stnb);
+        
+       // vector<char> row(VectorInt::GetStateNb());
+       // vector<char> col(VectorInt::GetStateNb());
         
         for (uint j = 0; j < VectorInt::GetStateNb(); j++)
         {
             row[j] = explMatrix.coefficients[i][j];
             col[j] = explMatrix.coefficients[j][i];
         }
-        auto it = int_vectors.emplace(row).first;
+        auto it = int_vectors.emplace(row, false).first;
         rows[i] = &(*it);
-        it = int_vectors.emplace(col).first;
+        it = int_vectors.emplace(col, false).first;
         cols[i] = &(*it);
+
+        rows[i]->print(cout);
+        cols[i]->print(cout);
     }
     update_hash();
 }
@@ -112,6 +115,14 @@ int MultiCounterMatrix::get(int i, int j) const
     return (rows[i]->coefs[j]);
 }
 
+#define COEF_TO_STRING \
+if (element == bottom()) result = "_ ";\
+else if (element == omega()) result = "O ";\
+else if (element ==  epsilon()) result = "E ";\
+else if (element <  epsilon()) result = "r" + to_string(element);\
+else result = "i" + to_string(element - epsilon() - 1);\
+if (result.size() <= 1) result.push_back(' ');
+
 //Print MultiCounterMatrix
 void MultiCounterMatrix::print(std::ostream & os, vector<string> state_names) const
 {
@@ -122,12 +133,7 @@ void MultiCounterMatrix::print(std::ostream & os, vector<string> state_names) co
             //			os << " " << (int)((rows[i]->coefs[j] == 6) ? 6 : rows[i]->coefs[j]);
             string result = "";
             auto element = rows[i]->coefs[j];
-            if (element == 2 * N + 2) result = "_ ";
-            else if (element == 2 * N + 1) result = "O ";
-            else if (element == N) result = "E ";
-            else if (element < N) result = "r" + to_string(element);
-            else result = "i" + to_string(element - N - 1);
-            if (result.size() <= 1) result.push_back(' ');
+            COEF_TO_STRING
             os << result << " ";
         }
         os << endl;
@@ -329,7 +335,8 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
                 [ act_prod[diags[0]][colj[0]] ]
                 ;
             for (uint b = 1; b<n; b++){
-                if(t == 0) break;
+                if(t == 0)
+                    break;
                 t = min(t,
                         act_prod
                         [ rowi[b] ]
@@ -354,7 +361,8 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
                 [act_prod[diags[0]][coli[0]]];
             
             for (uint b = 1; b<n; b++){
-                if(t == 0) break;
+                if(t == 0)
+                    break;
                 t = min(t,
                         act_prod[rowj[b]]
                         [act_prod[diags[b]][coli[b]]]

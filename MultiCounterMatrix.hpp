@@ -58,7 +58,9 @@ public:
 	/* called once each time a new monoid is created, given th enumber of counters*/
 	static void set_counter_and_states_number(char counterNumber, uint statesNumber);
 
-    const MultiCounterMatrix * operator*(const MultiCounterMatrix & other) const;
+    const MultiCounterMatrix * operator*(const MultiCounterMatrix & other) const {
+        return (const MultiCounterMatrix *) prod(&other);
+    }
     
 	/* coefficients getters and setters */
 	int get(int i, int j) const;
