@@ -295,7 +295,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 				uint p=aut->transdet[a][q]; // treat a-successors
 				//cout <<" succ "<<p<<endl;
 				if(reachable.find(p)==reachable.end()){ //if not already in reachable
-					temp.insert(aut->transdet[a][q]);
+					temp.insert(p);
 					reachable.insert(p);
 				}
 			}
