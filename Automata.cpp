@@ -662,7 +662,7 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
     auto eps = epsaut->get_trans_eps();
     //we dont want to delete eps
     auto prev_eps = (const MultiCounterMatrix *) new MultiCounterMatrix(eps);
-    auto new_eps = eps * &eps;
+    auto new_eps = eps * eps;
     //new_eps->print();
     int steps = 0;
     while (! (*new_eps == *prev_eps))
@@ -673,7 +673,7 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
         }
         delete prev_eps;
         prev_eps = new_eps;
-        new_eps =  (*new_eps) * &eps;
+        new_eps =  (*new_eps) * (*new_eps);
     }
     delete prev_eps;
     
