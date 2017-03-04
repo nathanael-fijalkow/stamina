@@ -134,7 +134,6 @@ protected:
 	int cnt;
 	void check_size(int i)
 	{
-        //cout << "A" << int_vectors.size() << endl;
 
 		cout << expr_to_mat.size() << " elements ";
 		cout << "and " << rewriteRules.size() << " rules and " 

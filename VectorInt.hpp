@@ -8,6 +8,7 @@
 
 class VectorInt;
 
+#define USE_MIN_HEURISTIC 1
 
 // Class of vectors
 class VectorInt
@@ -27,6 +28,11 @@ public:
 	// thus the array size is the smallest integer larger than entriesNb / (sizeof(uint) * 8) 
 	unsigned char * coefs;
 
+#if USE_MIN_HEURISTIC
+    //the minimum
+    unsigned char min;
+#endif
+    
 //	bool contains(size_t n) const { return  ( bits[n / (sizeof(uint) * 8)] & (1 << (n % (sizeof(uint) * 8)) ) ) != 0; };
 
 	// Construct new vector, size is fixed by set_size

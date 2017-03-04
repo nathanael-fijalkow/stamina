@@ -211,10 +211,12 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
     
     //memset(new_vec, 0, (VectorInt::GetStateNb() * sizeof(char)));
     auto stnb = VectorInt::GetStateNb();
-    
+
+#if USE_CACHED_VECTOR_PRODUCT
     long long v =  ((long long) vec) << 32;
-    
-    for (int j = VectorInt::GetStateNb() - 1; j >= 0; j--)
+#endif
+
+    for (int j = 0; j < stnb; j++)
     {
         auto colj = mat_cols[j];
         if(colj == zero_int_vector) {
@@ -226,6 +228,9 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
                 mult_buffer[j] = cached->second;
             else {
 #endif
+#if USE_MIN_HEURISTIC
+                auto m = (colj->min <= vec->min) ? colj->min : vec->min;
+#endif
             //compute and store in second part of buffer
             auto ab = vec->coefs;
             auto ae = vec->coefs + stnb;
@@ -235,8 +240,13 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
             for (; ab < ae; ) {
                 auto a = act_prod[ *ab++ ][ *bb++ ];
                 if(a < min_curr) min_curr = a;
+#if USE_MIN_HEURISTIC
                 if(a == 0)
                     break;
+#else
+                if(a == m)
+                    break;
+#endif
             }
 #if USE_CACHED_VECTOR_PRODUCT
             cached_product_vectors[v | (long long) colj] = min_curr;
@@ -247,8 +257,6 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
 #endif
         }
     }
-    
-  //  cout << "C" << int_vectors.size() << endl;
 
     auto it = int_vectors.emplace(mult_buffer).first;
     //cout << int_vectors.size() << " ";
@@ -397,7 +405,6 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
             }
             new_col[j] = t;
         }
-//        cout << "B" << int_vectors.size() << endl;
 
         auto it = int_vectors.emplace(new_col).first;
         result->cols[i] = &(*it);

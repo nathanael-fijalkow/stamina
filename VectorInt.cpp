@@ -11,13 +11,16 @@ using namespace std;
 void VectorInt::init(){
   	coefs = (unsigned char *)malloc(entriesNb * sizeof(char));
 	memset(coefs, (char)0, entriesNb * sizeof(char));
-	update_hash();
 }
 
 // First constructor
 VectorInt::VectorInt()
 {
   init();
+  update_hash();
+#if USE_MIN_HEURISTIC
+    min  = 0;
+#endif
 }
 
 //set Vector size
@@ -35,14 +38,25 @@ VectorInt::VectorInt(const VectorInt & other)
 {
 	memcpy(coefs, other.coefs, entriesNb * sizeof(char));
 	_hash = other.Hash();
+#if USE_MIN_HEURISTIC
+    min  = other.min;
+#endif
 }
 
 // Third constructor
 VectorInt::VectorInt(vector<char> data)
 {
         init();
-	for (int i = data.size() - 1; i >= 0; i--)
+#if USE_MIN_HEURISTIC
+    min = -1;
+#endif
+    for (int i = 0; i < data.size(); i++) {
 		coefs[i] = data[i];
+#if USE_MIN_HEURISTIC
+        if(data[i] < min) min = data[i];
+#endif
+    }
+    
 	update_hash();
 }
 
@@ -53,6 +67,12 @@ VectorInt::VectorInt(unsigned char * data, bool copy)
 	{
 		coefs = (unsigned char *)malloc(entriesNb * sizeof(char));
 		memcpy(coefs, data, entriesNb * sizeof(char));
+#if USE_MIN_HEURISTIC
+        min = -1;
+        for (int i = 0; i < entriesNb; i++)
+            if(data[i] < min)
+                min = data[i];
+#endif
 	}
 	else
 	{
