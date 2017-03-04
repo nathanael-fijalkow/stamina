@@ -332,7 +332,9 @@ const ExtendedExpression * UnstableMonoid::CloseByProduct()
 				return witness;
 			if (--cnt == 0)
 			{
-				cout << "processing product: ";
+                cout << std::chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - computation_start).count() << "ms: ";
+                         
+				cout << "processing product ";
 				check_size(d2 + new_elements.size() *(d1 - 1) + new_elements.size()* new_elements.size());
 				cnt = MAX_MONOID_SIZE / 10;
 			}
@@ -359,7 +361,9 @@ const ExtendedExpression * UnstableMonoid::CloseByProduct()
 				return witness;
 			if (--cnt == 0)
 			{
-				cout << "Processing product: ";
+                cout << std::chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - computation_start).count() << "ms: ";
+
+				cout << "processing product: ";
 				check_size(d1 + new_elements.size() *(d2 - 1));
 			}
 
@@ -384,7 +388,8 @@ const ExtendedExpression * UnstableMonoid::CloseByStabilization()
 		cur_index++;
 		if (--cnt == 0)
 		{
-            cout << "Processing stabilization: ";
+            cout << std::chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - computation_start).count() << "ms: ";
+            cout << "processing stabilization: ";
 			cout << expr_to_mat.size() << " elements and " << rewriteRules.size();
 			cout << " rewrite_rules and " << to_be_sharpified.size() - cur_index << " elements to sharpify" << endl;
 			if (to_be_sharpified.size() > MAX_MONOID_SIZE)
@@ -453,6 +458,8 @@ const ExtendedExpression * UnstableMonoid::sharpify_expression(const ExtendedExp
 
 const ExtendedExpression * UnstableMonoid::ComputeMonoid()
 {
+    computation_start = chrono::high_resolution_clock::now();
+    
 	cnt = MAX_MONOID_SIZE / 10;
 
 	new_elements.clear();
@@ -491,7 +498,9 @@ const ExtendedExpression * UnstableMonoid::ComputeMonoid()
 			cout << endl << "The current monoid is: " << endl << endl;
 			print();
 		}
-		cout << endl << "Starting iteration " << i << endl << endl ;
+        cout << endl;
+        cout << std::chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - computation_start).count() << "ms: ";
+        << "starting iteration " << i << endl << endl ;
 		cout << endl << "------> Closure by product" << endl ;
 #endif
 //		cout << "Concatenation" << endl;
@@ -510,6 +519,7 @@ const ExtendedExpression * UnstableMonoid::ComputeMonoid()
 			return witness;
 
 #if MONOID_COMPUTATION_VERBOSITY
+        cout << std::chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - computation_start).count() << "ms: ";
 		cout << "------> Closure by stabilization" << endl << endl;
 #endif
 //		cout << "Stabilization" << endl;

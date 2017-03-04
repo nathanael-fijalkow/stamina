@@ -8,6 +8,8 @@
 #include <map>
 #include <set>
 
+#include <chrono>
+
 #include "Expressions.hpp"
 #include "Matrix.hpp"
 
@@ -106,7 +108,7 @@ public:
 	};
 
 protected:
-
+    
 	/* the witness test */
 	bool(*test)(const Matrix *);
 
@@ -146,6 +148,8 @@ protected:
 	}
 
 	int _sharp_height;
+    
+    chrono::high_resolution_clock::time_point computation_start;
 };
 
 
