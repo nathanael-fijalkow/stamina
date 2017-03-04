@@ -261,11 +261,6 @@ const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
 
 // Construct a vector obtained by multiplying the line vec by all columns of mat.
 
-bool MultiCounterMatrix::isIdempotent() const
-{
-    return (*this == *(MultiCounterMatrix *)(this->MultiCounterMatrix::prod(this))) ? 1 : 0;
-};
-
 bool MultiCounterMatrix::isUnlimitedWitness(const vector<int> & initial_states, const vector<int> & final_states) const
 {
     bool found = false;

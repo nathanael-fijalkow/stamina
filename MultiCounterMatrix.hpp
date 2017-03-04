@@ -93,7 +93,7 @@ public:
 	const MultiCounterMatrix * stab() const;
 
 	// Function checking whether a matrix is idempotent
-	bool isIdempotent() const;
+    bool isIdempotent() const { return (*this) == * ((*this) * (*this)); }
 
 	// Equality operator
 	bool operator == (const MultiCounterMatrix & mat) const;

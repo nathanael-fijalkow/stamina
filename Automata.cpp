@@ -291,7 +291,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 		unordered_set<uint> temp;
 		for (auto q: new_states){
 		 //cout <<" treating state "<<q<<endl;
-			for(char a=0;a<nl;a++){
+			for(unsigned char a=0;a<nl;a++){
 				uint p=aut->transdet[a][q]; // treat a-successors
 				//cout <<" succ "<<p<<endl;
 				if(reachable.find(p)==reachable.end()){ //if not already in reachable
@@ -331,7 +331,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 					temp.insert(p); //add new eps-predecessors
 					coreachable.insert(p);
 				}
-				for(char a=0;a<nl;a++){
+				for(unsigned char a=0;a<nl;a++){
 					if (aut->transdet[a][p]==q && coreachable.find(p)==coreachable.end()){
 						temp.insert(p); //add new a-predecessors
 						coreachable.insert(p);

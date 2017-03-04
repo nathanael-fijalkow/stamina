@@ -3,6 +3,7 @@
 #include "Monoid.hpp"
 #include <sstream>
 #include "ProbMatrix.hpp"
+#include <chrono>
 
 //level 0 no verbosity 1 main steps 2 details
 #define MONOID_COMPUTATION_VERBOSITY 0
@@ -331,7 +332,7 @@ const ExtendedExpression * UnstableMonoid::CloseByProduct()
 				return witness;
 			if (--cnt == 0)
 			{
-				cout << "Processing product: ";
+				cout << "processing product: ";
 				check_size(d2 + new_elements.size() *(d1 - 1) + new_elements.size()* new_elements.size());
 				cnt = MAX_MONOID_SIZE / 10;
 			}
