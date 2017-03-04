@@ -762,10 +762,10 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
 	
 	//stabilize epsilon-transitions
     
-    auto eps = epsaut->get_trans_eps();
+    const MultiCounterMatrix & eps = epsaut->get_trans_eps();
     //we dont want to delete eps
-    auto prev_eps = (const MultiCounterMatrix *) new MultiCounterMatrix(eps);
-    auto new_eps = eps * eps;
+    const MultiCounterMatrix * prev_eps = (const MultiCounterMatrix *) new MultiCounterMatrix(eps);
+    const MultiCounterMatrix * new_eps = eps * eps;
     //new_eps->print();
     int steps = 0;
     while (! (*new_eps == *prev_eps))

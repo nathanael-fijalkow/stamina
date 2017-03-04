@@ -103,6 +103,6 @@ namespace std
 }
 
 /* the set of all vectors */
-static std::unordered_set<VectorInt> int_vectors;
+extern std::unordered_set<VectorInt> int_vectors;
 
 #endif

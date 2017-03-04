@@ -122,7 +122,7 @@ protected:
 	const VectorInt ** cols;
 
 	// Function used in the product
-	static const VectorInt * sub_prod_int(const VectorInt *, const VectorInt **, unsigned char * buffer);
+	static const VectorInt * sub_prod_int(const VectorInt *, const VectorInt **);
 
 	static const VectorInt * sub_prodor(const VectorInt *, const VectorInt **, const VectorInt *);
 
@@ -131,6 +131,8 @@ protected:
 
     //Cached value of is_idempotent
     char is_idempotent;
+    
+    static unsigned char * mult_buffer;
 };
 
 namespace std

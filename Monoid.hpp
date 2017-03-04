@@ -134,9 +134,11 @@ protected:
 	int cnt;
 	void check_size(int i)
 	{
+        //cout << "A" << int_vectors.size() << endl;
+
 		cout << expr_to_mat.size() << " elements ";
 		cout << "and " << rewriteRules.size() << " rules and " 
-		     << Matrix::vectors.size() + MultiCounterMatrix::vectors.size() 
+        << Matrix::vectors.size() + int_vectors.size()
 		     << " vectors and " << i << " expressions to process." << endl;
 		cnt = MAX_MONOID_SIZE / 10;
 

@@ -87,3 +87,5 @@ bool VectorInt::operator==(const VectorInt & vec) const
 		if (coefs[i] != vec.coefs[i]) return false;
 	return true;
 }
+
+std::unordered_set<VectorInt> int_vectors;

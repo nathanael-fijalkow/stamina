@@ -1,6 +1,7 @@
 #include "MultiCounterMatrix.hpp"
 #include <stdlib.h>
 #include <chrono>
+#include <unordered_map>
 
 #define TIME_BENCHMARKS 0
 
@@ -17,10 +18,23 @@ MultiCounterMatrix::MultiCounterMatrix()
     init();
 }
 
+#define USE_CACHED_VECTOR_PRODUCT 0
+#if USE_CACHED_VECTOR_PRODUCT
+std::unordered_map<long long, unsigned char> cached_product_vectors;
+#endif
+
 void MultiCounterMatrix::set_counter_and_states_number(char NbCounters, uint NbStates)
 {
     if(MultiCounterMatrix::N == NbCounters && VectorInt::GetStateNb() == NbStates && act_prod)
         return;
+    
+#if USE_CACHED_VECTOR_PRODUCT
+    cached_product_vectors.clear();
+#endif
+    
+    free(mult_buffer);
+    mult_buffer = (unsigned char *)malloc( 2 * NbStates * sizeof(char));
+
     
     VectorInt::SetSize(NbStates);
     
@@ -184,10 +198,11 @@ bool MultiCounterMatrix::operator==(const MultiCounterMatrix & mat) const
     return true;
 };
 
+
+
 const VectorInt * MultiCounterMatrix::sub_prod_int(
                                                    const VectorInt * vec,
-                                                   const VectorInt ** mat_cols,
-                                                   unsigned char * buffer
+                                                   const VectorInt ** mat_cols
                                                    )
 {
     if(vec == zero_int_vector) {
@@ -197,15 +212,24 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
     //memset(new_vec, 0, (VectorInt::GetStateNb() * sizeof(char)));
     auto stnb = VectorInt::GetStateNb();
     
+    long long v =  ((long long) vec) << 32;
+    
     for (int j = VectorInt::GetStateNb() - 1; j >= 0; j--)
     {
-        if(mat_cols[j] == zero_int_vector) {
-            buffer[j] = bottom();
+        auto colj = mat_cols[j];
+        if(colj == zero_int_vector) {
+            mult_buffer[j] = bottom();
         } else {
+#if USE_CACHED_VECTOR_PRODUCT
+            auto cached = cached_product_vectors.find(v | (long long) colj);
+            if(cached != cached_product_vectors.end())
+                mult_buffer[j] = cached->second;
+            else {
+#endif
             //compute and store in second part of buffer
             auto ab = vec->coefs;
             auto ae = vec->coefs + stnb;
-            auto bb = mat_cols[j]->coefs;
+            auto bb = colj->coefs;
             //            auto buf = buffer + stnb;
             auto min_curr = bottom();
             for (; ab < ae; ) {
@@ -214,13 +238,24 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
                 if(a == 0)
                     break;
             }
-            buffer[j] = min_curr;
+#if USE_CACHED_VECTOR_PRODUCT
+            cached_product_vectors[v | (long long) colj] = min_curr;
+#endif
+            mult_buffer[j] = min_curr;
+#if USE_CACHED_VECTOR_PRODUCT
+            }
+#endif
         }
     }
     
-    auto it = int_vectors.emplace(buffer).first;
+  //  cout << "C" << int_vectors.size() << endl;
+
+    auto it = int_vectors.emplace(mult_buffer).first;
+    //cout << int_vectors.size() << " ";
     return &(*it);
 }
+
+unsigned char * MultiCounterMatrix::mult_buffer = NULL;
 
 const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
 {
@@ -236,16 +271,13 @@ const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
     auto stnb = VectorInt::GetStateNb();
     
     
-    unsigned char * buffer = (unsigned char *)malloc( 2 * stnb * sizeof(char));
-    
     for (uint i = 0; i < stnb; i++){
         //if(i % 1024 == 256) cout << "Computing MultiCounterMatrix product line " << i << endl;
         result->rows[i] =
-        sub_prod_int(mat1.rows[i], mat2.cols, buffer);
+        sub_prod_int(mat1.rows[i], mat2.cols);
         result->cols[i] =
-        sub_prod_int(mat2.cols[i], mat1.rows, buffer);
+        sub_prod_int(mat2.cols[i], mat1.rows);
     }
-    free(buffer);
     result->update_hash();
     
 #if TIME_BENCHMARKS
@@ -365,6 +397,8 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
             }
             new_col[j] = t;
         }
+//        cout << "B" << int_vectors.size() << endl;
+
         auto it = int_vectors.emplace(new_col).first;
         result->cols[i] = &(*it);
         //if(i % 32 == 0) cout << "Stab col " << i << endl;
