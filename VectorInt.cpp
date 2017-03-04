@@ -67,17 +67,17 @@ VectorInt::VectorInt(unsigned char * data, bool copy)
 	{
 		coefs = (unsigned char *)malloc(entriesNb * sizeof(char));
 		memcpy(coefs, data, entriesNb * sizeof(char));
-#if USE_MIN_HEURISTIC
-        min = -1;
-        for (int i = 0; i < entriesNb; i++)
-            if(data[i] < min)
-                min = data[i];
-#endif
 	}
 	else
 	{
 		coefs = data;
 	}
+#if USE_MIN_HEURISTIC
+    min = -1;
+    for (int i = 0; i < entriesNb; i++)
+        if(data[i] < min)
+            min = data[i];
+#endif
 	update_hash();
 };
 

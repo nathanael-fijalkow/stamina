@@ -45,10 +45,10 @@ void MultiCounterMatrix::set_counter_and_states_number(char NbCounters, uint NbS
         act_prod = NULL;
     }
     
-    act_prod = (unsigned char **) malloc((2 * N + 3)  *  sizeof(char*));
-    for (uint i = 0; i < (2 * N + 3); i++){
-        act_prod[i] = (unsigned char *)malloc((2 * N + 3)  *  sizeof(char));
-        for (uint j = 0; j < (2 * N + 3); j++){
+    act_prod = (unsigned char **) malloc((1 + (long) bottom())  *  sizeof(char*));
+    for (uint i = 0; i <= bottom(); i++){
+        act_prod[i] = (unsigned char *) malloc( (1 + (long) bottom())  *  sizeof(char));
+        for (uint j = 0; j <= bottom(); j++){
             act_prod[i][j] =
             (i == bottom() || j == bottom())
             ? bottom()
@@ -241,10 +241,10 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
                 auto a = act_prod[ *ab++ ][ *bb++ ];
                 if(a < min_curr) min_curr = a;
 #if USE_MIN_HEURISTIC
-                if(a == 0)
+                if(a == m)
                     break;
 #else
-                if(a == m)
+                if(a == 0)
                     break;
 #endif
             }
