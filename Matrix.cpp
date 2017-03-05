@@ -76,24 +76,26 @@ const Vector * Matrix::zero_vector = NULL;
 const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat){
 	if (vec == Matrix::zero_vector)	return Matrix::zero_vector;
 
-	size_t * new_vec = (size_t *)malloc(  Vector::GetBitSize() * sizeof(size_t));
+	size_t * new_vec = (size_t *) malloc(  Vector::GetBitSize() * sizeof(size_t));
 	memset(new_vec, 0, (size_t)(Vector::GetBitSize()  * sizeof(size_t)));
 
 
 	for (int j = Vector::GetStateNb() - 1; j >= 0; j--)
 	{
-		//cout << "Vector "; vec->print(); cout << endl;
-		//cout << "times "; mat[j]->print(); cout << endl;
-
 		bool ok = false;
-		if (mat[j] != Matrix::zero_vector)
+        if (mat[j] != Matrix::zero_vector) {
 			for (uint i = 0; i < Vector::GetBitSize(); i++)
 			{
 			  ok = ((vec->bits[i]) & (mat[j]->bits[i])) != 0;
-			if (ok) break;
+                if (ok) break;
 			}
-		//cout << "Equal " << (ok ? 1 : 0) << endl;
-		new_vec[j / (8 * sizeof(uint))] = (new_vec[j / (8 * sizeof(uint)) ] << 1) | (ok ? 1 : 0);
+        }
+        
+        //update the coef with the result
+        //this is the part of the coef being updated
+        size_t * coef = new_vec + (j / (8 * sizeof(size_t)));
+        *coef <<= 1;
+        if(ok) (*coef)++;
 	}
 	/* old patch
 	if (!(*new_vec))

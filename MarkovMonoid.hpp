@@ -6,11 +6,16 @@
 #include "ProbMatrix.hpp"
 #include "Monoid.hpp"
 
+
+
 class UnstableMarkovMonoid : public UnstableMonoid
 {
 public:
 	// Creates zero vector
 	UnstableMarkovMonoid(uint dim);
+
+    // Check whether the monoid has value 1
+    const ExtendedExpression * hasValue1();
 
 	// The set containing the known matrices
 	unordered_set<ProbMatrix> matrices;
@@ -32,7 +37,12 @@ public:
 
 #endif
 
-
+    //used by the value1Witness test
+    static bool value1Test(const Matrix * m);
+    static int initialState;
+    static vector<bool> finalStates;
+    static int autsize;
+    
 protected:
 	pair <Matrix *, bool> addMatrix(const Matrix * mat);
 
@@ -40,6 +50,7 @@ protected:
 	const Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
 
 };
+
 
 
 #endif

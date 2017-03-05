@@ -19,13 +19,13 @@ ProbMatrix::ProbMatrix( const ProbMatrix& other )
 {
     allocate();
     *this = other;
-    update_hash();
+    _hash = other.hash();
 }
 
 ProbMatrix& ProbMatrix::operator=( const ProbMatrix& other )
 {
     memcpy(myvectors, other.myvectors, 4 * Vector::GetStateNb()  * sizeof(void *));
-    update_hash();
+    _hash = other.hash();
     return *this;
 }
 

@@ -39,6 +39,24 @@ UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : UnstableMonoid(dim)
 {
 };
 
+// Check whether the monoid has value 1
+const ExtendedExpression * UnstableMarkovMonoid::hasValue1() {
+
+    setWitnessTest(&value1Test);
+    
+    auto exp = ComputeMonoid();
+    if(exp) return exp;
+    
+    //in case the monod was already computed or half computed ...
+    
+    for(auto & mat : matrices) {
+        if(value1Test(&mat)) {
+            return mat_to_expr[&mat];
+        }
+    }
+    return NULL;
+}
+
 
 const Matrix * UnstableMarkovMonoid::convertExplicitMatrix(const ExplicitMatrix & mat) const
 {
@@ -90,4 +108,27 @@ const Vector * UnstableMarkovMonoid::recurrence_classes(const Matrix * mmat)
 	return mat->recurrent_classes();
 #endif
 }
+
+bool UnstableMarkovMonoid::value1Test(const Matrix * pm)
+{
+    auto m = (ProbMatrix *) pm;
+    //  cout << "Call to test_witness for " << endl << *m;
+    auto row = m->getRowOnes();
+    auto ones = row[UnstableMarkovMonoid::initialState];
+    
+    
+    /*	for (int i = 0; i < size; i++)
+     cout << i << ": " << finalStates[i] << " " << ones->contains(i) << endl;
+     */
+    
+    for (int i = 0; i < UnstableMarkovMonoid::autsize; i++)
+        if( !UnstableMarkovMonoid::finalStates[i]  && ones->contains(i))
+            return false;
+    return true;
+}
+
+int UnstableMarkovMonoid::initialState = 0;
+vector<bool> UnstableMarkovMonoid::finalStates;
+int UnstableMarkovMonoid::autsize = 0;
+
 
