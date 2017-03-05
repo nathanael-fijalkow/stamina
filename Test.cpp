@@ -242,7 +242,7 @@ int main(int argc, char **argv)
 	
 		if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
 		Subsetaut=SubPrune(Subsetaut);
-		//Subsetaut=SubMin(Subsetaut); optional for now, to test later
+		//Subsetaut=SubMin(Subsetaut);// optional for now, to test later
 		
 		ns=Subsetaut->NbStates;
 		nl=Subsetaut->NbLetters;
