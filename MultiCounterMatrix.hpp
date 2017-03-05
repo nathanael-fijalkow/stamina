@@ -6,6 +6,19 @@
 #include "VectorInt.hpp"
 #include <algorithm>
 
+/*
+ The Redundance Heuristic consists in storing in matrices
+ which lines and columns are identical
+ this can be used to speed up matrix product
+*/
+#define USE_REDUNDANCE_HEURISTIC 1
+
+/*
+ caches vector product. Unused due to the large number of vectors,
+ but can be turned on in special cases
+ */
+#define CACHE_VECTOR_PRODUCTS_HEUR 0
+
 
 class MultiCounterMatrix : public Matrix
 {
@@ -74,14 +87,17 @@ public:
     //the caller is responsible for releasing the memory
     ExplicitMatrix* toExplicitMatrix() const;
 
-	// Constructor
-	MultiCounterMatrix();
-	
+    //Destructor
+    virtual ~MultiCounterMatrix();
+    
 	//Constructor for another copy
 	MultiCounterMatrix(const MultiCounterMatrix *);
 	
 	// Constructor from explicit representation
 	MultiCounterMatrix(const ExplicitMatrix &, char N);
+
+    // Constructor of diagonal matrix
+    MultiCounterMatrix(unsigned char diag, unsigned char nondiag);
 
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns
@@ -113,6 +129,9 @@ public:
 
     static char counterNb() { return N; }
 protected:
+    // Constructor
+    MultiCounterMatrix();
+    
     // Number of counters
     static char N;
     
@@ -122,8 +141,13 @@ protected:
 	const VectorInt ** cols;
 
 	// Function used in the product
-	static const VectorInt * sub_prod_int(const VectorInt *, const VectorInt **);
-
+#if USE_REDUNDANCE_HEURISTIC
+    //third argument is the redudancy array of cols
+	static const VectorInt * sub_prod_int(const VectorInt *, const VectorInt ** cols, const uint * red_vec);
+#else
+    static const VectorInt * sub_prod_int(const VectorInt *, const VectorInt **);
+#endif
+    
 	static const VectorInt * sub_prodor(const VectorInt *, const VectorInt **, const VectorInt *);
 
 	//used in the product of MultiCounter
@@ -133,6 +157,14 @@ protected:
     char is_idempotent;
     
     static unsigned char * mult_buffer;
+    
+#if USE_REDUNDANCE_HEURISTIC
+    //this is a list of indices
+    //at index i is stored either -1 or the index of a similar vector of index < i
+    uint * row_red;
+    uint * col_red;
+    void update_red();
+#endif
 };
 
 namespace std

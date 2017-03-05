@@ -462,8 +462,10 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 }
 
 
-void MultiCounterAut::set_trans(char a, const MultiCounterMatrix & mat) {
-    trans[a] = mat;
+void MultiCounterAut::set_trans(unsigned char a, const MultiCounterMatrix & mat) {
+    trans.insert(
+                 std::pair<unsigned char, MultiCounterMatrix>(a,mat)
+                 );
 }
 
 
@@ -580,7 +582,7 @@ void MultiCounterAut::print(ostream& st){
 		for(uint i=0;i<NbStates;i++){
 			st << state_index_to_string(i) << " ";
 			for(uint j=0;j<NbStates;j++){
-				st << coef_to_string(trans[a].get(i,j)) << " ";
+				st << coef_to_string(trans.at(a).get(i,j)) << " ";
 			}
 			st << endl;
 		}
@@ -722,7 +724,8 @@ MultiCounterEpsAut::MultiCounterEpsAut(
                                        uint Nstates,
                                        char Ncounters
                                        )
-    : MultiCounterAut(Nletters, Nstates, Ncounters)
+    : MultiCounterAut(Nletters, Nstates, Ncounters),
+    _trans_eps(MultiCounterMatrix::epsilon(), MultiCounterMatrix::bottom())
 {
     uint s = Nletters * Nstates;
 
@@ -731,16 +734,6 @@ MultiCounterEpsAut::MultiCounterEpsAut(
 
     _transdet_action = (char *) malloc(s * sizeof(char));
     memset(_transdet_action, MultiCounterMatrix::bottom(), s); //initialize with Nstates, meaning "no transition"
-    
-    ExplicitMatrix m(Nstates);
-    for(int i = 0 ; i < Nstates; i++)
-        for(int j = 0; j < Nstates; j++)
-            m.coefficients[i][j] = (i==j)
-            ? MultiCounterMatrix::epsilon()
-            : MultiCounterMatrix::bottom();
-    set_trans_eps(m);
-
-    //_trans_eps = MultiCounterMatrix(&m);
 }
 
 

@@ -8,7 +8,11 @@
 
 class VectorInt;
 
-#define USE_MIN_HEURISTIC 1
+//The Min Heuristic consists in recording the minimal element in each vector and using it
+//for speeding up vector scalr poduct:
+//if the minimum is reached during the product then the loop stops
+#define USE_MIN_HEURISTIC 0
+
 
 // Class of vectors
 class VectorInt
@@ -35,16 +39,14 @@ public:
     
 //	bool contains(size_t n) const { return  ( bits[n / (sizeof(uint) * 8)] & (1 << (n % (sizeof(uint) * 8)) ) ) != 0; };
 
-	// Construct new vector, size is fixed by set_size
-	VectorInt();
-
 	// Second constructor
 	VectorInt(const VectorInt & other);
 
 	// Third constructor
 	VectorInt(std::vector<char> data);
 
-	VectorInt(unsigned char * data, bool copy = true);
+    //copy the data
+	VectorInt(unsigned char * data);
 
 	// Function returning the hash
 	size_t Hash() const { return _hash; };
@@ -61,6 +63,9 @@ public:
 
 
 protected:
+    // Construct new vector, size is fixed by set_size
+    VectorInt();
+
 
 	// Number of entries
 	static uint entriesNb;

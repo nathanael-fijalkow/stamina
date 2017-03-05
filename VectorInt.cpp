@@ -56,22 +56,23 @@ VectorInt::VectorInt(vector<char> data)
         if(data[i] < min) min = data[i];
 #endif
     }
-    
 	update_hash();
 }
 
 // Fourth constructor
-VectorInt::VectorInt(unsigned char * data, bool copy)
+VectorInt::VectorInt(unsigned char * data)
 {
-	if (copy)
+    
+//	if (copy)
 	{
-		coefs = (unsigned char *)malloc(entriesNb * sizeof(char));
+		coefs = (unsigned char *) malloc(entriesNb * sizeof(char));
 		memcpy(coefs, data, entriesNb * sizeof(char));
 	}
-	else
+/*	else
 	{
 		coefs = data;
 	}
+ */
 #if USE_MIN_HEURISTIC
     min = -1;
     for (int i = 0; i < entriesNb; i++)

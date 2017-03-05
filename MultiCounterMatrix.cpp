@@ -8,9 +8,27 @@
 //Constructor
 void MultiCounterMatrix::init()
 {
-    rows = (const VectorInt **)malloc(VectorInt::GetStateNb() * sizeof(VectorInt*));
-    cols = (const VectorInt **)malloc(VectorInt::GetStateNb() * sizeof(VectorInt*));
+    auto stnb = VectorInt::GetStateNb();
+    rows = (const VectorInt **)malloc(stnb * sizeof(void *));
+    cols = (const VectorInt **)malloc(stnb * sizeof(void *));
+    memset(rows, stnb, 0);
+    memset(cols, stnb, 0);
+#if USE_REDUNDANCE_HEURISTIC
+    row_red = (uint *) malloc(stnb * sizeof(void *));
+    col_red = (uint *) malloc(stnb * sizeof(void *));
+    memset(row_red, stnb, 0);
+    memset(col_red, stnb, 0);
+#endif
     is_idempotent = -1;
+}
+
+MultiCounterMatrix::~MultiCounterMatrix() {
+    free(rows); free(cols);
+    rows = cols = NULL;
+#if USE_REDUNDANCE_HEURISTIC
+    free(row_red); free(col_red);
+    row_red = col_red = NULL;
+#endif
 }
 
 MultiCounterMatrix::MultiCounterMatrix()
@@ -18,8 +36,7 @@ MultiCounterMatrix::MultiCounterMatrix()
     init();
 }
 
-#define USE_CACHED_VECTOR_PRODUCT 0
-#if USE_CACHED_VECTOR_PRODUCT
+#if CACHE_VECTOR_PRODUCTS_HEUR
 std::unordered_map<long long, unsigned char> cached_product_vectors;
 #endif
 
@@ -28,13 +45,13 @@ void MultiCounterMatrix::set_counter_and_states_number(char NbCounters, uint NbS
     if(MultiCounterMatrix::N == NbCounters && VectorInt::GetStateNb() == NbStates && act_prod)
         return;
     
-#if USE_CACHED_VECTOR_PRODUCT
+#if CACHE_VECTOR_PRODUCTS_HEUR
     cached_product_vectors.clear();
 #endif
     
     free(mult_buffer);
     mult_buffer = (unsigned char *)malloc( 2 * NbStates * sizeof(char));
-
+    
     
     VectorInt::SetSize(NbStates);
     
@@ -75,10 +92,15 @@ void MultiCounterMatrix::set_counter_and_states_number(char NbCounters, uint NbS
 
 MultiCounterMatrix::MultiCounterMatrix(const MultiCounterMatrix *mat){
     init();
-    for(int i=0;i<VectorInt::GetStateNb();i++){
+    auto stnb = VectorInt::GetStateNb();
+    for(int i=0;i< stnb;i++ ){
         rows[i]=mat->rows[i];
         cols[i]=mat->cols[i];
     }
+#if USE_REDUNDANCE_HEURISTIC
+    memcpy(row_red, mat->row_red, stnb);
+    memcpy(col_red, mat->col_red, stnb);
+#endif
     update_hash();
 }
 
@@ -92,30 +114,65 @@ MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix, char N
     if(stnb != explMatrix.stateNb)
         throw runtime_error("States number mismatch please call set_counter_and_states_number first");
     
-    this->N = N;
+    unsigned char * row = (unsigned char *) malloc(stnb);
+    unsigned char * col = (unsigned char *) malloc(stnb);
     for (uint i = 0; i < stnb; i++)
     {
-        unsigned char * row = (unsigned char *) malloc(stnb);
-        unsigned char * col = (unsigned char *) malloc(stnb);
-        
-       // vector<char> row(VectorInt::GetStateNb());
-       // vector<char> col(VectorInt::GetStateNb());
-        
         for (uint j = 0; j < VectorInt::GetStateNb(); j++)
         {
             row[j] = explMatrix.coefficients[i][j];
             col[j] = explMatrix.coefficients[j][i];
         }
-        auto it = int_vectors.emplace(row, false).first;
-        rows[i] = &(*it);
-        it = int_vectors.emplace(col, false).first;
-        cols[i] = &(*it);
-
-        rows[i]->print(cout);
-        cols[i]->print(cout);
+        auto itr = int_vectors.emplace(row).first;
+        auto itc = int_vectors.emplace(col).first;
+        rows[i] = &(*itr);
+        cols[i] = &(*itc);
     }
+    free(row); free(col);
+#if USE_REDUNDANCE_HEURISTIC
+    update_red();
+#endif
     update_hash();
 }
+
+MultiCounterMatrix::MultiCounterMatrix(unsigned char diag, unsigned char nondiag)
+{
+
+    init();
+    auto stnb = VectorInt::GetStateNb();
+    
+    unsigned char * row = (unsigned char *) malloc(stnb);
+    unsigned char * col = (unsigned char *) malloc(stnb);
+    for (uint i = 0; i < stnb; i++)
+    {
+        for (uint j = 0; j < VectorInt::GetStateNb(); j++)
+            row[j] = col[j] = (i == j) ? diag : nondiag;
+        auto itr = int_vectors.emplace(row).first;
+        auto itc = int_vectors.emplace(col).first;
+        rows[i] = &(*itr);
+        cols[i] = &(*itc);
+    }
+    free(row); free(col);
+    
+#if USE_REDUNDANCE_HEURISTIC
+    update_red();
+#endif
+    update_hash();
+}
+
+#if USE_REDUNDANCE_HEURISTIC
+void MultiCounterMatrix::update_red() {
+    auto stnb = VectorInt::GetStateNb();
+    
+    for(int i = 0; i < stnb; i++)
+        for(int j = 0; j < i; j++)
+            row_red[i] = (rows[i] == rows[j]) ? j : -1;
+    for(int i = 0; i < stnb; i++)
+        for(int j = 0; j < i; j++)
+            col_red[i] = (cols[i] == cols[j]) ? j : -1;
+}
+#endif
+
 
 char MultiCounterMatrix::N = 0;
 
@@ -200,10 +257,17 @@ bool MultiCounterMatrix::operator==(const MultiCounterMatrix & mat) const
 
 
 
+#if USE_REDUNDANCE_HEURISTIC
+//third argument is the redudancy array of cols
 const VectorInt * MultiCounterMatrix::sub_prod_int(
                                                    const VectorInt * vec,
-                                                   const VectorInt ** mat_cols
-                                                   )
+                                                   const VectorInt ** cols,
+                                                   const uint * red_vec)
+#else
+const VectorInt * MultiCounterMatrix::sub_prod_int(
+                                                   const VectorInt *,
+                                                   const VectorInt ** cols);
+#endif
 {
     if(vec == zero_int_vector) {
         return zero_int_vector;
@@ -211,55 +275,61 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
     
     //memset(new_vec, 0, (VectorInt::GetStateNb() * sizeof(char)));
     auto stnb = VectorInt::GetStateNb();
-
-#if USE_CACHED_VECTOR_PRODUCT
+    
+#if CACHE_VECTOR_PRODUCTS_HEUR
     long long v =  ((long long) vec) << 32;
 #endif
-
+    
     for (int j = 0; j < stnb; j++)
     {
-        auto colj = mat_cols[j];
+        auto colj = cols[j];
         if(colj == zero_int_vector) {
             mult_buffer[j] = bottom();
         } else {
-#if USE_CACHED_VECTOR_PRODUCT
+#if CACHE_VECTOR_PRODUCTS_HEUR
             auto cached = cached_product_vectors.find(v | (long long) colj);
-            if(cached != cached_product_vectors.end())
+            if(cached != cached_product_vectors.end()) {
                 mult_buffer[j] = cached->second;
-            else {
+            } else {
 #endif
-#if USE_MIN_HEURISTIC
-                auto m = (colj->min <= vec->min) ? colj->min : vec->min;
+#if USE_REDUNDANCE_HEURISTIC
+                //the redudnace heuristic avoids computing twice the same product
+                if(red_vec[j] != -1) {
+                    mult_buffer[j] = mult_buffer[ red_vec[j]];
+                } else {
 #endif
-            //compute and store in second part of buffer
-            auto ab = vec->coefs;
-            auto ae = vec->coefs + stnb;
-            auto bb = colj->coefs;
-            //            auto buf = buffer + stnb;
-            auto min_curr = bottom();
-            for (; ab < ae; ) {
-                auto a = act_prod[ *ab++ ][ *bb++ ];
-                if(a < min_curr) min_curr = a;
+                    auto min_curr = bottom();
+                    //compute scalar product
+                    auto ab = vec->coefs;
+                    auto ae = vec->coefs + stnb;
+                    auto bb = colj->coefs;
 #if USE_MIN_HEURISTIC
-                if(a == m)
-                    break;
+                    //the min value heristic breaks the loop if the min value is reached
+                    auto m = (colj->min <= vec->min) ? colj->min : vec->min;
+#endif
+                    for (; ab < ae; ) {
+                        auto a = act_prod[ *ab++ ][ *bb++ ];
+                        if(a < min_curr) min_curr = a;
+#if USE_MIN_HEURISTIC
+                        if(min_curr == m) break;
 #else
-                if(a == 0)
-                    break;
+                        if(min_curr == 0) break;
 #endif
-            }
-#if USE_CACHED_VECTOR_PRODUCT
-            cached_product_vectors[v | (long long) colj] = min_curr;
+                    }
+                    mult_buffer[j] = min_curr;
+#if USE_REDUNDANCE_HEURISTIC
+                }
 #endif
-            mult_buffer[j] = min_curr;
-#if USE_CACHED_VECTOR_PRODUCT
+#if CACHE_VECTOR_PRODUCTS_HEUR
+                cached_product_vectors[ v | (long long) colj ] = mult_buffer[ j ];
             }
 #endif
         }
     }
-
+    //we avoid multiplicating vectors:
+    //if this one was already known we use the one already known
     auto it = int_vectors.emplace(mult_buffer).first;
-    //cout << int_vectors.size() << " ";
+
     return &(*it);
 }
 
@@ -278,15 +348,30 @@ const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
     
     auto stnb = VectorInt::GetStateNb();
     
-    
+#if USE_REDUNDANCE_HEURISTIC
+    for (uint i = 0; i < stnb; i++){
+        result->rows[i] =
+        (row_red[i] != -1)
+        ? result->rows[row_red[i]]
+        : sub_prod_int(mat1.rows[i], mat2.cols, col_red);
+        
+        result->cols[i] =
+        (col_red[i] != -1)
+        ? result->cols[col_red[i]]
+        : sub_prod_int(mat1.cols[i], mat2.rows, row_red);
+    }
+#else
     for (uint i = 0; i < stnb; i++){
         //if(i % 1024 == 256) cout << "Computing MultiCounterMatrix product line " << i << endl;
-        result->rows[i] =
-        sub_prod_int(mat1.rows[i], mat2.cols);
-        result->cols[i] =
-        sub_prod_int(mat2.cols[i], mat1.rows);
+        result->rows[i] = sub_prod_int(mat1.rows[i], mat2.cols);
+        result->cols[i] = sub_prod_int(mat2.cols[i], mat1.rows);
     }
+#endif
     result->update_hash();
+    
+#if USE_REDUNDANCE_HEURISTIC
+    result->update_red();
+#endif
     
 #if TIME_BENCHMARKS
     auto end = std::chrono::high_resolution_clock::now();
@@ -295,7 +380,6 @@ const MultiCounterMatrix * MultiCounterMatrix::prod(const Matrix * pmat1) const
         << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << endl;
     }
 #endif
-
     return result;
 }
 
@@ -340,7 +424,7 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
     }
     
     uint n = VectorInt::GetStateNb();
-
+    
     MultiCounterMatrix * result = new MultiCounterMatrix();
     
     
@@ -366,9 +450,9 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
             auto colj = emat->cols[j]->coefs;
             //look for a possible path
             auto t = act_prod
-                [ rowi[0] ]
-                [ act_prod[diags[0]][colj[0]] ]
-                ;
+            [ rowi[0] ]
+            [ act_prod[diags[0]][colj[0]] ]
+            ;
             for (uint b = 1; b<n; b++){
                 if(t == 0)
                     break;
@@ -393,7 +477,7 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
             //look for a possible path
             
             auto t = act_prod[rowj[0]]
-                [act_prod[diags[0]][coli[0]]];
+            [act_prod[diags[0]][coli[0]]];
             
             for (uint b = 1; b<n; b++){
                 if(t == 0)
@@ -405,7 +489,7 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
             }
             new_col[j] = t;
         }
-
+        
         auto it = int_vectors.emplace(new_col).first;
         result->cols[i] = &(*it);
         //if(i % 32 == 0) cout << "Stab col " << i << endl;
@@ -416,7 +500,7 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
     free(diags);
     delete(emat);
     result->update_hash();
-
+    
 #if TIME_BENCHMARKS
     auto end = std::chrono::high_resolution_clock::now();
     if(n > 40) {
