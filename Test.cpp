@@ -35,7 +35,8 @@ UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
 {
     UnstableMarkovMonoid* monoid = new UnstableMarkovMonoid(aut->size);
     monoid->initialState = aut->initialState;
-    monoid->finalStates.resize(aut->size);
+    monoid->finalStates.clear();
+    monoid->finalStates.resize(aut->size, false);
     for(auto fs : aut->finalStates)
         monoid->finalStates[fs] = true;
     
@@ -54,8 +55,12 @@ ClassicAut* fromExplicitToClassic(ExplicitAutomaton* aut)
         ret->addLetter(i,*(aut->matrices[i]));
     
     ret->initialstate[aut->initialState]=true;
-    for(int i=0;aut->finalStates[i]!=-1 && i<aut->size;i++)
-        ret->finalstate[aut->finalStates[i]]=true;
+
+    ret->finalstate.clear();
+    ret->finalstate.resize(aut->size, false);
+    for(auto fs : aut->finalStates)
+        ret->finalstate[fs]=true;
+    
     return ret;
 }
 

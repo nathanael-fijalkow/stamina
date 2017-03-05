@@ -54,12 +54,11 @@ string Dot::giveStyles ()
 	if(finalStatesNb>1 || (finalStatesNb==1 && both>=0))
 	{
 		ret+=finalStyle;
-		for(int i=0;(i<size) && (finalStates[i]>=0);i++)
-		{
-			if(both>=0 && finalStates[i]==both)
-				continue;
-			ret+=std::to_string(finalStates[i]) + ";";
-		}
+        for(auto fs : finalStates) {
+            if(both == fs)
+                continue;
+            ret+=std::to_string(fs) + ";";
+        }
 		ret += "\n";
 	}
 	ret += normalStyle + "\n";
