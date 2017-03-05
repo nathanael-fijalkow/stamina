@@ -69,13 +69,15 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
   
   getfline(file,line);
   istringstream iss(line);
+  int id=0;
   for(int i=0;i<size;i++){
     getfline(iss,line,' ');
     if(!line.empty())
       try
 	{
-	  ret->finalStates[i]=stoi(line);
+	  ret->finalStates[id]=stoi(line);
 	  //	  cout << "Final state: " << i << ":"  << stoi(line) << endl;
+	  id++;
 	}
       catch(const exception & exc){ throw runtime_error("Error while parsing final states, could not parse '" + line + "' to integer"); }
     i++;
