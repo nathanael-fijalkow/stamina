@@ -462,10 +462,9 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 }
 
 
-void MultiCounterAut::set_trans(unsigned char a, const MultiCounterMatrix & mat) {
-    trans.insert(
-                 std::pair<unsigned char, MultiCounterMatrix>(a,mat)
-                 );
+void MultiCounterAut::set_trans(unsigned char a, const MultiCounterMatrix * mat)
+{
+    trans[a] = mat;
 }
 
 
@@ -489,6 +488,9 @@ MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
 
 MultiCounterAut::~MultiCounterAut()
 {
+    for(auto t : trans)
+        delete t.second;
+    trans.clear();
 };
 
 
@@ -582,7 +584,7 @@ void MultiCounterAut::print(ostream& st){
 		for(uint i=0;i<NbStates;i++){
 			st << state_index_to_string(i) << " ";
 			for(uint j=0;j<NbStates;j++){
-				st << coef_to_string(trans.at(a).get(i,j)) << " ";
+				st << coef_to_string(trans.at(a)->get(i,j)) << " ";
 			}
 			st << endl;
 		}
@@ -606,7 +608,7 @@ void MultiCounterEpsAut::set_transdet_action(char letter, uint state, char val)
 
 void MultiCounterEpsAut::set_trans_eps(const ExplicitMatrix & mat)
 {
-    _trans_eps = new MultiCounterMatrix(mat, NbCounters);
+    _trans_eps = *(new MultiCounterMatrix(mat));
 }
 
 const MultiCounterMatrix & MultiCounterEpsAut::get_trans_eps() const
@@ -701,13 +703,13 @@ MultiCounterMatrix * MultiCounterAut::prod_det_mat(
 		uint act = det_act[i];
 		for (uint j = 0; j<NbStates; j++){
 			//compute res[i][j]
-			if (k < NbStates)
-                res.coefficients[i][j] = MultiCounterMatrix::get_act_prod(act,mat2->get(k,j)); //if k=NbStates it means no transition
-			else
-				;//throw runtime_error("Problem in prod_det_mat: k should be less than NbStates");
+            res.coefficients[i][j] = MultiCounterMatrix::get_act_prod(
+                                                                      act,
+                                                                      mat2->get(k,j));
+            //if k=NbStates it means no transition
 		}
 	}
-	return new MultiCounterMatrix(res, NbCounters);
+	return new MultiCounterMatrix(res);
 }
 
 MultiCounterEpsAut::~MultiCounterEpsAut()
@@ -757,11 +759,11 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
     
     const MultiCounterMatrix & eps = epsaut->get_trans_eps();
     //we dont want to delete eps
-    const MultiCounterMatrix * prev_eps = (const MultiCounterMatrix *) new MultiCounterMatrix(eps);
+    const MultiCounterMatrix * prev_eps = new MultiCounterMatrix(eps);
     const MultiCounterMatrix * new_eps = eps * eps;
     //new_eps->print();
     int steps = 0;
-    while (! (*new_eps == *prev_eps))
+    while (! (*new_eps == *prev_eps) )
     {
         steps++;
         if(debug || VectorInt::GetStateNb() > 100 || (steps % 100 == 99)) {
@@ -780,20 +782,9 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
                                        epsaut->transdet_actions(a),
                                        new_eps
                                        );
-        auto trans = (*new_eps) * (*ae);
-
-        if(debug) {
-            cout << "New eps " << endl;
-            new_eps->print();
-            cout << "AE " << endl;
-            ae->print();
-            cout << "trans " << endl;
-            trans->print();
-        }
-        aut->set_trans(a, trans );
+        aut->set_trans(a, (*new_eps) * (*ae));
 
         //cleanup
-        delete trans;
         delete ae;
 	}
     delete new_eps;

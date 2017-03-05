@@ -90,17 +90,16 @@ mutex Monoid::singleton;
 
 
 // Adds a letter
-const Matrix * UnstableMonoid::addLetter(char a, ExplicitMatrix & mat)
+const Matrix * UnstableMonoid::addLetter(char a, const ExplicitMatrix & mat)
 {
 //	if (mat.Vector::GetStateNb() != dim)
 //		throw runtime_error("Cannot add an element of dim " + toString(mat.Vector::GetStateNb()) + " to a monoid of size " + toString(dim));
   if(a < 'a') a+= 'a';
 	auto it = letterExpressions.emplace(a).first;
-	auto pmat = convertExplicitMatrix(mat);
-	auto it2 = addMatrix(pmat);
 
-	if (!it2.second)
-		delete pmat;
+    auto pmat = convertExplicitMatrix(mat);
+	auto it2 = addMatrix(pmat);
+    delete pmat; pmat = NULL;
 
 	const ExtendedExpression * new_expr = &(*it);
 	const Matrix * new_mat = it2.first;
@@ -264,12 +263,17 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 		const ConcatExpr * new_expr = &*concatExpressions.emplace(elt_left, elt_right).first;
 
 		/* We compute the matrix */
-		auto mat = expr_to_mat[elt_left]->prod(expr_to_mat[elt_right]);
-
+        const Matrix * left = expr_to_mat.at(elt_left);
+        const Matrix * right = expr_to_mat.at(elt_right);
+        //right->print();
+        
+        const Matrix * mat = left->prod(right);
+        
 		/* we check if the matrix is already known */
 		auto result = addMatrix(mat);
+        delete mat; mat = NULL;
 
-		const Matrix *  new_mat = result.first;
+        const Matrix *  new_mat = result.first;
 		if (result.second)
 		{
 #if MONOID_COMPUTATION_VERBOSITY
@@ -429,22 +433,24 @@ bool UnstableMonoid::is_idempotent(const Matrix * mat)
 
 const ExtendedExpression * UnstableMonoid::sharpify_expression(const ExtendedExpression * elt){
 
-	const Matrix * mat_e = expr_to_mat[elt];
+	const Matrix * mat_e = expr_to_mat.at(elt);
 
 	if (is_idempotent(mat_e)){
+        
 		auto mat = mat_e->stab();
-
 		auto result = addMatrix(mat);
-		unordered_set<SharpedExpr>::iterator it = sharpExpressions.emplace(elt).first;
-		// DO WE ACTUALLY NEED SHARPEXPRESSIONS (UNORDERED SET)????
+        delete mat; mat = NULL;
+        auto nmat = result.first;
+        
+		auto it = sharpExpressions.emplace(elt).first;
 		const SharpedExpr * new_expr = &*it;
+        
 		if (result.second){
-			auto mat = &(*result.first);
-			expr_to_mat[new_expr] = mat;
-			mat_to_expr[&(*result.first)] = new_expr;
+			expr_to_mat[new_expr] = nmat;
+            mat_to_expr[&(*result.first)] = new_expr;
 			new_elements.push_back(new_expr);
 
-			if (test != NULL && test(mat))
+			if (test != NULL && test(nmat))
 				return new_expr;
 		}
 		else {

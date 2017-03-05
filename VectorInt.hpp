@@ -39,7 +39,7 @@ public:
     
 //	bool contains(size_t n) const { return  ( bits[n / (sizeof(uint) * 8)] & (1 << (n % (sizeof(uint) * 8)) ) ) != 0; };
 
-	// Second constructor
+	// Second constructor: copy constructor
 	VectorInt(const VectorInt & other);
 
 	// Third constructor
@@ -88,7 +88,7 @@ protected:
 private:
 
 	// Affecttaion operator
-	VectorInt & operator = (const VectorInt & other);
+	VectorInt & operator=(const VectorInt & other);
 
 };
 

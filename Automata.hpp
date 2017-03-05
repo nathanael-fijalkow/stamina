@@ -130,15 +130,15 @@ public:
 
     static char coef_to_char(string coef, int NbCounters);
 
-    void set_trans(unsigned char a, const MultiCounterMatrix & mat);
+    void set_trans(unsigned char a, const MultiCounterMatrix * mat);
 
-    const MultiCounterMatrix & get_trans(char a) const { return trans.at(a); };
+    const MultiCounterMatrix * get_trans(char a) const { return trans.at(a); };
     
 protected:
 	string state_index_to_string(int index);
     
     //transition table: one char matrix for each letter
-    map<unsigned char, MultiCounterMatrix> trans;
+    map<unsigned char, const MultiCounterMatrix * > trans;
     
 
 };

@@ -67,13 +67,8 @@ public:
     static bool is_omega(char code){ return code == 2 * N + 1; }
     static bool is_bottom(char code){ return code == 2 * N + 2; }
 
-public:
 	/* called once each time a new monoid is created, given th enumber of counters*/
 	static void set_counter_and_states_number(char counterNumber, uint statesNumber);
-
-    const MultiCounterMatrix * operator*(const MultiCounterMatrix & other) const {
-        return (const MultiCounterMatrix *) prod(&other);
-    }
     
 	/* coefficients getters and setters */
 	int get(int i, int j) const;
@@ -90,11 +85,14 @@ public:
     //Destructor
     virtual ~MultiCounterMatrix();
     
-	//Constructor for another copy
-	MultiCounterMatrix(const MultiCounterMatrix *);
-	
+	//Copy constructor
+	MultiCounterMatrix(const MultiCounterMatrix &);
+
+    //Assignement operator, performs copy
+    MultiCounterMatrix & operator=(const MultiCounterMatrix &);
+
 	// Constructor from explicit representation
-	MultiCounterMatrix(const ExplicitMatrix &, char N);
+	MultiCounterMatrix(const ExplicitMatrix &);
 
     // Constructor of diagonal matrix
     MultiCounterMatrix(unsigned char diag, unsigned char nondiag);
@@ -103,6 +101,10 @@ public:
 	// They update the matrices, rows and columns
     //The caller is in charge of deleting the returned object    
 	const MultiCounterMatrix * prod(const Matrix  *) const;
+
+    const MultiCounterMatrix * operator*(const MultiCounterMatrix & other) const{
+        return (const MultiCounterMatrix *) prod(&other);
+    }
 
 	// compute stabilisation
     //The caller is in charge of deleting the returned object
@@ -125,9 +127,10 @@ public:
 
 	bool isUnlimitedWitness(const vector<int> & inital_states, const vector<int> & final_states) const;
 
-    static  unsigned char const get_act_prod(uint i, uint j) { return act_prod[i][j]; };
+    static unsigned char const get_act_prod(uint i, uint j) { return act_prod[i][j]; };
 
     static char counterNb() { return N; }
+
 protected:
     // Constructor
     MultiCounterMatrix();
@@ -158,9 +161,13 @@ protected:
     
     static unsigned char * mult_buffer;
     
+    void copy_from(const MultiCounterMatrix & other);
+    
 #if USE_REDUNDANCE_HEURISTIC
     //this is a list of indices
-    //at index i is stored either -1 or the index of a similar vector of index < i
+    //row_red[i] contains
+    //0 if no previous vector equal to vector at index i
+    //j + 1 with 0 <= j < i th eindex of a previous vector equal to this one
     uint * row_red;
     uint * col_red;
     void update_red();

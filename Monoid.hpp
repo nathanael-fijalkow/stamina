@@ -74,7 +74,7 @@ public:
 	~UnstableMonoid();
 
 	// Adds a new letter
-	const Matrix * addLetter(char a, ExplicitMatrix & mat);
+	const Matrix * addLetter(char a, const ExplicitMatrix & mat);
 
 	// Adds a rewrite rule
 	void addRewriteRule(const ExtendedExpression *, const ExtendedExpression *);

@@ -32,6 +32,15 @@ void VectorInt::SetSize(uint size)
     }
 }
 
+// Assignment operator which performs a memcopy of the field sons
+VectorInt & VectorInt::operator=(const VectorInt & other) {
+    memcpy(coefs, other.coefs, entriesNb * sizeof(char));
+    _hash = other.Hash();
+#if USE_MIN_HEURISTIC
+    min  = other.min;
+#endif
+    return *this;
+}
 
 // Second constructor
 VectorInt::VectorInt(const VectorInt & other)
@@ -76,8 +85,8 @@ VectorInt::VectorInt(unsigned char * data)
 #if USE_MIN_HEURISTIC
     min = -1;
     for (int i = 0; i < entriesNb; i++)
-        if(data[i] < min)
-            min = data[i];
+        if(coefs[i] < min)
+            min = coefs[i];
 #endif
 	update_hash();
 };
