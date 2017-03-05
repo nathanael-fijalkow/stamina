@@ -9,7 +9,7 @@ ExplicitMatrix::ExplicitMatrix(uint size) : stateNb(size)
 	coefficients.resize(size);
 	for (auto & row : coefficients)
 		row.resize(size);
-    clear();
+    clear(0);
 };
 
 ExplicitMatrix::ExplicitMatrix(const ExplicitMatrix& mat)
@@ -33,10 +33,10 @@ void ExplicitMatrix::print(std::ostream& os) const
 	}
 }
 
-void ExplicitMatrix::clear() {
+void ExplicitMatrix::clear(unsigned char a) {
     for(int i = 0; i < stateNb; i++)
         for(int j = 0; j < stateNb; j++)
-            coefficients[i][j] = 0;
+            coefficients[i][j] = a;
 }
 
 

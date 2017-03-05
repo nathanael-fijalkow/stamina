@@ -46,7 +46,8 @@ public:
 	// Printing
 	virtual void print(std::ostream& os = std::cout) const;
 	
-    void clear();
+    //clear with a zero coef
+    void clear(unsigned char a);
 
 };
 
