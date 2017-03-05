@@ -409,9 +409,10 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 //Minimization of subset automata, too strict for now.
 ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 	uint N=aut->NbStates;
+	uint nl=aut->NbLetters;
 	uint *part=(uint *)malloc(N*sizeof(uint)); //array containing the number of the partition.
 	
-	VectorUInt::SetSize(aut->NbLetters+N);
+	VectorUInt::SetSize(nl+N+1);
 	
 	std::vector<uint> data(VectorUInt::GetStateNb()); //vector for merging, of size Nletters+Nstates, giving the partition of p---a-->?
 
@@ -428,23 +429,26 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 	uint nbpart=0;
 	uint new_nbpart=2;
 	
-	
+	//cout<<"minimisation"<<endl;
 	while(nbpart!=new_nbpart){
 		vectors.clear();
 		nbpart=new_nbpart;
 		new_nbpart=0;
 		//printf("nbpart:%d\n",nbpart);
-		
+		//cout<<nbpart<<endl;
 		for(uint i=0;i<N;i++){
-			for(unsigned char a=0;a<aut->NbLetters;a++){
+			for(unsigned char a=0;a<nl;a++){
 				data[a]=part[aut->transdet[a][i]]; //store the partitions of destinations in data
 			}
+			//clear the data
+			for(uint j=0;j<N;j++) data[nl+j]=0;
 			
 			for(uint j=0;j<N;j++){		
-				data[aut->NbLetters+j]=(aut->trans_eps[i][j])? 1: 0; //store the partitions of unions in data
+				if(data[nl+part[j]]==0) //if not already reached
+					data[nl+part[j]]=(aut->trans_eps[i][j])? 1: 0; //profile of epsilon transitions
+			
 			}
-			
-			
+			data[nl+N]=part[i]; //last index encodes previous partition
 			auto it = vectors.emplace(data,i);
 			
 			//if vector is new, we increase new_nb_part
@@ -473,7 +477,7 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 	}
 	
 	//det transitions
-	for(unsigned char a=0;a<aut->NbLetters;a++){
+	for(unsigned char a=0;a<nl;a++){
 		for(uint n=0;n<nbpart;n++){
 			MinAut->transdet[a][n]=part[aut->transdet[a][original[n]]];
 		}
