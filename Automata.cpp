@@ -401,7 +401,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 	for(unsigned char a=0;a<aut->NbLetters;a++){
 		for(uint n=0;n<nb_pruned;n++){
 			uint dd=names[aut->transdet[a][original[n]]];
-			if (dd==N) dd=nb_pruned; //to sink state if non-defined (sink actually absent now)
+			if (dd>=nb_pruned) dd=nb_pruned; //to sink state if non-defined (sink actually absent, virtual state)
 			PruneAut->transdet[a][n]=dd;
 		}
 		//PruneAut->transdet[a][nb_pruned]=nb_pruned; //self-loop on the sink state
@@ -413,6 +413,9 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 			PruneAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
 		}
 	}
+	PruneAut->orig=original;
+	PruneAut->names=names;
+	
 	//PruneAut->trans_eps[nb_pruned][nb_pruned]=true; // epsilon self-loop on the sink state
 	#if VERBOSE_AUTOMATA_COMPUTATION
 		PruneAut->print();
@@ -424,7 +427,8 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 	uint N=aut->NbStates;
 	uint nl=aut->NbLetters;
-	uint *part=(uint *)malloc(N*sizeof(uint)); //array containing the number of the partition.
+	uint *part=(uint *)malloc((N+1)*sizeof(uint)); //array containing the number of the partition. 
+	part[N]=N; //sink points to itself
 	
 	VectorUInt::SetSize(nl+N+1);
 	
@@ -449,17 +453,18 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 		nbpart=new_nbpart;
 		new_nbpart=0;
 		//printf("nbpart:%d\n",nbpart);
-		//cout<<nbpart<<endl;
+		cout<<nbpart<<endl;
 		for(uint i=0;i<N;i++){
 			for(unsigned char a=0;a<nl;a++){
 				data[a]=part[aut->transdet[a][i]]; //store the partitions of destinations in data
 			}
 			//clear the data
-			for(uint j=0;j<N;j++) data[nl+j]=0;
+			//for(uint j=0;j<N;j++) data[nl+j]=0;
 			
 			for(uint j=0;j<N;j++){		
-				if(data[nl+part[j]]==0) //if not already reached
-					data[nl+part[j]]=(aut->trans_eps[i][j])? 1: 0; //profile of epsilon transitions
+				//store the partition of the sups
+				uint supstate=aut->orig[i]|aut->orig[j];
+				data[nl+j]=part[aut->names[supstate]];
 			
 			}
 			data[nl+N]=part[i]; //last index encodes previous partition
