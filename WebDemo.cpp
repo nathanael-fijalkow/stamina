@@ -26,50 +26,41 @@ using namespace std;
 
 #define MAX_JOBS 10
 
-vector<bool> finalStates;
-int initialState = 0;
-int autsize = 0;
-
-
 
 
 UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
 {
-    initialState = aut->initialState;
-    autsize = aut->size;
-    finalStates.resize(autsize,false);
-    for(int i = 0 ; i < autsize; i++)
-    {
-        auto s = aut->finalStates[i];
-        //	    cout << i << " fstate: " << s << endl;
-        if(s>= 0 && s< autsize)
-            finalStates[s] = true;
-    }
-    UnstableMarkovMonoid* ret = new UnstableMarkovMonoid(aut->size);
-    for(int i=0;i<aut->alphabet.length();i++)
-        ret->addLetter(aut->alphabet[i],*(aut->matrices[i]));
-    return ret;
+    UnstableMarkovMonoid* monoid = new UnstableMarkovMonoid(aut->size);
+    monoid->initialState = aut->initialState;
+    monoid->finalStates.clear();
+    monoid->finalStates.resize(aut->size, false);
+    for(auto fs : aut->finalStates)
+        monoid->finalStates[fs] = true;
+    
+    //	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
+    for(int i = 0 ; i < aut->alphabet.length();i++)
+        monoid->addLetter(aut->alphabet[i],*(aut->matrices[i]));
+    
+    return monoid;
 };
 
 
 UnstableMultiMonoid * toUnstableMultiMonoid(ExplicitAutomaton * aut)
 {
-    initialState = aut->initialState;
-    autsize=aut->size;
+    UnstableMultiMonoid * monoid = new UnstableMultiMonoid(aut->size,aut->type);
+    monoid->initial_states.clear();
+    monoid->final_states.clear();
+    monoid->initial_states.push_back(aut->initialState);
     
-    UnstableMultiMonoid * ret = new UnstableMultiMonoid(autsize,aut->type);
-    ret->initial_states.clear();
-    ret->final_states.clear();
-    ret->initial_states.push_back(initialState);
-    for(int i = 0 ; i < autsize; i++)
+    for(int i = 0 ; i < aut->size; i++)
     {
         auto s = aut->finalStates[i];
-        if(s>= 0 && s< autsize)
-            ret->final_states.push_back(s);
+        if(s>= 0 && s< aut->size)
+            monoid->final_states.push_back(s);
     }
     for(int i=0 ; i < aut->alphabet.length() ; i++)
-        ret->addLetter( aut->alphabet[i] , *(aut->matrices[i]) );
-    return ret;
+        monoid->addLetter( aut->alphabet[i] , *(aut->matrices[i]) );
+    return monoid;
 };
 
 /*
@@ -143,11 +134,8 @@ int main(int argc, char **argv)
     
     if(expa->type==PROB)
     {
-        UnstableMarkovMonoid::initialState = initialState;
-        UnstableMarkovMonoid::finalStates = finalStates;
-        UnstableMarkovMonoid::autsize = autsize;
+        auto m = toMarkovMonoid(expa);
         
-        UnstableMarkovMonoid * m = toMarkovMonoid(expa);
         if(find_witness)
         {
             cout << "Looking for a value 1 witness in the Markov monoid..." << endl;
