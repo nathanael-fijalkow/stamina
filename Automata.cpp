@@ -311,7 +311,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 		new_states=temp;
 	}
 	
-	cout<<reachable.size()<<" reachable states"<<endl;
+	//cout<<reachable.size()<<" reachable states"<<endl;
 	
     /* Same  with co-reachability */
     unordered_set<uint> coreachable; // reachable and coreachable states
@@ -345,7 +345,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
     
     //now restric aut to reachable and co-reachable (valid) states
     
-    vector<uint> names(N); //-1 stands for not valid
+    vector<uint> names(N,N); //N stands for not valid
     //rename valid states
     uint nb_pruned=0;
     vector<uint> original; //correspondance in the other way
@@ -354,8 +354,9 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
     	original.push_back(p);
     	nb_pruned++;
     }
-  	 cout<<nb_pruned<<" states after pruning"<<endl;
-  	ClassicEpsAut *PruneAut=new ClassicEpsAut(nl,nb_pruned);	
+  	//cout<<nb_pruned<<" states after pruning"<<endl;
+  	ClassicEpsAut *PruneAut=new ClassicEpsAut(nl,nb_pruned+1);
+  	//we add a sink state nb_pruned	
   	
   	//initial and final states
 	PruneAut->initial=names[aut->initial];
@@ -385,8 +386,11 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 	//det transitions
 	for(unsigned char a=0;a<aut->NbLetters;a++){
 		for(uint n=0;n<nb_pruned;n++){
-			PruneAut->transdet[a][n]=names[aut->transdet[a][original[n]]];
+			uint dd=names[aut->transdet[a][original[n]]];
+			if (dd==N) dd=nb_pruned; //to sink state if non-defined
+			PruneAut->transdet[a][n]=dd;
 		}
+		PruneAut->transdet[a][nb_pruned]=nb_pruned; //self-loop on the sink state
 	}
 	
 	//epsilon transitions
@@ -395,6 +399,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 			PruneAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
 		}
 	}
+	PruneAut->trans_eps[nb_pruned][nb_pruned]=true; // epsilon self-loop on the sink state
 	#if VERBOSE_AUTOMATA_COMPUTATION
 		PruneAut->print();
 	#endif
