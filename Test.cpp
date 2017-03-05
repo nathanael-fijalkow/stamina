@@ -30,19 +30,6 @@ void pusage(char* s)
     exit(-1);
 }
 
-/*
-int *finalStates;
-int initialState;
-int size;
-
-bool not_final(int s)
-{
-    for(int i=0;i<size;i++)
-        if(finalStates[i]==s)
-            return false;
-    return true;
-}
- */
 
 UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
 {
