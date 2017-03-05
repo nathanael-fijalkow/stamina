@@ -13,13 +13,13 @@ const string normalStyle = "node [shape = circle, color = lightblue, style = fil
 int Dot::SH;
 int Dot::size;
 int Dot::initialState;
-const int* Dot::finalStates;
+vector<int> Dot::finalStates;
 //TODO: Factor this out (with Test.cpp). These functions do not belong
 //here
 bool Dot::not_final(int s) 
 {
-	for(int i=0;i<size;i++)
-		if(finalStates[i]==s)
+    for(auto st : finalStates)
+        if(st == s)
 			return false;
 	return true;
 }
@@ -40,16 +40,15 @@ string Dot::giveStyles ()
 	int both = -1;
 	int finalStatesNb=0;
 
-	for(int i=0;i<size;i++)
-	{
-		if(finalStates[i]==initialState)
-		{
-			ret+=initialFinalStyle + std::to_string(initialState)+";\n";
-			both = initialState;
-		}
-		if(finalStates[i]>=0)
-			finalStatesNb++;
-	}
+    for(auto fs : finalStates) {
+        if(fs == initialState)
+        {
+            ret+=initialFinalStyle + std::to_string(initialState)+";\n";
+            both = initialState;
+        }
+    }
+    finalStatesNb = finalStates.size();
+    
 	if(both < 0)
 		ret += initialStyle + std::to_string(initialState) + ";\n";
 	if(finalStatesNb>1 || (finalStatesNb==1 && both>=0))

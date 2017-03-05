@@ -14,7 +14,7 @@ private:
   static int SH;
   static int size;
   static int initialState;
-  static const int* finalStates;
+  static vector<int> finalStates;
   
   static string giveStyles();
   static string toDot(const ExplicitAutomaton* a);

@@ -4,11 +4,16 @@
 
 OneCounterLargeMatrix::OneCounterLargeMatrix()
 {
-	rows = (const Vector ***)malloc(4 * sizeof(const Vector **));
-	cols = (const Vector ***)malloc(4 * sizeof(const Vector **));
+    init();
+}
+
+void OneCounterLargeMatrix::init()
+{
+	rows = (const Vector ***)malloc(4 * sizeof(void *));
+	cols = (const Vector ***)malloc(4 * sizeof(void *));
 	for (unsigned char act = 0; act<4; act++){
-		rows[act] = (const Vector **)malloc(Vector::GetStateNb() * sizeof(const Vector *));
-		cols[act] = (const Vector **)malloc(Vector::GetStateNb() * sizeof(const Vector *));
+		rows[act] = (const Vector **)malloc(Vector::GetStateNb() * sizeof(void *));
+		cols[act] = (const Vector **)malloc(Vector::GetStateNb() * sizeof(void *));
 	}
 	//useless?
 	//update_hash();
@@ -35,6 +40,7 @@ OneCounterSmallMatrix::OneCounterSmallMatrix()
 //Constructor from Explicit Matrix
 OneCounterLargeMatrix::OneCounterLargeMatrix(const ExplicitMatrix & explMatrix)
 {
+    init();
 	for (unsigned char act = 0; act<4; act++){
 		for (uint i = 0; i < Vector::GetStateNb(); i++)
 		{
@@ -76,6 +82,46 @@ OneCounterSmallMatrix::OneCounterSmallMatrix(const ExplicitMatrix & explMatrix)
 	}
 	update_hash();
 }
+
+//Copy constructor
+OneCounterSmallMatrix::OneCounterSmallMatrix(const OneCounterSmallMatrix & other) {
+    init();
+    copy_from(other);
+}
+
+//Assignement operator, performs copy
+OneCounterSmallMatrix & OneCounterSmallMatrix::operator=(const OneCounterSmallMatrix & other) {
+    copy_from(other);
+    return *this;
+}
+void OneCounterSmallMatrix::copy_from(const OneCounterSmallMatrix & other) {
+    for (unsigned char act = 0; act<4; act++){
+        memcpy(rows[act], other.rows[act], sizeof(uint) * Vector::GetStateNb());
+        memcpy(cols[act], other.cols[act], sizeof(uint) * Vector::GetStateNb());
+    }
+    _hash = other._hash;
+ }
+
+//Copy constructor
+OneCounterLargeMatrix::OneCounterLargeMatrix(const OneCounterLargeMatrix & other) {
+    init();
+    copy_from(other);
+}
+
+//Assignement operator, performs copy
+OneCounterLargeMatrix & OneCounterLargeMatrix::operator=(const OneCounterLargeMatrix & other) {
+    copy_from(other);
+    return *this;
+}
+
+void OneCounterLargeMatrix::copy_from(const OneCounterLargeMatrix & other) {
+    for (unsigned char act = 0; act<4; act++){
+        memcpy(rows[act], other.rows[act], sizeof(void *) * Vector::GetStateNb());
+        memcpy(cols[act], other.cols[act], sizeof(void *) * Vector::GetStateNb());
+    }
+    _hash = other._hash;
+}
+
 
 //Print OneCounterMatrix
 void OneCounterMatrix::print(std::ostream & os, vector<string> state_names) const

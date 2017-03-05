@@ -29,11 +29,14 @@ class OneCounterSmallMatrix : public OneCounterMatrix
 {
 
 public:
-	// Constructor
-	OneCounterSmallMatrix();
-
 	// Constructor from explicit representation
 	OneCounterSmallMatrix(const ExplicitMatrix &);
+
+    //Copy constructor
+    OneCounterSmallMatrix(const OneCounterSmallMatrix &);
+    
+    //Assignement operator, performs copy
+    OneCounterSmallMatrix & operator=(const OneCounterSmallMatrix &);
 
 	// Equality operator
 	bool operator == (const OneCounterSmallMatrix & mat) const;
@@ -73,6 +76,12 @@ protected:
 
 	/* intializes memory, for C++0x constructor compatibility */
 	void init();
+    
+    //one shall not contruct a matrix from nothing
+    OneCounterSmallMatrix();
+    
+    void copy_from(const OneCounterSmallMatrix & other);
+    
 };
 
 /* Matrices of dimension more than sizeof(uint) */
@@ -80,10 +89,14 @@ protected:
 class OneCounterLargeMatrix : public OneCounterMatrix
 {
 public:
-	OneCounterLargeMatrix();
-
 	// Constructor from explicit representation
 	OneCounterLargeMatrix(const ExplicitMatrix &);
+
+    //Copy constructor
+    OneCounterLargeMatrix(const OneCounterLargeMatrix &);
+    
+    //Assignement operator, performs copy
+    OneCounterLargeMatrix & operator=(const OneCounterLargeMatrix &);
 
 	// Function computing the product and stabilization
 	// They update the matrices, rows and columns
@@ -107,6 +120,12 @@ protected:
 	// Four C-style matrices of size Vector::GetStateNb() containing all rows, state per state
 	const Vector *** rows;
 	const Vector *** cols;
+    void init();
+    void copy_from(const OneCounterLargeMatrix & other);
+
+    //you shall not contruct a matrix from nothing
+    OneCounterLargeMatrix();
+    
 
 	void update_hash()
 	{

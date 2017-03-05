@@ -12,7 +12,7 @@ public:
   int size;
   string alphabet;
   int initialState;
-  int* finalStates;
+  vector<int> finalStates;
   ExplicitMatrix** matrices; 
   ExplicitAutomaton(int size,int alphabet_length);
   ~ExplicitAutomaton();
