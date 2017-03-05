@@ -310,12 +310,12 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k){
 
 		for (unsigned char a = 0; a < nl; a++)
 		{
-            auto c = (Subsetaut->transdet[a][p] < ns)
-            ? w + Subsetaut->transdet[a][p]
-            : MultiCounterMatrix::epsilon();
-            
+	    auto dd=Subsetaut->transdet[a][p];
+            auto c =  (dd<ns) ? w + dd: 0; //going to state 0 with action bottom if undefined.
+	    auto newaction=(dd<ns)?action:MultiCounterMatrix::bottom(); //if dd==ns it means that there is no transition, we express this with bottom.
+	    
             EpsBaut->set_transdet_state(a,i, c);
-			EpsBaut->set_transdet_action(a,i, action);
+			EpsBaut->set_transdet_action(a,i, newaction);
 		}
 		for (uint q = 0; q < ns; q++)
 			if (Subsetaut->trans_eps[p][q])

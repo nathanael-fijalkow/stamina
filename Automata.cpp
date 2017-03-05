@@ -355,7 +355,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
     	nb_pruned++;
     }
   	//cout<<nb_pruned<<" states after pruning"<<endl;
-  	ClassicEpsAut *PruneAut=new ClassicEpsAut(nl,nb_pruned+1);
+  	ClassicEpsAut *PruneAut=new ClassicEpsAut(nl,nb_pruned);
   	//we add a sink state nb_pruned	
   	
   	//initial and final states
@@ -387,10 +387,10 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 	for(unsigned char a=0;a<aut->NbLetters;a++){
 		for(uint n=0;n<nb_pruned;n++){
 			uint dd=names[aut->transdet[a][original[n]]];
-			if (dd==N) dd=nb_pruned; //to sink state if non-defined
+			if (dd==N) dd=nb_pruned; //to sink state if non-defined (sink actually absent now)
 			PruneAut->transdet[a][n]=dd;
 		}
-		PruneAut->transdet[a][nb_pruned]=nb_pruned; //self-loop on the sink state
+		//PruneAut->transdet[a][nb_pruned]=nb_pruned; //self-loop on the sink state
 	}
 	
 	//epsilon transitions
@@ -399,7 +399,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 			PruneAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
 		}
 	}
-	PruneAut->trans_eps[nb_pruned][nb_pruned]=true; // epsilon self-loop on the sink state
+	//PruneAut->trans_eps[nb_pruned][nb_pruned]=true; // epsilon self-loop on the sink state
 	#if VERBOSE_AUTOMATA_COMPUTATION
 		PruneAut->print();
 	#endif
