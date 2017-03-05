@@ -31,22 +31,7 @@ void pusage(char* s)
 }
 
 
-ClassicAut* fromExplicitToClassic(ExplicitAutomaton* aut)
-{
-    ClassicAut* ret = new ClassicAut(aut->alphabet.length(),aut->size);
-    
-    for(int i=0;i<aut->alphabet.length();i++)
-        ret->addLetter(i,*(aut->matrices[i]));
-    
-    ret->initialstate[aut->initialState]=true;
 
-    ret->finalstate.clear();
-    ret->finalstate.resize(aut->size, false);
-    for(auto fs : aut->finalStates)
-        ret->finalstate[fs]=true;
-    
-    return ret;
-}
 
 int main(int argc, char **argv)
 {
@@ -130,7 +115,7 @@ int main(int argc, char **argv)
             }
             else cout << "No value 1 witness found: the automaton may or may not have value 1." << endl << endl;
         }
-                
+        
         if(verbose){
             cout << "***************************************" << endl;
             cout << "***********VERBOSE MODE****************" << endl;
@@ -148,9 +133,9 @@ int main(int argc, char **argv)
         cout << endl << endl << "The input automaton is a classical automaton. Stamina will compute its star height." << endl ;
         cout << "It first finds an upper bound using the Loop Complexity heuristics, and then proceeds with the star height computation." << endl << endl ;
         
-        ClassicAut* aut = fromExplicitToClassic(expa);
+        ClassicAut aut(*expa);
         
-        if(! aut->isdet()){
+        if(! aut.isdet()){
             cout<<"The input automaton is non-deterministic."<<endl;
             cout<<"This functionality is not implemented yet for star-height"<<endl;
             cout<<"Exiting"<<endl;
@@ -158,16 +143,16 @@ int main(int argc, char **argv)
             return 0;
         }
         
-        if(! aut->iscomplete()){
+        if(! aut.iscomplete()){
             cout<<"The input automaton is not complete, adding sink state."<<endl<<endl;
-            aut->addsink();
+            aut.addsink();
         }
         
         cout << "************LOOP COMPLEXITY******************" << endl << endl;
-        pair<char,list<uint>> res = LoopComplexity(aut);
+        pair<char,list<uint>> res = LoopComplexity(&aut);
         int LC = (int)res.first ;
         list<uint> order = res.second;
-        RegExp* regexpr = Aut2RegExp(aut,order);
+        RegExp* regexpr = Aut2RegExp(&aut,order);
         
         cout << "According to the Loop Complexity heuristics, the star-height is at most " << LC << "." << endl;
         cout << "A regular expression for the language (omitting a finite number of words) is:  "<<endl;
@@ -195,7 +180,7 @@ int main(int argc, char **argv)
         if(verbose) cout << "Computing the Subset Automaton..." << endl;
         //We start by computing the subset automaton of aut
         //It has deterministic letters
-        ClassicEpsAut* Subsetaut=toSubsetAut(aut);
+        ClassicEpsAut* Subsetaut=toSubsetAut(&aut);
         
         uint ns=Subsetaut->NbStates;
         char nl=Subsetaut->NbLetters;

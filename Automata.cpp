@@ -26,6 +26,20 @@ ClassicAut::ClassicAut(char Nletters,uint Nstates)
 	init(Nletters,Nstates);
 }
 
+ClassicAut::ClassicAut(const ExplicitAutomaton & aut)
+: ClassicAut(aut.alphabet.length(),aut.size)
+{
+    
+    for(int i=0;i<aut.alphabet.length();i++)
+        addLetter(i,*(aut.matrices[i]));
+    
+    initialstate[aut.initialState]=true;
+    
+    finalstate.clear();
+    finalstate.resize(aut.size, false);
+    for(auto fs : aut.finalStates)
+        finalstate[fs]=true;
+}
 
 //test wether the automaton is deterministic
 bool ClassicAut::isdet(){

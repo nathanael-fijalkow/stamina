@@ -6,6 +6,7 @@
 #include "MultiCounterMatrix.hpp"
 #include "VectorUInt.hpp"
 #include <map>
+#include "ExplicitAutomaton.hpp"
 
 #define VERBOSE_AUTOMATA_COMPUTATION 0
 #define LOG_COMPUTATION_TO_FILE 1
@@ -18,6 +19,8 @@ public:
 	// Constructor
 	ClassicAut(char Nletters, uint Nstates);
 
+    ClassicAut(const ExplicitAutomaton &);
+    
 	// number of letters in alphabet, numbered 0,1,2,...
 	char NbLetters;
 
