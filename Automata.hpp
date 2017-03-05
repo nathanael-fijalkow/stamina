@@ -7,7 +7,7 @@
 #include "VectorUInt.hpp"
 #include <map>
 
-#define VERBOSE_AUTOMATA_COMPUTATION 0
+#define VERBOSE_AUTOMATA_COMPUTATION 1
 #define LOG_COMPUTATION_TO_FILE 1
 
 

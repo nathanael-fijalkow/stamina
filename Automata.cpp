@@ -225,6 +225,7 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 
 	//final states are subsets where all states are final. This is because we actually powerset the automaton for the complement.
 	uint k;
+	uint nfinal=0;
 	for(uint i=0;i<nspow;i++){
 		k=0;
 		bool fin=true;
@@ -233,11 +234,12 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 			//fin=aut->finalstate[bit(i,k)];
 			k++;
 		}
+		if(fin) nfinal++;
 		Subaut->finalstate[i]=fin;
 	}
 
 #if VERBOSE_AUTOMATA_COMPUTATION
-	printf("Final states created\n");
+	printf("Final states created: %d final states\n", nfinal);
 #endif
 
 	//transitions are as usually in powerset
@@ -272,7 +274,6 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut){
 			Subaut->trans_eps[i][j]=( (i|j) == j);  //test for bitwise inclusion
 		}
 	}
-		
 	return Subaut;
 }
 
@@ -358,9 +359,27 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
   	
   	//initial and final states
 	PruneAut->initial=names[aut->initial];
-	
+	PruneAut->initialstate[PruneAut->initial]=true;
+		
 	for(uint i=0;i<nb_pruned;i++){
 		PruneAut->finalstate[i]=aut->finalstate[original[i]];
+		#if VERBOSE_AUTOMATA_COMPUTATION
+			cout<<i<<": {";
+			uint orig=original[i];
+			uint k=0;
+			while(orig!=0){
+				if (orig & 1) {
+					cout<<k;
+					if(orig>1) cout<<",";
+				}
+				k++;
+				orig=orig>>1;
+			}
+			cout <<"}";
+			if (PruneAut->initialstate[i]) cout<<" initial";
+			if (PruneAut->finalstate[i]) cout<<" final";
+			cout<<endl;
+		#endif
 	}
 	
 	//det transitions
@@ -376,7 +395,9 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 			PruneAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
 		}
 	}
-	
+	#if VERBOSE_AUTOMATA_COMPUTATION
+		PruneAut->print();
+	#endif
 	return PruneAut;
 }
 

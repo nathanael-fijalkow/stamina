@@ -278,7 +278,7 @@ int main(int argc, char **argv)
             
              if(verbose) cout << "Second step: checking whether the Loop Complexity suggestions are unlimitedness witnesses." << endl;
 			for(ExtendedExpression *sharp_expr: sharplist){
-				break; //not using heuristic
+				//break; //not using heuristic
 				const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr,*Baut);
 				if (verbose) cout <<"."<<flush; 
 				//if(verbose) {mat->print();cout<<endl<<endl;}

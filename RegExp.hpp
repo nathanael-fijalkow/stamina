@@ -8,7 +8,7 @@
 #include <utility>
 #include <list>
 
-#define VERBOSE_AUTOMATA_COMPUTATION 0
+//#define VERBOSE_AUTOMATA_COMPUTATION 0 (commented, already in Automata.hpp)
 #define LOG_COMPUTATION_TO_FILE 1
 
 
