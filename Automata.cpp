@@ -355,7 +355,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
     	nb_pruned++;
     }
   	//cout<<nb_pruned<<" states after pruning"<<endl;
-  	ClassicEpsAut *PruneAut=new ClassicEpsAut(nl,nb_pruned+1);
+  	ClassicEpsAut *PruneAut=new ClassicEpsAut(nl,nb_pruned);
   	//we add a sink state nb_pruned	
   	
   	//initial and final states
@@ -387,10 +387,10 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 	for(unsigned char a=0;a<aut->NbLetters;a++){
 		for(uint n=0;n<nb_pruned;n++){
 			uint dd=names[aut->transdet[a][original[n]]];
-			if (dd==N) dd=nb_pruned; //to sink state if non-defined
+			if (dd==N) dd=nb_pruned; //to sink state if non-defined (sink actually absent now)
 			PruneAut->transdet[a][n]=dd;
 		}
-		PruneAut->transdet[a][nb_pruned]=nb_pruned; //self-loop on the sink state
+		//PruneAut->transdet[a][nb_pruned]=nb_pruned; //self-loop on the sink state
 	}
 	
 	//epsilon transitions
@@ -399,21 +399,21 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 			PruneAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
 		}
 	}
-	PruneAut->trans_eps[nb_pruned][nb_pruned]=true; // epsilon self-loop on the sink state
+	//PruneAut->trans_eps[nb_pruned][nb_pruned]=true; // epsilon self-loop on the sink state
 	#if VERBOSE_AUTOMATA_COMPUTATION
 		PruneAut->print();
 	#endif
 	return PruneAut;
 }
 
-//Minimization of subset automata
+//Minimization of subset automata, too strict for now.
 ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 	uint N=aut->NbStates;
 	uint *part=(uint *)malloc(N*sizeof(uint)); //array containing the number of the partition.
 	
 	VectorUInt::SetSize(aut->NbLetters+N);
 	
-	std::vector<uint> data(VectorUInt::GetStateNb()); //vector for merging, of size Nletters+Nstates, giving the partition of p---a-->? and then p|q=?
+	std::vector<uint> data(VectorUInt::GetStateNb()); //vector for merging, of size Nletters+Nstates, giving the partition of p---a-->?
 
 
 	//initially, two partitions: 0 for rejecting and 1 for accepting
@@ -439,9 +439,11 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 			for(unsigned char a=0;a<aut->NbLetters;a++){
 				data[a]=part[aut->transdet[a][i]]; //store the partitions of destinations in data
 			}
+			
 			for(uint j=0;j<N;j++){		
-				data[aut->NbLetters+j]=part[i|j]; //store the partitions of unions in data
+				data[aut->NbLetters+j]=(aut->trans_eps[i][j])? 1: 0; //store the partitions of unions in data
 			}
+			
 			
 			auto it = vectors.emplace(data,i);
 			
@@ -483,7 +485,9 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 			MinAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
 		}
 	}
-	
+	#if VERBOSE_AUTOMATA_COMPUTATION
+		MinAut->print();
+	#endif
 	return MinAut;
 }
 
