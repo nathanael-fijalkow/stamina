@@ -20,7 +20,7 @@ protected:
 	pair <Matrix *, bool> addMatrix(const Matrix * mat);
 
 	/* converts an explicit matrix */
-	virtual const Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const = 0;
+	const Matrix * convertExplicitMatrix(const ExplicitMatrix & mat) const;
 
 };
 
