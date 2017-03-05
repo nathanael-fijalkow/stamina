@@ -65,7 +65,7 @@ string Dot::giveStyles ()
 	return ret;
 }
 
-string Dot::toDot(const ExplicitAutomaton* a)
+string Dot::toDot(const ExplicitAutomaton & a)
 {
 	string ret=start;
 	if(SH == -1)
@@ -73,11 +73,12 @@ string Dot::toDot(const ExplicitAutomaton* a)
 	else
 		ret += "label=\"Monoid for SH=" + std::to_string(SH) +"\"\n";
 	ret += giveStyles();
-	for(int i=0;i<a->alphabet.length();i++)
+	for(int i=0;i<a.alphabet.length();i++)
 		for(int j=0;j<size;j++)
 			for(int k=0;k<size;k++)
-				if( a->matrices[i]->coefficients[j][k] == 2 )
-					ret+=std::to_string(j) + " -> " + std::to_string(k) + " [label = \""+a->alphabet[i]+"\"];\n";
+				if( a.matrices[i].coefficients[j][k] == 2 )
+					ret+=std::to_string(j) + " -> " + std::to_string(k) + " [label = \""
+                        +a.alphabet[i]+"\"];\n";
 	ret+="}\n";
 	return ret;
 }
@@ -182,7 +183,7 @@ string Dot::toDot(const ExplicitAutomaton* a, Monoid* m, int sh)
 	initialState = a->initialState;
 	finalStates = a->finalStates;
 	SH = sh;
-	ret += toDot(a);
+	ret += toDot(*a);
 	ret += toDot(m);
 	return ret;
 }

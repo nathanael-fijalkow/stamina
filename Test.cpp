@@ -38,7 +38,6 @@ int main(int argc, char **argv)
     
     int opt,verbose=1,toOut=0;
     ifstream ifs;
-    ofstream ofs;
     string outputFilename;
 #ifndef WIN32
     while((opt = getopt(argc,argv, "vho:")) != -1)
@@ -70,16 +69,7 @@ int main(int argc, char **argv)
         cerr << "Could not open file " << argv[optind] << endl;
         pusage(argv[0]);
     }
-    
-    if(toOut)
-    {
-        ofs.open(outputFilename);
-        if(ofs.fail())
-        {
-            cerr << "Could not open file " << outputFilename << endl;
-            pusage(argv[0]);
-        }
-    }
+
 #endif
     
     ExplicitAutomaton* expa = Parser::parseFile(ifs);
@@ -124,8 +114,11 @@ int main(int argc, char **argv)
             m.print();
             cout << endl;
         }
-        if(toOut)
+        if(toOut) {
+            ofstream ofs(outputFilename + ".dot");
+            
             ofs << Dot::toDot(expa,&m, -1);
+        }
     }
     else if (expa->type==CLASSICAL)
     {
@@ -139,7 +132,6 @@ int main(int argc, char **argv)
             cout<<"The input automaton is non-deterministic."<<endl;
             cout<<"This functionality is not implemented yet for star-height"<<endl;
             cout<<"Exiting"<<endl;
-            ofs.close();
             return 0;
         }
         
@@ -164,7 +156,6 @@ int main(int argc, char **argv)
         if(sharplist.size()==0)// empty language
         {
             cout <<"The language is empty, the star height is 0."<<endl;
-            ofs.close();
             return 0;
         }
         
@@ -276,11 +267,13 @@ int main(int argc, char **argv)
                 else{
                     if(verbose) cout << "The automaton is limited." << endl;
                     cout << "RESULTS: the star height is " << h << "." << endl;
-                    break;
                 }
             }
-            if(toOut)
+            if(toOut) {
+                ofstream ofs(outputFilename + " sh " + to_string(h) + ".dot");
+                if(!ofs) throw runtime_error("Could not open output dot file ");
                 ofs << Dot::toDot(expa, &monoid, h);
+            }
             h++;
         }
         if(h==LC){
@@ -289,6 +282,5 @@ int main(int argc, char **argv)
             cout << "." << endl;
         }
     }
-    ofs.close();
     return 0;
 }

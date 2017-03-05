@@ -24,7 +24,7 @@ UnstableMultiMonoid::UnstableMultiMonoid(const ExplicitAutomaton & aut)
         final_states.push_back(fs);
 
     for(int i=0 ; i < aut.alphabet.length() ; i++)
-        addLetter( aut.alphabet[i] , *(aut.matrices[i]) );
+        addLetter( aut.alphabet[i] , aut.matrices[i]);
 };
 
 //Constructor from automata

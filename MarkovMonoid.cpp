@@ -50,7 +50,7 @@ UnstableMarkovMonoid::UnstableMarkovMonoid(const ExplicitAutomaton & aut)
     
     //	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
     for(int i = 0 ; i < aut.alphabet.length();i++)
-        addLetter(aut.alphabet[i],*(aut.matrices[i]));
+        addLetter(aut.alphabet[i],aut.matrices[i]);
     
 }
 

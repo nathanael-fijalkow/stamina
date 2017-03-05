@@ -17,7 +17,7 @@ private:
   static vector<int> finalStates;
   
   static string giveStyles();
-  static string toDot(const ExplicitAutomaton* a);
+  static string toDot(const ExplicitAutomaton & a);
   static string toDot(UnstableMultiMonoid* m, const ExtendedExpression* e, const MultiCounterMatrix* mat);
   static string toDot(UnstableMarkovMonoid* m,const ExtendedExpression* e,const ProbMatrix* mat);
   static string toDot(Monoid* m);

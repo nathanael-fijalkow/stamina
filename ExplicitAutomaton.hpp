@@ -2,6 +2,7 @@
 #ifndef EXPLICITAUTOMATON_HPP
 #define EXPLICITAUTOMATON_HPP
 
+#include <map>
 #include "Matrix.hpp"
 
 #define PROB 0
@@ -13,7 +14,7 @@ public:
   string alphabet;
   int initialState;
   vector<int> finalStates;
-  ExplicitMatrix** matrices; 
+  vector<ExplicitMatrix> matrices;
   ExplicitAutomaton(int size,int alphabet_length);
   ~ExplicitAutomaton();
 };

@@ -31,7 +31,7 @@ ClassicAut::ClassicAut(const ExplicitAutomaton & aut)
 {
     
     for(int i=0;i<aut.alphabet.length();i++)
-        addLetter(i,*(aut.matrices[i]));
+        addLetter(i, aut.matrices[i]);
     
     initialstate[aut.initialState]=true;
     

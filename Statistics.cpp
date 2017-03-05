@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 		UnstableStabMonoid monoid(n);
 
 		ExplicitMatrix m1(n), m2(n);
-		int max_tries = 100;
+		//int max_tries = 100;
 
 			for (int i = 0; i < n; i++)
 			{

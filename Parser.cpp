@@ -82,7 +82,7 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
     }
     
     for(int i=0;i<alphabet.length();i++) {
-        ExplicitMatrix* mat = new ExplicitMatrix(size);
+        ExplicitMatrix mat(size);
         string lt;
         getfline(file,lt);
         for(int j=0;j<size;j++) {
@@ -91,13 +91,13 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
             for(int k=0;k<size;k++) {
                 getfline(iss2,line,' ');
                 if(type <= 0)
-                    mat->coefficients[j][k]=lttoi(line);
+                    mat.coefficients[j][k]=lttoi(line);
                 else
-                    mat->coefficients[j][k]=MultiCounterAut::coef_to_char(line,type);
+                    mat.coefficients[j][k]=MultiCounterAut::coef_to_char(line,type);
                 
             }
         }
-        ret->matrices[i]=mat;
+        ret->matrices.push_back(mat);
     }
     
     return ret;
