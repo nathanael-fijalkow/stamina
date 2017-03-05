@@ -11,8 +11,8 @@ void MultiCounterMatrix::init()
     auto stnb = VectorInt::GetStateNb();
     rows = (const VectorInt **)malloc(stnb * sizeof(void *));
     cols = (const VectorInt **)malloc(stnb * sizeof(void *));
-    memset(rows, NULL, stnb * sizeof(void *));
-    memset(cols, NULL, stnb * sizeof(void *));
+    memset(rows, 0, stnb * sizeof(void *));
+    memset(cols, 0, stnb * sizeof(void *));
 #if USE_REDUNDANCE_HEURISTIC
     row_red = (uint *) malloc(stnb * sizeof(int));
     col_red = (uint *) malloc(stnb * sizeof(int));

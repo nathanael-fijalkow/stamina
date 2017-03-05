@@ -28,41 +28,6 @@ using namespace std;
 
 
 
-UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
-{
-    UnstableMarkovMonoid* monoid = new UnstableMarkovMonoid(aut->size);
-    monoid->initialState = aut->initialState;
-    monoid->finalStates.clear();
-    monoid->finalStates.resize(aut->size, false);
-    for(auto fs : aut->finalStates)
-        monoid->finalStates[fs] = true;
-    
-    //	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
-    for(int i = 0 ; i < aut->alphabet.length();i++)
-        monoid->addLetter(aut->alphabet[i],*(aut->matrices[i]));
-    
-    return monoid;
-};
-
-
-UnstableMultiMonoid * toUnstableMultiMonoid(ExplicitAutomaton * aut)
-{
-    UnstableMultiMonoid * monoid = new UnstableMultiMonoid(aut->size,aut->type);
-    monoid->initial_states.clear();
-    monoid->final_states.clear();
-    monoid->initial_states.push_back(aut->initialState);
-    
-    for(int i = 0 ; i < aut->size; i++)
-    {
-        auto s = aut->finalStates[i];
-        if(s>= 0 && s< aut->size)
-            monoid->final_states.push_back(s);
-    }
-    for(int i=0 ; i < aut->alphabet.length() ; i++)
-        monoid->addLetter( aut->alphabet[i] , *(aut->matrices[i]) );
-    return monoid;
-};
-
 /*
  passthru() est similaire à la fonction exec() car les deux exécutent la commande command. Si l'argument return_var est présent, le code de statut de réponse UNIX y sera placé. Cette fonction devrait être préférée aux commandes exec() ou system() lorsque le résultat attendu est de type binaire, et doit être passé tel quel à un navigateur. Une utilisation classique de cette fonction est l'exécution de l'utilitaire pbmplus qui peut retourner une image. En fixant le résultat du contenu (Content-Type) à image/gif puis en appelant pbmplus pour obtenir une image gif, vous pouvez créer des scripts PHP qui retournent des images.
  
@@ -134,28 +99,28 @@ int main(int argc, char **argv)
     
     if(expa->type==PROB)
     {
-        auto m = toMarkovMonoid(expa);
+        UnstableMarkovMonoid m(*expa);
         
         if(find_witness)
         {
             cout << "Looking for a value 1 witness in the Markov monoid..." << endl;
-            m->setWitnessTest(&UnstableMarkovMonoid::value1Test);
+            m.setWitnessTest(&UnstableMarkovMonoid::value1Test);
         }
         else
         {
             cout << "Computing the Markov monoid..." << endl;
         }
-        auto expr = m->ComputeMonoid();
+        auto expr = m.ComputeMonoid();
         
         if(expr == NULL)
-            cout << "The monoid has exactly " << m->expr_to_mat.size() << " elements" << endl;
+            cout << "The monoid has exactly " << m.expr_to_mat.size() << " elements" << endl;
         else
         {
-            cout << "The monoid has at least " << m->expr_to_mat.size() << " elements,<br/>";
+            cout << "The monoid has at least " << m.expr_to_mat.size() << " elements,<br/>";
             cout << "the computation stopped because a value 1 witness was found." << endl;
         }
         
-        pair<int, const ExtendedExpression*> r = m->maxLeakNb();
+        pair<int, const ExtendedExpression*> r = m.maxLeakNb();
         auto lnb = r.first;
         if(lnb == 0)
         {
@@ -168,7 +133,7 @@ int main(int argc, char **argv)
             cout << "is a leak" << endl;
         }
         if(!find_witness)
-            expr = m->hasValue1();
+            expr = m.hasValue1();
         if (expr)
         {
             cout << "The automaton has value 1.\nA value 1 witness is " << endl;
@@ -183,7 +148,7 @@ int main(int argc, char **argv)
             cout << "Since the automaton is not leaktight, and since there is no value1 witness,";
             cout << "the algorithm could not determine whether the automaton has value 1 or not." << endl;
         }
-        m->print();
+        m.print();
         //      if(toOut)
         //ofs << Dot::toDot(expa,m);
         
@@ -233,17 +198,17 @@ int main(int argc, char **argv)
     }
     else if (expa->type > 0)
     {
-        UnstableMultiMonoid * m = toUnstableMultiMonoid(expa);
+        UnstableMultiMonoid m(* expa);
         const ExtendedExpression * expr =
-        find_witness ?
-        m->containsUnlimitedWitness() :
-        m->ComputeMonoid();
+            find_witness ?
+            m.containsUnlimitedWitness() :
+            m.ComputeMonoid();
         
         if(expr == NULL)
-            cout << "The monoid has exactly " << m->expr_to_mat.size() << " elements" << endl;
+            cout << "The monoid has exactly " << m.expr_to_mat.size() << " elements" << endl;
         else
         {
-            cout << "The monoid has at least " << m->expr_to_mat.size() << " elements,<br/>";
+            cout << "The monoid has at least " << m.expr_to_mat.size() << " elements,<br/>";
             cout << "the computation stopped because an unlimited witness was found." << endl;
         }
         
@@ -259,7 +224,7 @@ int main(int argc, char **argv)
                 cout << *expr << endl;
             }
         }
-        m->print();
+        m.print();
     }
     cout << "Computation over " << endl;
 }

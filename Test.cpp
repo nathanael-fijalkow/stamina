@@ -31,22 +31,6 @@ void pusage(char* s)
 }
 
 
-UnstableMarkovMonoid* toMarkovMonoid(ExplicitAutomaton* aut)
-{
-    UnstableMarkovMonoid* monoid = new UnstableMarkovMonoid(aut->size);
-    monoid->initialState = aut->initialState;
-    monoid->finalStates.clear();
-    monoid->finalStates.resize(aut->size, false);
-    for(auto fs : aut->finalStates)
-        monoid->finalStates[fs] = true;
-    
-    //	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
-    for(int i = 0 ; i < aut->alphabet.length();i++)
-        monoid->addLetter(aut->alphabet[i],*(aut->matrices[i]));
-    
-    return monoid;
-}
-
 ClassicAut* fromExplicitToClassic(ExplicitAutomaton* aut)
 {
     ClassicAut* ret = new ClassicAut(aut->alphabet.length(),aut->size);
@@ -118,19 +102,16 @@ int main(int argc, char **argv)
     
     if(expa->type==PROB)
     {
-        
         cout << endl << endl << "The input automaton is a probabilistic automaton. Stamina will construct the Markov Monoid to check whether it has value 1." << endl << endl ;
         
-        UnstableMarkovMonoid* m = toMarkovMonoid(expa);
-        auto expr = m->ComputeMonoid();
-        
+        UnstableMarkovMonoid m(*expa);
+        auto expr = m.ComputeMonoid();
         
         cout << "***************************************" << endl;
         cout << "***********MAIN RESULTS****************" << endl;
         cout << "***************************************" << endl << endl;
         
-        pair<int, const ExtendedExpression*> r = m->maxLeakNb();
-        
+        pair<int, const ExtendedExpression*> r = m.maxLeakNb();
         if(r.first == 0){
             cout << "No leak found: the automaton is leaktight." << endl;
             if (expr) {
@@ -149,18 +130,17 @@ int main(int argc, char **argv)
             }
             else cout << "No value 1 witness found: the automaton may or may not have value 1." << endl << endl;
         }
-        
-        
+                
         if(verbose){
             cout << "***************************************" << endl;
             cout << "***********VERBOSE MODE****************" << endl;
             cout << "***************************************" << endl << endl;
             
-            m->print();
+            m.print();
             cout << endl;
         }
         if(toOut)
-            ofs << Dot::toDot(expa,m, -1);
+            ofs << Dot::toDot(expa,&m, -1);
     }
     else if (expa->type==CLASSICAL)
     {

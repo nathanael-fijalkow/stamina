@@ -5,6 +5,7 @@
 
 #include "ProbMatrix.hpp"
 #include "Monoid.hpp"
+#include "ExplicitAutomaton.hpp"
 
 
 
@@ -13,6 +14,9 @@ class UnstableMarkovMonoid : public UnstableMonoid
 public:
 	// Creates zero vector
 	UnstableMarkovMonoid(uint dim);
+
+    // Creates zero vector
+    UnstableMarkovMonoid(const ExplicitAutomaton & aut);
 
     // Check whether the monoid has value 1
     const ExtendedExpression * hasValue1();

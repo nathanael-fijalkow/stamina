@@ -39,6 +39,22 @@ UnstableMarkovMonoid::UnstableMarkovMonoid(uint dim) : UnstableMonoid(dim)
 {
 };
 
+UnstableMarkovMonoid::UnstableMarkovMonoid(const ExplicitAutomaton & aut)
+    : UnstableMonoid(aut.size)
+{
+    initialState = aut.initialState;
+    finalStates.clear();
+    finalStates.resize(aut.size, false);
+    for(auto fs : aut.finalStates)
+        finalStates[fs] = true;
+    
+    //	ret->setWitnessTest((bool(*)(const Matrix*))&test_witness);
+    for(int i = 0 ; i < aut.alphabet.length();i++)
+        addLetter(aut.alphabet[i],*(aut.matrices[i]));
+    
+}
+
+
 // Check whether the monoid has value 1
 const ExtendedExpression * UnstableMarkovMonoid::hasValue1() {
 

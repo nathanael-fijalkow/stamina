@@ -6,7 +6,7 @@
 #include "Monoid.hpp"
 #include "MultiCounterMatrix.hpp"
 #include "Automata.hpp"
-
+#include "ExplicitAutomaton.hpp"
 
 class UnstableMultiMonoid : public UnstableMonoid
 {
@@ -14,9 +14,12 @@ public:
 	// Constructor
 	UnstableMultiMonoid(uint dim, uint counter_number);
 
-	//Constructor from automa
-	UnstableMultiMonoid(const MultiCounterAut & automata);
+	//Constructor from automaton
+	UnstableMultiMonoid(const MultiCounterAut & automaton);
 
+    //Constructor form explicit automaton
+    UnstableMultiMonoid(const ExplicitAutomaton & automaton);
+    
 	// The set containing the known small matrices
 	unordered_set <MultiCounterMatrix> matrices;
 

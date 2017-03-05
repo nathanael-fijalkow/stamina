@@ -13,8 +13,23 @@ UnstableMultiMonoid::UnstableMultiMonoid(uint dim, uint counter_number) : Unstab
 	MultiCounterMatrix::set_counter_and_states_number(counter_number, dim);
 }
 
+UnstableMultiMonoid::UnstableMultiMonoid(const ExplicitAutomaton & aut)
+: UnstableMultiMonoid(aut.size, aut.type)
+{
+    initial_states.clear();
+    final_states.clear();
+    initial_states.push_back(aut.initialState);
+
+    for(auto fs : aut.finalStates)
+        final_states.push_back(fs);
+
+    for(int i=0 ; i < aut.alphabet.length() ; i++)
+        addLetter( aut.alphabet[i] , *(aut.matrices[i]) );
+};
+
 //Constructor from automata
-UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata) : UnstableMonoid(automata.NbStates)
+UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata)
+: UnstableMonoid(automata.NbStates)
 {
 	initial_states.clear();
 	final_states.clear();
