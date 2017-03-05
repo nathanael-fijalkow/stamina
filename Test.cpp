@@ -267,6 +267,7 @@ int main(int argc, char **argv)
                 else{
                     if(verbose) cout << "The automaton is limited." << endl;
                     cout << "RESULTS: the star height is " << h << "." << endl;
+                    break;
                 }
             }
             if(toOut) {
