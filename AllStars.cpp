@@ -70,17 +70,21 @@ int main(int argc, char **argv)
     
     
     for(int stnb = 1 ; stnb < max_state_nb; stnb++) {
-        nb++;
         
         expa = new ExplicitAutomaton(stnb,letters_nb);
         expa->initialState = 0;
         expa->finalStates.push_back(stnb -1);
 
         while(true) {
+            nb++;
+
             ClassicAut aut(*expa);
-            
-            if(aut.isdet()) {
-                
+            if(!aut.iscomplete()) {
+               // cout << "Automaton #" << nb << " not complete" << endl;
+            } else if (!aut.isdet()){
+                //cout << "Automaton #" << nb << " not deterministic" << endl;
+            } else {
+                cout << "Automaton #" << nb << " complete and deterministic" << endl;
                 UnstableMultiMonoid * monoid = NULL;
                 const ExtendedExpression * witness = NULL;
                 auto h = computeStarHeight(aut, monoid, witness, false, false);
@@ -92,8 +96,9 @@ int main(int argc, char **argv)
                     file << ";" << monoid->rewriteRules.size() << ";" << int_vectors.size();
                     file << ";" << h << endl;
                     file.close();
+                } else {
+                    cout << "Automaton #" << nb << " empty language" << endl;
                 }
-                
                 delete monoid;
             }
             
