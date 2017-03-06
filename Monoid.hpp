@@ -20,8 +20,8 @@
 using namespace std;
 
 
-#define MAX_EXPR_TO_PROCESS_DEFAULT 990000000;
-#define MAX_MONOID_SIZE_DEFAULT 1000000;
+#define MAX_EXPR_TO_PROCESS_DEFAULT 990000000
+#define MAX_MONOID_SIZE_DEFAULT 1000000
 
 /* CLASS DEFINITIONS */
 // This class describes a Markov Monoid

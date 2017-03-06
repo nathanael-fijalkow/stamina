@@ -120,6 +120,11 @@ int main(int argc, char **argv)
                 aut_id = atoi(optarg);
                 cout << "Automaton id #" << aut_id<< endl;
                 break;
+            case 'm':
+                max_state_nb = atoi(optarg);
+                if(max_state_nb <= 0) max_state_nb = 1;
+                cout << "Automaton id #" << aut_id<< endl;
+                break;
             default:
                 pusage(argv[0]);
         }
@@ -127,22 +132,19 @@ int main(int argc, char **argv)
     
     if(aut_id>=0) random_mode = false;
     
-    if(random_mode) {
-        unsigned int seed = time(NULL);
-        cout << "Random seed " << seed << endl;
-        srand(seed);
-    }
 
     
     stringstream filename;
-    filename << "StarHeight_maxstatenb " << max_state_nb;
+    filename << "starheight_" << (random_mode ? "random" : "enumerative");
     
-    ofstream file(filename.str() + ".csv");
+    ofstream file(filename.str() + ".csv", ofstream::app);
     file << "#;StarHeight;LoopComplexity;AutomatonSize;MonoidDim;MonoidSize;RewriteRulesNb;VectorsNb;ComputationTime(ms)" << endl;
     file.close();
     
     uint nb = 0;
-    
+
+    auto base = std::chrono::high_resolution_clock::now();
+
     
     for(int stnb = 1 ; stnb < max_state_nb; stnb++) {
         
@@ -153,12 +155,17 @@ int main(int argc, char **argv)
         while(true) {
             nb++;
             if(aut_id < 0 || nb == aut_id) {
-                auto start = std::chrono::high_resolution_clock::now();
                 
+                auto start = std::chrono::high_resolution_clock::now();
+                unsigned int seed
+                    = chrono::duration_cast<chrono::microseconds>(start - base).count();
+
                 if(random_mode)
                 {
-                    stnb = (rand() % max_state_nb);
-                    cout << "New random automaton with " << stnb << " states" << endl;
+                    cout << "Random seed " << seed << endl;
+                    srand(seed);
+                    stnb = 1 + (rand() % (max_state_nb - 1));
+                    cout << "New random automaton with " << stnb << " states and seed " << seed << endl;
                     random_automaton(stnb);
                 }
 
@@ -175,7 +182,14 @@ int main(int argc, char **argv)
                     UnstableMultiMonoid * monoid = NULL;
                     const ExtendedExpression * witness = NULL;
                     int loopComplexity;
-                    auto h = computeStarHeight(aut, monoid, witness, loopComplexity, false, false, "AllStars");
+                    auto h = computeStarHeight(
+                                               aut,
+                                               monoid,
+                                               witness,
+                                               loopComplexity,
+                                               verbose,
+                                               out_file,
+                                               "AllStars");
                     
                     auto end = std::chrono::high_resolution_clock::now();
                     auto ctime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -183,7 +197,7 @@ int main(int argc, char **argv)
                     if(monoid != NULL) {
                         cout << "StarHeight " << h << endl;
                         ofstream file(filename.str() + ".csv", ofstream::app);
-                        file << nb << ";" << h << ";" << loopComplexity << ";";
+                        file << (random_mode ? nb : seed) << ";" << h << ";" << loopComplexity << ";";
                         file << stnb  << ";" << VectorInt::GetStateNb() << ";";
                         file << monoid->expr_to_mat.size();
                         file << ";" << monoid->rewriteRules.size() << ";" << int_vectors.size();
@@ -193,7 +207,7 @@ int main(int argc, char **argv)
                     } else  {
                         cout << "StarHeight " << h << endl;
                         ofstream file(filename.str() + ".csv", ofstream::app);
-                        file << nb << ";" << h << ";" << loopComplexity << ";";
+                        file << (random_mode ? nb : seed) << ";" << h << ";" << loopComplexity << ";";
                         file << stnb << ";" << VectorInt::GetStateNb()<< ";" << 0;
                         file << ";" << 0 << ";" << 0;
                         file << ";" << ctime << endl;
