@@ -24,24 +24,41 @@ int main(int argc, char **argv)
 
 	unsigned int seed = time(NULL);
 
-    while(true) {
-        MultiCounterAut *Baut = toNestedBaut(Subsetaut, h);
-        UnstableMultiMonoid monoid(*Baut);
+    unsigned int nb_samples = 100;
+    
+    int max_state_nb = 15;
+    
+    stringstream filename;
+    filename << "Experiment seed " << seed << " samples " << nb_samples << " maxstatenb " << max_state_nb;
+    
+    ofstream file("Exp/" + filename.str() + ".csv");
+    ofstream file2("Exp/" + filename.str() + " monoids.txt");
+    
+    file << "#;Size;Densitya;Densityb;ElementsNb;RewriteRulesNb;VectorNb;LeakNb;SharpHeight" << endl;
+    
+    uint nb = 0;
+
+    while(nb++ < nb_samples) {
+        ClassicAut aut(*expa);
+        if(!aut.isdet()) {
+            cout << "Only deterministic automata are handled" << endl;
+            return 0;
+        }
+        UnstableMultiMonoid * monoid = NULL;
+        const ExtendedExpression * witness = NULL;
+        
+        auto h = computeStarHeight(aut, monoid, witness, true, true);
+        cout << "RESULT: the star height is " << h << "." << endl;
+        
+        if(toOut) {
+            ofstream ofs(outputFilename + ".dot");
+            ofs << Dot::toDot(expa,monoid, -1);
+        }
+        
+        delete expa;
+        delete monoid;
     }
     
-	unsigned int nb_samples = 100;
-
-	int max_state_nb = 15;
-
-	stringstream filename;
-	filename << "Experiment seed " << seed << " samples " << nb_samples << " maxstatenb " << max_state_nb;
-
-	ofstream file("Exp/" + filename.str() + ".csv");
-	ofstream file2("Exp/" + filename.str() + " monoids.txt");
-
-	file << "#;Size;Densitya;Densityb;ElementsNb;RewriteRulesNb;VectorNb;LeakNb;SharpHeight" << endl;
-
-	uint nb = 0;
 	while (nb++ < nb_samples)
 	{
 		int n = 5 + (rand() % max_state_nb);

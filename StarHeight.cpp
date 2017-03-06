@@ -231,7 +231,7 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut){
     return pair<char, list<uint>>(lc, gaut->order);
 }
 
-MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k){
+MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k, string filepref){
     
     bool debug = true;
     
@@ -326,14 +326,14 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k){
     //trans_eps_mat.print();
     EpsBaut->set_trans_eps(trans_eps_mat);
     
-    ofstream file("multicountereps_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
+    ofstream file(filepref + "multicountereps_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
     EpsBaut->print(file);
     
     if(debug) cout << "Removing epsilon transitions..." << endl;
     
     auto epsremoved = EpsRemoval(EpsBaut);
     
-    ofstream file2("epsremoved_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
+    ofstream file2(filepref + "epsremoved_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
     epsremoved->print(file2);
     
     return epsremoved;
@@ -343,7 +343,8 @@ int computeStarHeight( ClassicAut & aut,
                       UnstableMultiMonoid * monoid,
                       const ExtendedExpression * witness,
                       bool filelogs,
-                      bool verbose
+                      bool verbose,
+                      string filepref
                       )
 {
     if(! aut.iscomplete())
@@ -384,7 +385,7 @@ int computeStarHeight( ClassicAut & aut,
     
     if(verbose){
         printf("Subset Automaton Built, %d states\n\n",ns);
-        ofstream file("subset_aut.txt");
+        ofstream file(filepref + "subset_aut.txt");
         Subsetaut->print(file);
     }
     
@@ -397,7 +398,7 @@ int computeStarHeight( ClassicAut & aut,
     
     if(verbose) printf("Pruned Subset Automaton Built, %d states\n\n",ns);
     if(filelogs) {
-        ofstream file("subset_aut_pruned.txt");
+        ofstream file(filepref + "subset_aut_pruned.txt");
         Subsetaut->print(file);
     }
     
@@ -422,7 +423,7 @@ int computeStarHeight( ClassicAut & aut,
                 if(verbose)
                     cout << "--> The heuristic found a witness, star height is > than " << h << endl;
                 if(filelogs) {
-                    ofstream f("unlimited_witness_sh_" +  to_string(h) + ".txt");
+                    ofstream f(filepref + "unlimited_witness_sh_" +  to_string(h) + ".txt");
                     f << *witness;
                 }
             } else if(verbose) {
@@ -439,7 +440,7 @@ int computeStarHeight( ClassicAut & aut,
             
             if(filelogs) {
                 monoid->print_summary();
-                ofstream f("monoid_sh_" + to_string(h) + ".txt");
+                ofstream f(filepref + "monoid_sh_" + to_string(h) + ".txt");
                 f << *monoid;
             }
             delete Baut;
@@ -455,7 +456,7 @@ int computeStarHeight( ClassicAut & aut,
                     cout << endl;
                 }
                 if(filelogs) {
-                    ofstream f("unlimited_witness_sh_" +   to_string(h) + ".txt");
+                    ofstream f(filepref + "unlimited_witness_sh_" +   to_string(h) + ".txt");
                     f << *witness;
                 }
                 delete Baut;
