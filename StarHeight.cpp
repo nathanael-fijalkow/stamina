@@ -468,10 +468,12 @@ int computeStarHeight( ClassicAut & aut,
                     ofstream f(filepref + "unlimited_witness_sh_" +   to_string(h) + ".txt");
                     f << *witness;
                 }
-                delete monoid;
-                monoid = NULL;
+		if (h+1 < LC) {
+		  delete monoid;
+		  monoid = NULL;
+		}
             }
-        } else {
+        } else if (h+1 < LC) {
             delete monoid;
             monoid = NULL;
         }
