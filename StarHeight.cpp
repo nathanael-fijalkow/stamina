@@ -401,7 +401,7 @@ int computeStarHeight( ClassicAut & aut,
         Subsetaut->print(file);
     }
     
-    int h = 1;
+    int h = 0;
     
     while (h<LC){
         if(verbose) {
