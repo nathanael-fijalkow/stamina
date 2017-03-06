@@ -485,7 +485,7 @@ checkLoopComplexitySuggestions(
     for(auto sharp_expr : suggestions)
     {
         const Matrix* mat = monoid->ExtendedExpression2Matrix(sharp_expr, Baut);
-        cout <<"."<<flush;
+        //cout <<"."<<flush;
         if(monoid->IsUnlimitedWitness(mat)){
             return sharp_expr;
         }

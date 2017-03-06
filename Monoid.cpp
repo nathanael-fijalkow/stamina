@@ -141,7 +141,7 @@ const ExtendedExpression * UnstableMonoid::process_expression(const ExtendedExpr
 			(*elt_left).print();
 			cout << " and " ;
 			(*elt_right).print();
-			cout << "." << endl; 
+			//cout << "." << endl;
 #endif
 
 			// the potentially new concat expression
