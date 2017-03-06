@@ -197,7 +197,7 @@ int main(int argc, char **argv)
             ofstream file("subset_aut_pruned.txt");
             Subsetaut->print(file);
         }
-        int h = 1;
+        int h = 0;
         while (h<LC){
             //			ofstream output("monoid " + to_string(h) + ".txt");
             
