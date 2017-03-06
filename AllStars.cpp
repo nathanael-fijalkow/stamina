@@ -5,6 +5,7 @@
 #include "MarkovMonoid.hpp"
 #include "StabilisationMonoid.hpp"
 #include "StarHeight.hpp"
+#include <chrono>
 
 #include <fstream>
 #include <sstream>
@@ -70,7 +71,7 @@ int main(int argc, char **argv)
     filename << "StarHeight_maxstatenb " << max_state_nb;
     
     ofstream file(filename.str() + ".csv");
-    file << "#;StatesNb;ElementsNb;RewriteRulesNb;VectorNb;StarHeight" << endl;
+    file << "#;StatesNb;ElementsNb;RewriteRulesNb;VectorNb;StarHeight;ComputationTime(ms)" << endl;
     file.close();
     
     uint nb = 0;
@@ -84,6 +85,7 @@ int main(int argc, char **argv)
 
         while(true) {
             nb++;
+            auto start = std::chrono::high_resolution_clock::now();
 
             ClassicAut aut(*expa);
             if(!aut.iscomplete()) {
@@ -96,12 +98,15 @@ int main(int argc, char **argv)
                 const ExtendedExpression * witness = NULL;
                 auto h = computeStarHeight(aut, monoid, witness, false, false);
                 
+                auto end = std::chrono::high_resolution_clock::now();
+                auto ctime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
                 if(monoid != NULL && h>0) {
                     cout << "StarHeight " << h << endl;
                     ofstream file(filename.str() + ".csv", ofstream::app);
                     file << nb << ";" << stnb << ";" << monoid->expr_to_mat.size();
                     file << ";" << monoid->rewriteRules.size() << ";" << int_vectors.size();
-                    file << ";" << h << endl;
+                    file << ";" << h << ";"  << ctime << endl;
                     file.close();
                     delete monoid;
                 } else if(h > 0) {
@@ -109,7 +114,7 @@ int main(int argc, char **argv)
                     ofstream file(filename.str() + ".csv", ofstream::app);
                     file << nb << ";" << stnb << ";" << 0;
                     file << ";" << 0 << ";" << 0;
-                    file << ";" << h << endl;
+                    file << ";" << h << ";"  << ctime << endl;
                     file.close();
                 }
                 else {
