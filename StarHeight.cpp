@@ -353,7 +353,7 @@ int computeStarHeight( ClassicAut & aut,
     int LC = (int)res.first ;
     list<uint> order = res.second;
     RegExp * regexpr = Aut2RegExp( &aut , order );
-	if(regexpr->starheight<LC) LC=regexpr->starheight;
+
     list<ExtendedExpression *> sharplist = Reg2Sharps(regexpr);
 
     if(regexpr == NULL || sharplist.size()==0)// empty language
@@ -362,7 +362,9 @@ int computeStarHeight( ClassicAut & aut,
         monoid = NULL; witness = NULL;
         return 0;
     }
-    
+
+    if(regexpr->starheight<LC) LC=regexpr->starheight;
+
     if(verbose) {
         cout << "According to the Loop Complexity heuristics,";
         cout << "the star-height is at most " << LC << "." << endl;
