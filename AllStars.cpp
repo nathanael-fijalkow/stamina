@@ -96,12 +96,7 @@ int main(int argc, char **argv)
                 cout << "Automaton #" << nb << " complete and deterministic" << endl;
                 UnstableMultiMonoid * monoid = NULL;
                 const ExtendedExpression * witness = NULL;
-                auto h = -1;
-                try {
-                    h = computeStarHeight(aut, monoid, witness, false, false);
-                } catch(const runtime_error & exc) {
-                    cout << "computeStarHeight failed " << string(exc.what()) << endl;
-                }
+                auto h = computeStarHeight(aut, monoid, witness, false, false);
                 
                 auto end = std::chrono::high_resolution_clock::now();
                 auto ctime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();

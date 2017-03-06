@@ -429,20 +429,30 @@ int computeStarHeight( ClassicAut & aut,
                 cout << "-->Heuristic found no witness." << endl << endl;
             }
         }
+        //no need anymore for Baut;
+        delete Baut;
+        Baut = NULL;
+
         
         if(!witness){
             if(verbose){
                 cout << "Third step: computing the monoid, and checking for the existence of an unlimitedness witness on the fly." << endl << endl;
             }
             
-            witness = monoid->containsUnlimitedWitness();
+            try {
+                witness = monoid->containsUnlimitedWitness();
+            } catch(const runtime_error & exc) {
+                cout << "Starheight >= "  << h << " but exact computation failed with " << endl;
+                cout << string(exc.what()) << endl;
+                return -h;
+            }
+
             
             if(filelogs) {
                 monoid->print_summary();
                 ofstream f(filepref + "monoid_sh_" + to_string(h) + ".txt");
                 f << *monoid;
             }
-            delete Baut;
             
             if(!witness) {
                 if(verbose)
@@ -458,7 +468,6 @@ int computeStarHeight( ClassicAut & aut,
                     ofstream f(filepref + "unlimited_witness_sh_" +   to_string(h) + ".txt");
                     f << *witness;
                 }
-                delete Baut;
                 delete monoid;
                 monoid = NULL;
             }
