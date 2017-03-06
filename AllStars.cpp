@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     filename << "StarHeight_maxstatenb " << max_state_nb;
     
     ofstream file(filename.str() + ".csv");
-    file << "#;Size;StatesNb;ElementsNb;RewriteRulesNb;VectorNb;StarHeight" << endl;
+    file << "#;StatesNb;ElementsNb;RewriteRulesNb;VectorNb;StarHeight" << endl;
     file.close();
     
     uint nb = 0;
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
                 auto h = computeStarHeight(aut, monoid, witness, false, false);
                 
                 if(monoid != NULL && h>0) {
-                    cout << "SharpHeight " << h << endl;
+                    cout << "StarHeight " << h << endl;
                     ofstream file(filename.str() + ".csv", ofstream::app);
                     file << nb << ";" << stnb << ";" << monoid->expr_to_mat.size();
                     file << ";" << monoid->rewriteRules.size() << ";" << int_vectors.size();
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
                     file.close();
                     delete monoid;
                 } else if(h > 0) {
-                    cout << "SharpHeight " << h << endl;
+                    cout << "StarHeight " << h << endl;
                     ofstream file(filename.str() + ".csv", ofstream::app);
                     file << nb << ";" << stnb << ";" << 0;
                     file << ";" << 0 << ";" << 0;
