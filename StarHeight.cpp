@@ -231,10 +231,7 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut){
     return pair<char, list<uint>>(lc, gaut->order);
 }
 
-MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k, string filepref){
-    
-    bool debug = true;
-    
+MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k, string filepref, bool debug){
     
     uint ns=Subsetaut->NbStates;
     char nl=Subsetaut->NbLetters;
@@ -407,14 +404,14 @@ int computeStarHeight( ClassicAut & aut,
     int h = 1;
     
     while (h<LC){
+        if(verbose) {
         cout << endl << "******************************" << endl;
         cout << "Testing star height " << h << endl;
         cout << "******************************" << endl;
-        
-        if(verbose)
             cout << "First step: computing the automaton with counters." << endl << endl;
+        }
         
-        MultiCounterAut * Baut = toNestedBaut(Subsetaut, h);
+        MultiCounterAut * Baut = toNestedBaut(Subsetaut, h, "", verbose);
         monoid = new UnstableMultiMonoid(*Baut);
         
         if(verbose)
