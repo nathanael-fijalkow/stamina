@@ -344,8 +344,11 @@ int computeStarHeight( ClassicAut & aut,
                       string filepref
                       )
 {
-    if(! aut.iscomplete())
+    if(! aut.iscomplete()){
+    	//cout<<" adding sink"<<endl;
         aut.addsink();
+      }
+        
     
     if(verbose) cout << "************LOOP COMPLEXITY******************" << endl << endl;
     
@@ -373,8 +376,8 @@ int computeStarHeight( ClassicAut & aut,
         regexpr->print();
         cout << endl;
     }
-    int h=0;
-    if (LC!=0){
+    int h=LC;
+    if (LC>1){
     if(verbose) cout << endl << "************STAR HEIGHT COMPUTATION**********" << endl;
     if(verbose) cout << "Computing the Subset Automaton..." << endl;
     
@@ -392,8 +395,9 @@ int computeStarHeight( ClassicAut & aut,
     }
     
     if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
+
+    //Subsetaut=SubMinPre(Subsetaut); //optional for now, to test later
     Subsetaut=SubPrune(Subsetaut);
-    //Subsetaut=SubMin(Subsetaut); //optional for now, to test later
     
     ns=Subsetaut->NbStates;
     nl=Subsetaut->NbLetters;
@@ -502,7 +506,7 @@ checkLoopComplexitySuggestions(
     for(auto sharp_expr : suggestions)
     {
         const Matrix* mat = monoid->ExtendedExpression2Matrix(sharp_expr, Baut);
-        //cout <<"."<<flush;
+        cout <<"."<<flush; //nicer to see the program advance
         if(monoid->IsUnlimitedWitness(mat)){
             return sharp_expr;
         }
