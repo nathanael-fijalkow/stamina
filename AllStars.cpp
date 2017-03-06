@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     filename << "StarHeight_maxstatenb " << max_state_nb;
     
     ofstream file(filename.str() + ".csv");
-    file << "#;StarHeight;AutomatonSize;MonoidDim;MonoidSize;RewriteRulesNb;VectorsNb;ComputationTime(ms)" << endl;
+    file << "#;StarHeight;LoopComplexity;AutomatonSize;MonoidDim;MonoidSize;RewriteRulesNb;VectorsNb;ComputationTime(ms)" << endl;
     file.close();
     
     uint nb = 0;
@@ -96,7 +96,8 @@ int main(int argc, char **argv)
                 cout << "Automaton #" << nb << " complete and deterministic" << endl;
                 UnstableMultiMonoid * monoid = NULL;
                 const ExtendedExpression * witness = NULL;
-                auto h = computeStarHeight(aut, monoid, witness, false, false);
+                int loopComplexity;
+                auto h = computeStarHeight(aut, monoid, witness, loopComplexity, false, false, "AllStars");
                 
                 auto end = std::chrono::high_resolution_clock::now();
                 auto ctime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -104,7 +105,9 @@ int main(int argc, char **argv)
                 if(monoid != NULL) {
                     cout << "StarHeight " << h << endl;
                     ofstream file(filename.str() + ".csv", ofstream::app);
-                    file << nb << ";" << h << ";" << stnb  << ";" << VectorInt::GetStateNb() << ";" << monoid->expr_to_mat.size();
+                    file << nb << ";" << h << ";" << loopComplexity << ";";
+                    file << stnb  << ";" << VectorInt::GetStateNb() << ";";
+                    file << monoid->expr_to_mat.size();
                     file << ";" << monoid->rewriteRules.size() << ";" << int_vectors.size();
                     file << ";" <<  ctime << endl;
                     file.close();
@@ -112,7 +115,8 @@ int main(int argc, char **argv)
                 } else  {
                     cout << "StarHeight " << h << endl;
                     ofstream file(filename.str() + ".csv", ofstream::app);
-                    file << nb << ";" << h << ";" << stnb << ";" << VectorInt::GetStateNb()<< ";" << 0;
+                    file << nb << ";" << h << ";" << loopComplexity << ";";
+                    file << stnb << ";" << VectorInt::GetStateNb()<< ";" << 0;
                     file << ";" << 0 << ";" << 0;
                     file << ";" << ctime << endl;
                     file.close();

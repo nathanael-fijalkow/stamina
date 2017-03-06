@@ -231,7 +231,13 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut){
     return pair<char, list<uint>>(lc, gaut->order);
 }
 
-MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k, string filepref, bool debug){
+MultiCounterAut * toNestedBaut(
+                               ClassicEpsAut *Subsetaut,
+                               char k,
+                               bool debug,
+                               bool output_file,
+                               string filepref
+                               ){
     
     uint ns=Subsetaut->NbStates;
     char nl=Subsetaut->NbLetters;
@@ -323,15 +329,19 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k, string filepref
     //trans_eps_mat.print();
     EpsBaut->set_trans_eps(trans_eps_mat);
     
-    ofstream file(filepref + "multicountereps_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
-    EpsBaut->print(file);
+    if(output_file) {
+        ofstream file(filepref + "multicountereps_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
+        EpsBaut->print(file);
+    }
     
     if(debug) cout << "Removing epsilon transitions..." << endl;
     
     auto epsremoved = EpsRemoval(EpsBaut);
     
-    ofstream file2(filepref + "epsremoved_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
-    epsremoved->print(file2);
+    if(output_file) {
+        ofstream file2(filepref + "epsremoved_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
+        epsremoved->print(file2);
+    }
     
     return epsremoved;
 }
@@ -339,6 +349,7 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k, string filepref
 int computeStarHeight( ClassicAut & aut,
                       UnstableMultiMonoid * & monoid,
                       const ExtendedExpression * & witness,
+                      int & LC,
                       bool filelogs,
                       bool verbose,
                       string filepref
@@ -353,7 +364,7 @@ int computeStarHeight( ClassicAut & aut,
     if(verbose) cout << "************LOOP COMPLEXITY******************" << endl << endl;
     
     pair<char,list<uint>> res = LoopComplexity(&aut);
-    int LC = (int)res.first ;
+    LC = (int)res.first ;
     list<uint> order = res.second;
     RegExp * regexpr = Aut2RegExp( &aut , order );
 
@@ -418,12 +429,13 @@ int computeStarHeight( ClassicAut & aut,
             cout << "First step: computing the automaton with counters." << endl << endl;
         }
         
-        MultiCounterAut * Baut = toNestedBaut(Subsetaut, h, "", verbose);
+        MultiCounterAut * Baut = toNestedBaut(Subsetaut, h, verbose, filelogs, "AllStars_");
         monoid = new UnstableMultiMonoid(*Baut);
         
         if(verbose)
             cout << "Second step: checking whether the Loop Complexity suggestions are unlimitedness witnesses." << endl;
-        if(h <= 1) {
+        if(h <= 1)
+        {
             witness = checkLoopComplexitySuggestions(monoid, *Baut, sharplist);
             if(witness != NULL) {
                 if(verbose)

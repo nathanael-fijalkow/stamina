@@ -126,10 +126,12 @@ int main(int argc, char **argv)
             cout << "Only deterministic automata are handled" << endl;
             return 0;
         }
+        
+        //outputs
         UnstableMultiMonoid * monoid = NULL;
         const ExtendedExpression * witness = NULL;
-        
-        auto h = computeStarHeight(aut, monoid, witness, true, true);
+        int loopComplexity = 0;
+        auto h = computeStarHeight(aut, monoid, witness, loopComplexity, true, true);
         cout << "RESULT: the star height is " << h << "." << endl;
 
         if(toOut) {
