@@ -428,8 +428,8 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
             PruneAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
         }
     }
-    PruneAut->orig=original;
-    PruneAut->names=names;
+    //PruneAut->orig=original;
+    //PruneAut->names=names;
     
     //PruneAut->trans_eps[nb_pruned][nb_pruned]=true; // epsilon self-loop on the sink state
 #if VERBOSE_AUTOMATA_COMPUTATION
@@ -565,8 +565,8 @@ ClassicEpsAut* SubPruneSink(ClassicEpsAut *aut){
             PruneAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
         }
     }
-    PruneAut->orig=original;
-    PruneAut->names=names;
+    //PruneAut->orig=original;
+    //PruneAut->names=names;
     
     PruneAut->trans_eps[nb_pruned][nb_pruned]=true; // epsilon self-loop on the sink state
 #if VERBOSE_AUTOMATA_COMPUTATION
@@ -587,20 +587,21 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
         for(uint j=0;j<N;j++){
             //final below non-final
             bool bj=aut->finalstate[j];
-            preorder[i][j]= bi || !bj; // only non-equivalence if when i is not final and j is.
+            preorder[i][j]= bi || !bj; // only non-equivalence is when i is not final and j is.
         }
     }
     
     bool search=true;
-    cout<<"preorder initiated"<<endl;
+    //cout<<"preorder initialized"<<endl;
     
     //cout<<"minimisation"<<endl;
     while(search){
-        cout <<"Iteration"<<endl;
+       // cout <<"Iteration"<<endl;
         vector<vector<bool>> new_pre(N);
         //initialisation
         search=false;
         for(uint i=0;i<N;i++){
+        	new_pre[i].clear();
             new_pre[i].resize(N,false);
             for(uint j=0;j<N;j++){
                 if (! preorder[i][j]) continue; //already separated
@@ -623,13 +624,13 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
                 }
                 if(k<N) continue;
                 new_pre[i][j]=true; //stay related
-                printset(i);cout<<" <= ";printset(j);cout<<endl;
+                //printset(i);cout<<" <= ";printset(j);cout<<endl;
             }
         }
         preorder=new_pre;
     }
     
-    cout<<"preorder created"<<endl;
+    //cout<<"preorder created"<<endl;
     
     //build the Min automaton from the preorder.
     
@@ -643,14 +644,14 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
             if(preorder[i][j] && preorder[j][i]){
                 //equivalent element found
                 repr[i]=repr[j];
-                cout<<"merging ";printset(i);cout<<" and ";printset(j);cout<<endl;
+                //cout<<"merging ";printset(i);cout<<" and ";printset(j);cout<<endl;
                 found=true;
                 break;
             }
         }
         if(!found) {
             repr[i]=nb;
-            printset(i);cout <<" affected to "<<nb<<endl;
+           // printset(i);cout <<" affected to "<<nb<<endl;
             prev.push_back(i);
             nb++;
         }
@@ -659,7 +660,7 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
     
     
     ClassicEpsAut *MinAut=new ClassicEpsAut(nl,nb);
-    cout<<"minAut created"<<endl;
+    //cout<<"minAut created"<<endl;
     //initial and final states
     MinAut->initial=repr[aut->initial];
     MinAut->initialstate[MinAut->initial]=true;
@@ -698,97 +699,6 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
     return MinAut;
 }
 
-
-//Minimization of subset automata, first try, not really working
-ClassicEpsAut* SubMin(ClassicEpsAut *aut){
-    uint N=aut->NbStates;
-    uint nl=aut->NbLetters;
-    uint *part=(uint *)malloc((N+1)*sizeof(uint)); //array containing the number of the partition.
-    part[N]=N; //sink points to itself
-    
-    VectorUInt::SetSize(nl+N+1);
-    
-    std::vector<uint> data(VectorUInt::GetStateNb()); //vector for merging, of size Nletters+Nstates, giving the partition of p---a-->?
-    
-    
-    //initially, two partitions: 0 for rejecting and 1 for accepting
-    for(uint i=0;i<N;i++){
-        part[i]=(aut->finalstate[i])?1:0;
-    }
-    
-    std::unordered_set<VectorUInt> vectors;
-    
-    uint *original=(uint *)malloc(N*sizeof(uint));// to go from representant to one original state.
-    
-    uint nbpart=0;
-    uint new_nbpart=2;
-    
-    //cout<<"minimisation"<<endl;
-    while(nbpart!=new_nbpart){
-        vectors.clear();
-        nbpart=new_nbpart;
-        new_nbpart=0;
-        //printf("nbpart:%d\n",nbpart);
-        cout<<nbpart<<endl;
-        for(uint i=0;i<N;i++){
-            for(unsigned char a=0;a<nl;a++){
-                data[a]=part[aut->transdet[a][i]]; //store the partitions of destinations in data
-            }
-            //clear the data
-            //for(uint j=0;j<N;j++) data[nl+j]=0;
-            
-            for(uint j=0;j<N;j++){
-                //store the partition of the sups
-                uint supstate=aut->orig[i]|aut->orig[j];
-                data[nl+j]=part[aut->names[supstate]];
-                
-            }
-            data[nl+N]=part[i]; //last index encodes previous partition
-            auto it = vectors.emplace(data,i);
-            
-            //if vector is new, we increase new_nb_part
-            if(it.second){
-                part[i]=new_nbpart; //take the current identifier
-                original[new_nbpart]=i;// memorize an original state of this identifier
-                new_nbpart++;
-            } else {
-                part[i]=part[it.first->id]; //point to same representant as existing one
-            }
-            //maybe replace this with monotonicity instead of equality later...
-            
-        }
-        
-    }
-    
-    //after stabilization, compute new transition table.
-    
-    ClassicEpsAut *MinAut=new ClassicEpsAut(aut->NbLetters,nbpart);
-    
-    //initial and final states
-    MinAut->initial=part[aut->initial];
-    
-    for(uint i=0;i<nbpart;i++){
-        MinAut->finalstate[i]=aut->finalstate[original[i]];
-    }
-    
-    //det transitions
-    for(unsigned char a=0;a<nl;a++){
-        for(uint n=0;n<nbpart;n++){
-            MinAut->transdet[a][n]=part[aut->transdet[a][original[n]]];
-        }
-    }
-    
-    //epsilon transitions
-    for(uint i=0;i<nbpart;i++){
-        for(uint j=0;j<nbpart;j++){
-            MinAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
-        }
-    }
-#if VERBOSE_AUTOMATA_COMPUTATION
-    MinAut->print();
-#endif
-    return MinAut;
-}
 
 
 void MultiCounterAut::set_trans(unsigned char a, const MultiCounterMatrix * mat)

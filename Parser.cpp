@@ -76,10 +76,10 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
             try
         {
             ret->finalStates.push_back(stoi(line));
-            //	  cout << "Final state: " << i << ":"  << stoi(line) << endl;
+            	 // cout << "Final state: " << i << ":"  << stoi(line) << endl;
         }
         catch(const exception & exc){ throw runtime_error("Error while parsing final states, could not parse '" + line + "' to integer"); }
-        i++;
+        //i++;
     }
     
     for(int i=0;i<alphabet.length();i++) {
