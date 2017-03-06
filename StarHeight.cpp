@@ -257,7 +257,6 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k){
     MultiCounterEpsAut* EpsBaut=new MultiCounterEpsAut(nl,N,k+1);
     
     //the last state on the pile is the remainder modulo ns
-    
     //initial states are the ones from SubAut of length 1, i.e. the same
     for(uint i=0;i<ns;i++){ EpsBaut->initialstate[i]=(Subsetaut->initial==i); }
     
@@ -269,20 +268,14 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k){
     }
     
     //TRANSITION table
-    
     if(debug) cout << "Adding transitions..." << endl;
     
     uint l,bound;
-    
-    l=1;//length of the sequence
-    bound=ns;//next time the length increases
-    
+    l=1; //length of the sequence
+    bound=ns; //next time the length increases
     
     ExplicitMatrix trans_eps_mat(VectorInt::GetStateNb()); //stores eps trans
     trans_eps_mat.clear(MultiCounterMatrix::bottom());
-    
-    
-    // trans_eps_mat.print();
     
     for(uint i=0;i<N;i++){
         if(i==bound)
@@ -333,27 +326,12 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k){
     //trans_eps_mat.print();
     EpsBaut->set_trans_eps(trans_eps_mat);
     
-    /*
-     if(debug){
-     cout << "****************************************" << endl << "MultiCounterEpsAut " << endl << "****************************************" << endl;
-     EpsBaut->print();
-     ofstream file("multicountereps_automaton.txt");
-     trans_eps_mat.print(file);
-     }
-     */
-    
     ofstream file("multicountereps_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
     EpsBaut->print(file);
     
     if(debug) cout << "Removing epsilon transitions..." << endl;
     
     auto epsremoved = EpsRemoval(EpsBaut);
-    /*
-     if(debug){
-     cout << "****************************************" << endl << "Epsilon removed " << endl << "****************************************" << endl;
-     ofstream file2("epsremoved_automaton.txt");
-     epsremoved->print(file2);
-     }*/
     
     ofstream file2("epsremoved_stnb_"+ to_string(VectorInt::GetStateNb()) + ".txt");
     epsremoved->print(file2);
