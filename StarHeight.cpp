@@ -277,6 +277,7 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k){
     l=1;//length of the sequence
     bound=ns;//next time the length increases
     
+
     ExplicitMatrix trans_eps_mat(VectorInt::GetStateNb()); //stores eps trans
     trans_eps_mat.clear(MultiCounterMatrix::bottom());
     

@@ -74,6 +74,10 @@ public:
 	//unique initial state
 	uint initial;
 	
+	//powerset information
+	vector<uint> orig; //get the original encoding of a state, i.e. its powerset encoding
+	vector<uint> names; //from powerset encoding to the new name. return >NbStates if not assigned
+	
 	virtual void print(ostream& st = cout);
 
 };
@@ -84,9 +88,11 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut);
 
 //pruning of subset automata: remove non-accessible and non co-accessible states
 ClassicEpsAut* SubPrune(ClassicEpsAut *aut);
+ClassicEpsAut* SubPruneSink(ClassicEpsAut *aut);
 
 //Minimisation of subset automata
 ClassicEpsAut* SubMin(ClassicEpsAut *aut);
+ClassicEpsAut* SubMinPre(ClassicEpsAut *aut);
 
 class charMat
 {

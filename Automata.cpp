@@ -401,7 +401,7 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 	for(unsigned char a=0;a<aut->NbLetters;a++){
 		for(uint n=0;n<nb_pruned;n++){
 			uint dd=names[aut->transdet[a][original[n]]];
-			if (dd==N) dd=nb_pruned; //to sink state if non-defined (sink actually absent now)
+			if (dd>=nb_pruned) dd=nb_pruned; //to sink state if non-defined (sink actually absent, virtual state)
 			PruneAut->transdet[a][n]=dd;
 		}
 		//PruneAut->transdet[a][nb_pruned]=nb_pruned; //self-loop on the sink state
@@ -413,6 +413,9 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 			PruneAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
 		}
 	}
+	PruneAut->orig=original;
+	PruneAut->names=names;
+	
 	//PruneAut->trans_eps[nb_pruned][nb_pruned]=true; // epsilon self-loop on the sink state
 	#if VERBOSE_AUTOMATA_COMPUTATION
 		PruneAut->print();
@@ -420,11 +423,262 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
 	return PruneAut;
 }
 
-//Minimization of subset automata, too strict for now.
+
+//pruning of subset automata: remove non-accessible and non co-accessible states, keep the sink as an explicit state
+ClassicEpsAut* SubPruneSink(ClassicEpsAut *aut){
+	uint N=aut->NbStates;
+	uint nl=aut->NbLetters;
+	
+	/* reachability algorithm, inspired from "DFA_minimization" Wikipedia page */
+	unordered_set<uint> reachable; // reachable states
+	unordered_set<uint> new_states;
+	reachable.insert(aut->initial);
+	new_states.insert(aut->initial); //only initial state at first.
+	while(! new_states.empty()){
+		unordered_set<uint> temp;
+		for (auto q: new_states){
+		 //cout <<" treating state "<<q<<endl;
+			for(unsigned char a=0;a<nl;a++){
+				uint p=aut->transdet[a][q]; // treat a-successors
+				//cout <<" succ "<<p<<endl;
+				if(reachable.find(p)==reachable.end()){ //if not already in reachable
+					temp.insert(p);
+					reachable.insert(p);
+				}
+			}
+			//treat epsilon-successors
+			for (uint p=0;p<N;p++){ //not efficient, sparse matrix for epsilons later ?
+				if (aut->trans_eps[q][p] && reachable.find(p)==reachable.end()){
+					temp.insert(p); //add new eps-successors
+					reachable.insert(p);
+				}
+			}
+		}
+		new_states=temp;
+	}
+	
+	//cout<<reachable.size()<<" reachable states"<<endl;
+	
+    /* Same  with co-reachability */
+    unordered_set<uint> coreachable; // reachable and coreachable states
+    new_states.clear(); //should be useless
+    for (uint p: reachable){ //start from final reachable states
+    	if(aut->finalstate[p]) {
+    		coreachable.insert(p);
+    		new_states.insert(p);
+    	}
+    }
+    //same with transitions in reverse order, so no more determinism
+    while(! new_states.empty()){
+		unordered_set<uint> temp;
+		for (uint q: new_states){
+			//treat epsilon-successors
+			for (uint p:reachable){ //iterate only over reachable p
+				if (aut->trans_eps[p][q] && coreachable.find(p)==coreachable.end()){
+					temp.insert(p); //add new eps-predecessors
+					coreachable.insert(p);
+				}
+				for(unsigned char a=0;a<nl;a++){
+					if (aut->transdet[a][p]==q && coreachable.find(p)==coreachable.end()){
+						temp.insert(p); //add new a-predecessors
+						coreachable.insert(p);
+					}
+				}
+			}
+		}
+		new_states=temp;
+	}
+    
+    //now restric aut to reachable and co-reachable (valid) states
+    
+    vector<uint> names(N+1,N); //N stands for not valid
+    //rename valid states
+    uint nb_pruned=0;
+    vector<uint> original; //correspondance in the other way
+    for(auto p:coreachable){
+    	names[p]=nb_pruned;
+    	original.push_back(p);
+    	nb_pruned++;
+    }	
+    //rename unreachable states
+    bool ren=true;
+    for(uint p=0;p<N;p++){
+    	if(names[p]>=nb_pruned) {
+    		names[p]=nb_pruned;
+    		if(ren) {
+    			original.push_back(p);
+    			ren=false;
+    		 }
+    	}
+    }
+    
+  	//cout<<nb_pruned<<" states after pruning"<<endl;
+  	ClassicEpsAut *PruneAut=new ClassicEpsAut(nl,nb_pruned+1);
+  	//we add a sink state nb_pruned	
+  	
+  	//initial and final states
+	PruneAut->initial=names[aut->initial];
+	PruneAut->initialstate[PruneAut->initial]=true;
+		
+	for(uint i=0;i<nb_pruned;i++){
+		PruneAut->finalstate[i]=aut->finalstate[original[i]];
+		#if VERBOSE_AUTOMATA_COMPUTATION
+			cout<<i<<": {";
+			uint orig=original[i];
+			uint k=0;
+			while(orig!=0){
+				if (orig & 1) {
+					cout<<k;
+					if(orig>1) cout<<",";
+				}
+				k++;
+				orig=orig>>1;
+			}
+			cout <<"}";
+			if (PruneAut->initialstate[i]) cout<<" initial";
+			if (PruneAut->finalstate[i]) cout<<" final";
+			cout<<endl;
+		#endif
+	}
+	//sink not accepting
+	PruneAut->finalstate[nb_pruned]=false;
+	
+	//det transitions
+	for(unsigned char a=0;a<aut->NbLetters;a++){
+		for(uint n=0;n<nb_pruned;n++){
+			uint dd=names[aut->transdet[a][original[n]]];
+			if (dd>=nb_pruned) dd=nb_pruned; //to sink state if non-defined
+			PruneAut->transdet[a][n]=dd;
+		}
+		PruneAut->transdet[a][nb_pruned]=nb_pruned; //self-loop on the sink state
+	}
+	
+	//epsilon transitions
+	for(uint i=0;i<nb_pruned;i++){
+		for(uint j=0;j<nb_pruned;j++){
+			PruneAut->trans_eps[i][j]=aut->trans_eps[original[i]][original[j]];
+		}
+	}
+	PruneAut->orig=original;
+	PruneAut->names=names;
+	
+	PruneAut->trans_eps[nb_pruned][nb_pruned]=true; // epsilon self-loop on the sink state
+	#if VERBOSE_AUTOMATA_COMPUTATION
+		PruneAut->print();
+	#endif
+	return PruneAut;
+}
+
+//Minimization of subset automata with preorders
+ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
+	uint N=aut->NbStates;
+	uint nl=aut->NbLetters;
+	vector<vector<bool>> preorder(N);  //we assume the automaton is complete
+	//initialisation
+	for(uint i=0;i<N;i++){
+		preorder[i].resize(N); 
+		bool bi=aut->finalstate[i];
+		for(uint j=0;j<N;j++){
+			//final below non-final
+			bool bj=aut->finalstate[j];
+			preorder[i][j]= bi || !bj; // only non-equivalence if when i is not final and j is.
+		}	
+	}
+	
+	bool search=true;
+	cout<<"preorder initiated"<<endl;
+	
+	//cout<<"minimisation"<<endl;
+	while(search){
+		vector<vector<bool>> new_pre(N); 
+		//initialisation
+		search=false;
+		for(uint i=0;i<N;i++){
+			new_pre[i].resize(N,false); 
+			for(uint j=0;j<N;j++){
+				if (! preorder[i][j]) break;
+				unsigned char a;
+				for(a=0;a<nl;a++){
+					//cout<<"transdet"<<endl;
+					uint p=aut->transdet[a][i];
+					uint q=aut->transdet[a][j];
+					if (!preorder[p][q]) {search=true;break;}
+				}
+				if (a<nl) continue;
+				uint k;
+				for(k=0;k<N;k++){
+					//cout<<"accessing names and orig"<<endl;
+					uint p=aut->names[aut->orig[i]|aut->orig[k]];
+					uint q=aut->names[aut->orig[j]|aut->orig[k]];
+					if (!preorder[p][q]) {search=true;break;}
+				}
+				if(k<N) continue;
+				new_pre[i][j]=true;
+			}
+		}
+		preorder=new_pre;
+	}
+	
+	cout<<"preorder created"<<endl;
+	
+	//build the Min automaton from the preorder.
+	
+	vector<uint> repr(N); //new names
+	vector<uint> prev; //previous names
+	uint nb=0;
+	for(uint i=0;i<N;i++){
+		bool found=false;
+		for(int j=0;j<i;j++){
+			if(preorder[i][j] && preorder[j][i]){
+				//equivalent element found
+				repr[i]=repr[j];
+				found=true;
+				break;
+			}
+		}
+		if(!found) {
+			repr[i]=nb;
+			prev.push_back(nb);
+			nb++;
+		}
+	}
+	
+	
+	ClassicEpsAut *MinAut=new ClassicEpsAut(nl,nb);
+	cout<<"minAut created"<<endl;
+	//initial and final states
+	MinAut->initial=repr[aut->initial];
+	
+	for(uint i=0;i<nb;i++){
+		MinAut->finalstate[i]=aut->finalstate[prev[i]];
+	}
+	
+	//det transitions
+	for(unsigned char a=0;a<nl;a++){
+		for(uint n=0;n<nb;n++){
+			MinAut->transdet[a][n]=repr[aut->transdet[a][prev[n]]];
+		}
+	}
+	
+	//epsilon transitions
+	for(uint i=0;i<nb;i++){
+		for(uint j=0;j<nb;j++){
+			MinAut->trans_eps[i][j]=preorder[prev[i]][prev[j]];
+		}
+	}
+	#if VERBOSE_AUTOMATA_COMPUTATION
+		MinAut->print();
+	#endif
+	return MinAut;	
+}
+
+
+//Minimization of subset automata, first try, not really working
 ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 	uint N=aut->NbStates;
 	uint nl=aut->NbLetters;
-	uint *part=(uint *)malloc(N*sizeof(uint)); //array containing the number of the partition.
+	uint *part=(uint *)malloc((N+1)*sizeof(uint)); //array containing the number of the partition. 
+	part[N]=N; //sink points to itself
 	
 	VectorUInt::SetSize(nl+N+1);
 	
@@ -449,17 +703,18 @@ ClassicEpsAut* SubMin(ClassicEpsAut *aut){
 		nbpart=new_nbpart;
 		new_nbpart=0;
 		//printf("nbpart:%d\n",nbpart);
-		//cout<<nbpart<<endl;
+		cout<<nbpart<<endl;
 		for(uint i=0;i<N;i++){
 			for(unsigned char a=0;a<nl;a++){
 				data[a]=part[aut->transdet[a][i]]; //store the partitions of destinations in data
 			}
 			//clear the data
-			for(uint j=0;j<N;j++) data[nl+j]=0;
+			//for(uint j=0;j<N;j++) data[nl+j]=0;
 			
 			for(uint j=0;j<N;j++){		
-				if(data[nl+part[j]]==0) //if not already reached
-					data[nl+part[j]]=(aut->trans_eps[i][j])? 1: 0; //profile of epsilon transitions
+				//store the partition of the sups
+				uint supstate=aut->orig[i]|aut->orig[j];
+				data[nl+j]=part[aut->names[supstate]];
 			
 			}
 			data[nl+N]=part[i]; //last index encodes previous partition

@@ -121,7 +121,6 @@ int main(int argc, char **argv)
     }
     else if (expa->type==CLASSICAL)
     {
-        
         ClassicAut aut(*expa);
         if(!aut.isdet()) {
             cout << "Only deterministic automata are handled" << endl;
