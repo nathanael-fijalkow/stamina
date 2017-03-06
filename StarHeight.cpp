@@ -353,7 +353,7 @@ int computeStarHeight( ClassicAut & aut,
     int LC = (int)res.first ;
     list<uint> order = res.second;
     RegExp * regexpr = Aut2RegExp( &aut , order );
-
+	if(regexpr->starheight<LC) LC=regexpr->starheight;
     list<ExtendedExpression *> sharplist = Reg2Sharps(regexpr);
 
     if(regexpr == NULL || sharplist.size()==0)// empty language
@@ -371,7 +371,8 @@ int computeStarHeight( ClassicAut & aut,
         regexpr->print();
         cout << endl;
     }
-    
+    int h=0;
+    if (LC!=0){
     if(verbose) cout << endl << "************STAR HEIGHT COMPUTATION**********" << endl;
     if(verbose) cout << "Computing the Subset Automaton..." << endl;
     
@@ -401,7 +402,7 @@ int computeStarHeight( ClassicAut & aut,
         Subsetaut->print(file);
     }
     
-    int h = 0;
+    h = 1;
     
     while (h<LC){
         if(verbose) {
@@ -478,6 +479,7 @@ int computeStarHeight( ClassicAut & aut,
             monoid = NULL;
         }
         h++;
+    }
     }
     if(h==LC && verbose){
         cout << endl << "RESULTS: the star height is " << LC << ", matching the Loop Complexity, and a regular expression witnessing it is ";
