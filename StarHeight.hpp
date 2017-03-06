@@ -36,8 +36,8 @@ MultiCounterAut* toNestedBaut(ClassicEpsAut *SubsetAut, char k, string filepref 
 
 /* Compute the star height and return monoid and witness*/
 int computeStarHeight(ClassicAut & aut,
-                      UnstableMultiMonoid* monoid,
-                      const ExtendedExpression * witness,
+                      UnstableMultiMonoid * & monoid,
+                      const ExtendedExpression * & witness,
                       bool filelogs,
                       bool verbose,
                       string filepref = ""

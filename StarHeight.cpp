@@ -340,8 +340,8 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k, string filepref
 }
 
 int computeStarHeight( ClassicAut & aut,
-                      UnstableMultiMonoid * monoid,
-                      const ExtendedExpression * witness,
+                      UnstableMultiMonoid * & monoid,
+                      const ExtendedExpression * & witness,
                       bool filelogs,
                       bool verbose,
                       string filepref
@@ -465,6 +465,8 @@ int computeStarHeight( ClassicAut & aut,
                 delete monoid;
                 h++;
             }
+        } else {
+            delete monoid;
         }
     }
     if(h==LC && verbose){
