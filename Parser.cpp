@@ -72,7 +72,7 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
     
     getfline(file,line);
     istringstream iss(line);
-    while(getfline(iss,line,' '))
+    while(getfline(iss,line,' ')) {
         try
         {
             ret->finalStates.push_back(stoi(line));
@@ -81,6 +81,7 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
         {
             throw runtime_error("Error while parsing final states, could not parse line" + line + " to integer");
         }
+    }
     
     
     for(int i=0;i<alphabet.length();i++) {

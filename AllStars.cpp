@@ -215,9 +215,8 @@ int main(int argc, char **argv)
                     }
                 }
             }
-            else {
-                if(!inc_mat_and_states()) break;
-            }
+            if(!random_mode && !inc_mat_and_states())
+                break;
         }
         delete expa;
         if(nb >= aut_id) break;
