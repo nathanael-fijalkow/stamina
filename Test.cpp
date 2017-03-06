@@ -133,6 +133,8 @@ int main(int argc, char **argv)
             ofstream ofs(outputFilename + ".dot");
             ofs << Dot::toDot(expa,monoid, -1);
         }
+        delete expa;
+        delete monoid;
     }
     return 0;
 }
