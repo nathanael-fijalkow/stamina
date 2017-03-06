@@ -34,14 +34,17 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut);
 MultiCounterAut* toNestedBaut(
                               ClassicEpsAut *SubsetAut,
                               char k,
-                              string filepref = "",
-                              bool debug = true);
+                              bool debug = true,
+                              bool output_file = true,
+                              string filepref = ""
+);
 
 
 /* Compute the star height and return monoid and witness*/
 int computeStarHeight(ClassicAut & aut,
                       UnstableMultiMonoid * & monoid,
                       const ExtendedExpression * & witness,
+                      int & loopComplexity,
                       bool filelogs,
                       bool verbose,
                       string filepref = ""
