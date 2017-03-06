@@ -4,6 +4,7 @@
 #include "Matrix.hpp"
 #include "MarkovMonoid.hpp"
 #include "StabilisationMonoid.hpp"
+#include "StarHeight.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -23,6 +24,11 @@ int main(int argc, char **argv)
 
 	unsigned int seed = time(NULL);
 
+    while(true) {
+        MultiCounterAut *Baut = toNestedBaut(Subsetaut, h);
+        UnstableMultiMonoid monoid(*Baut);
+    }
+    
 	unsigned int nb_samples = 100;
 
 	int max_state_nb = 15;
