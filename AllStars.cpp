@@ -101,7 +101,7 @@ int main(int argc, char **argv)
                 auto end = std::chrono::high_resolution_clock::now();
                 auto ctime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-                if(monoid != NULL && h>0) {
+                if(monoid != NULL) {
                     cout << "StarHeight " << h << endl;
                     ofstream file(filename.str() + ".csv", ofstream::app);
                     file << nb << ";" << stnb << ";" << monoid->expr_to_mat.size();
@@ -109,16 +109,13 @@ int main(int argc, char **argv)
                     file << ";" << h << ";"  << ctime << endl;
                     file.close();
                     delete monoid;
-                } else if(h > 0) {
+                } else  {
                     cout << "StarHeight " << h << endl;
                     ofstream file(filename.str() + ".csv", ofstream::app);
                     file << nb << ";" << stnb << ";" << 0;
                     file << ";" << 0 << ";" << 0;
                     file << ";" << h << ";"  << ctime << endl;
                     file.close();
-                }
-                else {
-                    cout << "Automaton #" << nb << " empty language" << endl;
                 }
             }
             
