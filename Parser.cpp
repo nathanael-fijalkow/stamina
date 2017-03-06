@@ -68,19 +68,20 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
     }
     catch(const exception & exc){ throw runtime_error("Error while parsing initial states, could not parse '" + line + "' to integer"); }
     
+    ret->finalStates.clear();
+    
     getfline(file,line);
     istringstream iss(line);
-    for(int i=0;i<size;i++){
-        getfline(iss,line,' ');
-        if(!line.empty())
-            try
+    while(getfline(iss,line,' '))
+        try
         {
             ret->finalStates.push_back(stoi(line));
-            	 // cout << "Final state: " << i << ":"  << stoi(line) << endl;
         }
-        catch(const exception & exc){ throw runtime_error("Error while parsing final states, could not parse '" + line + "' to integer"); }
-        //i++;
-    }
+        catch(const exception & exc)
+        {
+            throw runtime_error("Error while parsing final states, could not parse line" + line + " to integer");
+        }
+    
     
     for(int i=0;i<alphabet.length();i++) {
         ExplicitMatrix mat(size);
