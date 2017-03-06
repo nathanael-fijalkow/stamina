@@ -104,7 +104,15 @@ int main(int argc, char **argv)
                     file << ";" << h << endl;
                     file.close();
                     delete monoid;
-                } else {
+                } else if(h > 0) {
+                    cout << "SharpHeight " << h << endl;
+                    ofstream file(filename.str() + ".csv", ofstream::app);
+                    file << nb << ";" << stnb << ";" << 0;
+                    file << ";" << 0 << ";" << 0;
+                    file << ";" << h << endl;
+                    file.close();
+                }
+                else {
                     cout << "Automaton #" << nb << " empty language" << endl;
                 }
             }

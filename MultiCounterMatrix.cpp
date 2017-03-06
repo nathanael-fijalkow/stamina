@@ -3,7 +3,7 @@
 #include <chrono>
 #include <unordered_map>
 
-#define TIME_BENCHMARKS 0
+#define TIME_BENCHMARKS 1
 
 //Constructor
 void MultiCounterMatrix::init()

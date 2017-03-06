@@ -460,11 +460,13 @@ int computeStarHeight( ClassicAut & aut,
                 }
                 delete Baut;
                 delete monoid;
-                h++;
+                monoid = NULL;
             }
         } else {
             delete monoid;
+            monoid = NULL;
         }
+        h++;
     }
     if(h==LC && verbose){
         cout << endl << "RESULTS: the star height is " << LC << ", matching the Loop Complexity, and a regular expression witnessing it is ";
