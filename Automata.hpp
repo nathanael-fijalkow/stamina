@@ -88,9 +88,11 @@ ClassicEpsAut* toSubsetAut(ClassicAut *aut);
 
 //pruning of subset automata: remove non-accessible and non co-accessible states
 ClassicEpsAut* SubPrune(ClassicEpsAut *aut);
+ClassicEpsAut* SubPruneSink(ClassicEpsAut *aut);
 
 //Minimisation of subset automata
 ClassicEpsAut* SubMin(ClassicEpsAut *aut);
+ClassicEpsAut* SubMinPre(ClassicEpsAut *aut);
 
 class charMat
 {

@@ -491,7 +491,7 @@ ClassicEpsAut* SubPruneSink(ClassicEpsAut *aut){
     
     //now restric aut to reachable and co-reachable (valid) states
     
-    vector<uint> names(N,N); //N stands for not valid
+    vector<uint> names(N+1,N); //N stands for not valid
     //rename valid states
     uint nb_pruned=0;
     vector<uint> original; //correspondance in the other way
@@ -499,7 +499,7 @@ ClassicEpsAut* SubPruneSink(ClassicEpsAut *aut){
     	names[p]=nb_pruned;
     	original.push_back(p);
     	nb_pruned++;
-    }
+    }	
     //rename unreachable states
     bool ren=true;
     for(uint p=0;p<N;p++){
@@ -586,36 +586,90 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
 	}
 	
 	bool search=true;
+	cout<<"preorder initiated"<<endl;
 	
 	//cout<<"minimisation"<<endl;
 	while(search){
-		vector<vector<bool>> new_pre(N);  //there is an implicit sink state N
+		vector<vector<bool>> new_pre(N); 
 		//initialisation
 		search=false;
 		for(uint i=0;i<N;i++){
 			new_pre[i].resize(N,false); 
 			for(uint j=0;j<N;j++){
 				if (! preorder[i][j]) break;
-				for(unsigned char a=0;a<nl;a++){
-					uint p=aut->transdet[a][p];
-					uint q=aut->transdet[a][q];
+				unsigned char a;
+				for(a=0;a<nl;a++){
+					//cout<<"transdet"<<endl;
+					uint p=aut->transdet[a][i];
+					uint q=aut->transdet[a][j];
 					if (!preorder[p][q]) {search=true;break;}
 				}
-				for(uint k=0;k<N;k++){
+				if (a<nl) continue;
+				uint k;
+				for(k=0;k<N;k++){
+					//cout<<"accessing names and orig"<<endl;
 					uint p=aut->names[aut->orig[i]|aut->orig[k]];
 					uint q=aut->names[aut->orig[j]|aut->orig[k]];
 					if (!preorder[p][q]) {search=true;break;}
 				}
+				if(k<N) continue;
 				new_pre[i][j]=true;
 			}
 		}
 		preorder=new_pre;
 	}
+	
+	cout<<"preorder created"<<endl;
+	
 	//build the Min automaton from the preorder.
 	
+	vector<uint> repr(N); //new names
+	vector<uint> prev; //previous names
+	uint nb=0;
+	for(uint i=0;i<N;i++){
+		bool found=false;
+		for(int j=0;j<i;j++){
+			if(preorder[i][j] && preorder[j][i]){
+				//equivalent element found
+				repr[i]=repr[j];
+				found=true;
+				break;
+			}
+		}
+		if(!found) {
+			repr[i]=nb;
+			prev.push_back(nb);
+			nb++;
+		}
+	}
 	
-	return NULL;	
 	
+	ClassicEpsAut *MinAut=new ClassicEpsAut(nl,nb);
+	cout<<"minAut created"<<endl;
+	//initial and final states
+	MinAut->initial=repr[aut->initial];
+	
+	for(uint i=0;i<nb;i++){
+		MinAut->finalstate[i]=aut->finalstate[prev[i]];
+	}
+	
+	//det transitions
+	for(unsigned char a=0;a<nl;a++){
+		for(uint n=0;n<nb;n++){
+			MinAut->transdet[a][n]=repr[aut->transdet[a][prev[n]]];
+		}
+	}
+	
+	//epsilon transitions
+	for(uint i=0;i<nb;i++){
+		for(uint j=0;j<nb;j++){
+			MinAut->trans_eps[i][j]=preorder[prev[i]][prev[j]];
+		}
+	}
+	#if VERBOSE_AUTOMATA_COMPUTATION
+		MinAut->print();
+	#endif
+	return MinAut;	
 }
 
 
