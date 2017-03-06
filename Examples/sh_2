@@ -1,4 +1,4 @@
-% This automaton recognises b*(b*ab*a)*, so star-height is 2
+% This automaton recognises (b*ab*a)*b*, so star-height is 2
 2
 c
 ab

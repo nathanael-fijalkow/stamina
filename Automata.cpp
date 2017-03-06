@@ -587,20 +587,21 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
         for(uint j=0;j<N;j++){
             //final below non-final
             bool bj=aut->finalstate[j];
-            preorder[i][j]= bi || !bj; // only non-equivalence if when i is not final and j is.
+            preorder[i][j]= bi || !bj; // only non-equivalence is when i is not final and j is.
         }
     }
     
     bool search=true;
-    cout<<"preorder initiated"<<endl;
+    //cout<<"preorder initialized"<<endl;
     
     //cout<<"minimisation"<<endl;
     while(search){
-        cout <<"Iteration"<<endl;
+       // cout <<"Iteration"<<endl;
         vector<vector<bool>> new_pre(N);
         //initialisation
         search=false;
         for(uint i=0;i<N;i++){
+        	new_pre[i].clear();
             new_pre[i].resize(N,false);
             for(uint j=0;j<N;j++){
                 if (! preorder[i][j]) continue; //already separated
@@ -623,13 +624,13 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
                 }
                 if(k<N) continue;
                 new_pre[i][j]=true; //stay related
-                printset(i);cout<<" <= ";printset(j);cout<<endl;
+                //printset(i);cout<<" <= ";printset(j);cout<<endl;
             }
         }
         preorder=new_pre;
     }
     
-    cout<<"preorder created"<<endl;
+    //cout<<"preorder created"<<endl;
     
     //build the Min automaton from the preorder.
     
@@ -643,14 +644,14 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
             if(preorder[i][j] && preorder[j][i]){
                 //equivalent element found
                 repr[i]=repr[j];
-                cout<<"merging ";printset(i);cout<<" and ";printset(j);cout<<endl;
+                //cout<<"merging ";printset(i);cout<<" and ";printset(j);cout<<endl;
                 found=true;
                 break;
             }
         }
         if(!found) {
             repr[i]=nb;
-            printset(i);cout <<" affected to "<<nb<<endl;
+           // printset(i);cout <<" affected to "<<nb<<endl;
             prev.push_back(i);
             nb++;
         }
@@ -659,7 +660,7 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
     
     
     ClassicEpsAut *MinAut=new ClassicEpsAut(nl,nb);
-    cout<<"minAut created"<<endl;
+    //cout<<"minAut created"<<endl;
     //initial and final states
     MinAut->initial=repr[aut->initial];
     MinAut->initialstate[MinAut->initial]=true;

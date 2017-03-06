@@ -396,7 +396,7 @@ int computeStarHeight( ClassicAut & aut,
     
     if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
 
-    //Subsetaut=SubMinPre(Subsetaut); //optional for now, to test later
+    Subsetaut=SubMinPre(Subsetaut); //optional for now, to test later
     Subsetaut=SubPrune(Subsetaut);
     
     ns=Subsetaut->NbStates;
