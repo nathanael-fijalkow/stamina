@@ -163,8 +163,8 @@ ConcatRegExp::ConcatRegExp(RegExp *e1, RegExp *e2)
 
 ConcatRegExp::~ConcatRegExp() 
 {
-	delete left; 
-	delete right;
+    delete left; left = NULL;
+    delete right; right = NULL;
 }
 UnionRegExp::UnionRegExp(RegExp *e1, RegExp *e2)
 {
@@ -175,8 +175,8 @@ UnionRegExp::UnionRegExp(RegExp *e1, RegExp *e2)
 }
 UnionRegExp::~UnionRegExp() 
 {
-	delete left;
-	delete right;
+    delete left; left = NULL;
+    delete right; right = NULL;
 }
 
 StarRegExp::StarRegExp(RegExp *e1)
@@ -191,7 +191,7 @@ StarRegExp::StarRegExp(RegExp *e1)
 
 StarRegExp::~StarRegExp() 
 {
-	delete base; 
+    delete base; base = NULL;
 }
 
 bool RegExp::operator ==(const RegExp* r) const
@@ -392,8 +392,9 @@ struct UnionListRegExp : RegExp
 		starheight=m;
 	}
 	~UnionListRegExp(){
-		for(RegExp *e: sons)
-			delete e;
+        for(auto & e: sons) {
+            delete e; e = NULL;
+        }
 	}
 	virtual void print() const {
 		bool f=true;

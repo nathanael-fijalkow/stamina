@@ -23,7 +23,7 @@ public:
 	// The set containing the known small matrices
 	unordered_set <MultiCounterMatrix> matrices;
 
-	//Returns null if no witness, otherwise a witness
+	//Returns NULL if no witness, otherwise a witness
 	const ExtendedExpression * containsUnlimitedWitness();
     
 	static bool IsUnlimitedWitness(const Matrix * matrix);

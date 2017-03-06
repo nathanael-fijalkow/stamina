@@ -137,8 +137,8 @@ int main(int argc, char **argv)
             ofs << Dot::toDot(expa,monoid, -1);
         }
         
-        delete expa;
-        delete monoid;
+        delete expa; expa = NULL;
+        delete monoid; monoid = NULL;
     }
     return 0;
 }

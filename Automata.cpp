@@ -800,8 +800,9 @@ MultiCounterAut::MultiCounterAut(char Nletters,uint Nstates, char Ncounters){
 
 MultiCounterAut::~MultiCounterAut()
 {
-    for(auto t : trans)
-        delete t.second;
+    for(auto & t : trans) {
+        delete t.second; t.second = NULL;
+    }
     trans.clear();
 };
 
@@ -1081,11 +1082,11 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
         if(debug || VectorInt::GetStateNb() > 100 || (steps % 100 == 99)) {
             cout << "Removing eps transitions step " << steps <<  endl;
         }
-        delete prev_eps;
+        delete prev_eps; prev_eps = NULL;
         prev_eps = new_eps;
         new_eps =  (*new_eps) * (*new_eps);
     }
-    delete prev_eps;
+    delete prev_eps; prev_eps = NULL;
     
     //update matrices of each letter : new_a=e*ae*
     for(char a=0;a<nl;a++){
@@ -1097,9 +1098,9 @@ MultiCounterAut* EpsRemoval(MultiCounterEpsAut *epsaut){
         aut->set_trans(a, (*new_eps) * (*ae));
         
         //cleanup
-        delete ae;
+        delete ae; ae = NULL;
     }
-    delete new_eps;
+    delete new_eps; new_eps = NULL;
     
     return aut;
 }

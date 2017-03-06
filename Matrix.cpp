@@ -102,7 +102,7 @@ const Vector * Matrix::sub_prod(const Vector * vec, const Vector ** mat){
 		return Matrix::zero_vector;
 		*/
 	auto it = vectors.emplace(new_vec, Vector::GetStateNb()).first;
-	free(new_vec);
+    free(new_vec); new_vec = NULL;
 	//cout << "Final result "; (*it).print(); cout << endl;
 	return &(*it);
 }

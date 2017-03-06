@@ -44,7 +44,7 @@ UnstableMultiMonoid::UnstableMultiMonoid(const MultiCounterAut & automata)
          */
         auto mat = automata.get_trans(letter)->toExplicitMatrix();
 		addLetter(letter, *mat);
-        free(mat);
+        free(mat); mat = NULL;
 	}
 
 	for (int i = 0; i < automata.NbStates; i++)
@@ -124,7 +124,7 @@ const MultiCounterMatrix * UnstableMultiMonoid::ExtendedExpression2Matrix(
 	if(isLetterExpr(expr)){
 		auto mat = automata.get_trans(lexpr->letter)->toExplicitMatrix();
         auto res = addLetter(lexpr->letter, *mat);
-        delete mat;
+        delete mat; mat = NULL;
         return (const MultiCounterMatrix*) res;
 	}
 	else

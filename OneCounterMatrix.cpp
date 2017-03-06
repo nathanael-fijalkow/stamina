@@ -336,10 +336,11 @@ Matrix * OneCounterLargeMatrix::stab() const
 
 	free(new_row);
 	free(new_col);
-
 	free(diags[RESET]);
 	free(diags[EPS]);
 	free(diags[OM]);
+    new_row = new_col = NULL;
+    diags[RESET] = diags[EPS] = diags[OM] = NULL;
 
 	result->update_hash();
 	return result;
@@ -438,7 +439,7 @@ const Vector * OneCounterLargeMatrix::sub_prodor(const Vector * vec, const Vecto
 		new_vec[j] |= vecor->bits[j];
 
 	auto it = vectors.emplace(new_vec).first;
-	free(new_vec);
+    free(new_vec); new_vec = NULL;
 	//cout << "Final result "; (*it).print(); cout << endl;
 	return &(*it);
 }
@@ -493,7 +494,7 @@ const Vector * OneCounterLargeMatrix::sub_prod2(const Vector * vec1, const Vecto
 
 	auto it = vectors.emplace(new_vec);
 
-	free(new_vec);
+    free(new_vec); new_vec = NULL;
 
 	//cout << "Final result "; (*it).print(); cout << endl;
 	return &(*it.first);

@@ -108,7 +108,7 @@ int main(int argc, char **argv)
                     file << ";" << monoid->rewriteRules.size() << ";" << int_vectors.size();
                     file << ";" << h << ";"  << ctime << endl;
                     file.close();
-                    delete monoid;
+                    delete monoid; monoid = NULL;
                 } else  {
                     cout << "StarHeight " << h << endl;
                     ofstream file(filename.str() + ".csv", ofstream::app);

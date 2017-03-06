@@ -86,8 +86,8 @@ void MultiCounterMatrix::set_counter_and_states_number(char NbCounters, uint NbS
     }
     
     //set_zero_vector
-    vector<char> nullvec(NbStates, bottom());
-    auto it = int_vectors.emplace(nullvec).first;
+    vector<char> NULLvec(NbStates, bottom());
+    auto it = int_vectors.emplace(NULLvec).first;
     zero_int_vector = &(*it);
     
 }
@@ -140,7 +140,7 @@ MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix)
         rows[i] = &(*itr);
         cols[i] = &(*itc);
     }
-    free(row); free(col);
+    free(row); free(col); row = NULL; col = NULL;
 #if USE_REDUNDANCE_HEURISTIC
     update_red();
 #endif
@@ -164,7 +164,7 @@ MultiCounterMatrix::MultiCounterMatrix(unsigned char diag, unsigned char nondiag
         rows[i] = &(*itr);
         cols[i] = &(*itc);
     }
-    free(row); free(col);
+    free(row); free(col); row = NULL; col = NULL;
     
 #if USE_REDUNDANCE_HEURISTIC
     update_red();
@@ -456,12 +456,12 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
         auto new_emat = (*emat) * (*emat);
         if(*new_emat == *emat)
         {
-            delete new_emat;
+            delete new_emat; new_emat = NULL;
             break;
         }
         auto to_delete = emat;
         emat = new_emat;
-        delete to_delete;
+        delete to_delete; to_delete = NULL;
     }
     
     uint n = VectorInt::GetStateNb();
@@ -537,9 +537,9 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
     }
     free(new_row);
     free(new_col);
-    
     free(diags);
-    delete(emat);
+    new_row = new_col = diags = NULL;
+    delete(emat); emat = NULL;
     result->update_hash();
     
 #if TIME_BENCHMARKS
