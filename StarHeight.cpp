@@ -434,7 +434,7 @@ int computeStarHeight( ClassicAut & aut,
         
         if(verbose)
             cout << "Second step: checking whether the Loop Complexity suggestions are unlimitedness witnesses." << endl;
-        if(h <= 1)
+        //if(h <= 1)
         {
             witness = checkLoopComplexitySuggestions(monoid, *Baut, sharplist);
             if(witness != NULL) {
