@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     filename << "StarHeight_maxstatenb " << max_state_nb;
     
     ofstream file(filename.str() + ".csv");
-    file << "#;StatesNb;Dimension;ElementsNb;RewriteRulesNb;VectorNb;StarHeight;ComputationTime(ms)" << endl;
+    file << "#;StarHeight;AutomatonSize;MonoidDim;MonoidSize;RewriteRulesNb;VectorsNb;ComputationTime(ms)" << endl;
     file.close();
     
     uint nb = 0;
@@ -104,17 +104,17 @@ int main(int argc, char **argv)
                 if(monoid != NULL) {
                     cout << "StarHeight " << h << endl;
                     ofstream file(filename.str() + ".csv", ofstream::app);
-                    file << nb << ";" << stnb  << ";" << VectorInt::GetStateNb() << ";" << monoid->expr_to_mat.size();
+                    file << nb << ";" << h << ";" << stnb  << ";" << VectorInt::GetStateNb() << ";" << monoid->expr_to_mat.size();
                     file << ";" << monoid->rewriteRules.size() << ";" << int_vectors.size();
-                    file << ";" << h << ";"  << ctime << endl;
+                    file << ";" <<  ctime << endl;
                     file.close();
                     delete monoid; monoid = NULL;
                 } else  {
                     cout << "StarHeight " << h << endl;
                     ofstream file(filename.str() + ".csv", ofstream::app);
-                    file << nb << ";" << stnb << ";" << VectorInt::GetStateNb()<< ";" << 0;
+                    file << nb << ";" << h << ";" << stnb << ";" << VectorInt::GetStateNb()<< ";" << 0;
                     file << ";" << 0 << ";" << 0;
-                    file << ";" << h << ";"  << ctime << endl;
+                    file << ";" << ctime << endl;
                     file.close();
                 }
             }
