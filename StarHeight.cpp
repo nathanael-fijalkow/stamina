@@ -277,7 +277,7 @@ MultiCounterAut * toNestedBaut(ClassicEpsAut *Subsetaut, char k){
     l=1;//length of the sequence
     bound=ns;//next time the length increases
     
-
+    
     ExplicitMatrix trans_eps_mat(VectorInt::GetStateNb()); //stores eps trans
     trans_eps_mat.clear(MultiCounterMatrix::bottom());
     
@@ -372,12 +372,12 @@ int computeStarHeight( ClassicAut & aut,
         aut.addsink();
     
     if(verbose) cout << "************LOOP COMPLEXITY******************" << endl << endl;
-
+    
     pair<char,list<uint>> res = LoopComplexity(&aut);
     int LC = (int)res.first ;
     list<uint> order = res.second;
     RegExp * regexpr = Aut2RegExp( &aut , order );
-
+    
     list<ExtendedExpression *> sharplist = Reg2Sharps(regexpr);
     if(sharplist.size()==0)// empty language
     {
@@ -396,7 +396,7 @@ int computeStarHeight( ClassicAut & aut,
     
     if(verbose) cout << endl << "************STAR HEIGHT COMPUTATION**********" << endl;
     if(verbose) cout << "Computing the Subset Automaton..." << endl;
-
+    
     //We start by computing the subset automaton of aut
     //It has deterministic letters
     ClassicEpsAut * Subsetaut = toSubsetAut(&aut);
@@ -466,7 +466,11 @@ int computeStarHeight( ClassicAut & aut,
             }
             delete Baut;
             
-            if (witness){
+            if(!witness) {
+                if(verbose)
+                    cout << "The monoid for sh=" << h << " is limited." << endl;
+                return h;
+            } else {
                 if(verbose){
                     cout << "An unlimited witness is ";
                     witness->print();
@@ -476,15 +480,6 @@ int computeStarHeight( ClassicAut & aut,
                     ofstream f("unlimited_witness_sh_" +   to_string(h) + ".txt");
                     f << *witness;
                 }
-            }
-            else if(verbose){
-                cout << "The automaton is limited." << endl;
-                cout << "RESULTS: the star height is " << h << "." << endl;
-            }
-            if(!witness) {
-                return h;
-            }
-            else{
                 delete Baut;
                 delete monoid;
                 h++;

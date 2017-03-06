@@ -128,11 +128,15 @@ int main(int argc, char **argv)
         }
         UnstableMultiMonoid * monoid = NULL;
         const ExtendedExpression * witness = NULL;
-        computeStarHeight(aut, monoid, witness, true, true);
+        
+        auto h = computeStarHeight(aut, monoid, witness, true, true);
+        cout << "RESULT: the star height is " << h << "." << endl;
+
         if(toOut) {
             ofstream ofs(outputFilename + ".dot");
             ofs << Dot::toDot(expa,monoid, -1);
         }
+        
         delete expa;
         delete monoid;
     }
