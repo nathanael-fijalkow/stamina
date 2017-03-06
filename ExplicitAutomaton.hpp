@@ -15,7 +15,7 @@ public:
   int initialState;
   vector<int> finalStates;
   vector<ExplicitMatrix> matrices;
-  ExplicitAutomaton(int size,int alphabet_length);
-  ~ExplicitAutomaton();
+    ExplicitAutomaton(int size,int alphabet_length);
+    ~ExplicitAutomaton();
 };
 #endif

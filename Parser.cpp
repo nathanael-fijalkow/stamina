@@ -56,6 +56,7 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
     getfline(file,alphabet);
     
     ExplicitAutomaton* ret = new ExplicitAutomaton(size,alphabet.length());
+    ret->matrices.clear();//backward compatibility
     ret->type = type;
     ret->alphabet = alphabet;
     

@@ -60,6 +60,8 @@ public:
 	// Sharp-height (constant not function)
 	char sharp_height;// () const = 0;
 
+    virtual ~ExtendedExpression(){};
+    
 protected:
 
 	// The hash. It is used in the == operator to quickly detect if two expressions are different.

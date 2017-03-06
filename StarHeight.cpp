@@ -356,12 +356,14 @@ int computeStarHeight( ClassicAut & aut,
     int LC = (int)res.first ;
     list<uint> order = res.second;
     RegExp * regexpr = Aut2RegExp( &aut , order );
-    
+
     list<ExtendedExpression *> sharplist = Reg2Sharps(regexpr);
-    if(sharplist.size()==0)// empty language
+
+    if(regexpr == NULL || sharplist.size()==0)// empty language
     {
-        cout <<"The language is empty, the star height is 0."<<endl;
-        monoid = NULL; witness = NULL; return 0;
+        if(verbose) cout <<"The language is empty, the star height is 0."<<endl;
+        monoid = NULL; witness = NULL;
+        return 0;
     }
     
     if(verbose) {
