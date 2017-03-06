@@ -34,8 +34,22 @@ pair<char,list<uint>> LoopComplexity(ClassicAut *aut);
 MultiCounterAut* toNestedBaut(ClassicEpsAut *SubsetAut, char k);
 
 
-/* Compute the star height */
-int computeStarHeight(ExplicitAutomaton & aut, bool filelogs, bool verbose);
+/* Compute the star height and return monoid and witness*/
+int computeStarHeight(ClassicAut & aut,
+                      UnstableMultiMonoid* monoid,
+                      const ExtendedExpression * witness,
+                      bool filelogs,
+                      bool verbose
+);
+
+ExtendedExpression *
+checkLoopComplexitySuggestions(
+                UnstableMultiMonoid * monoid,
+                const MultiCounterAut & Baut,
+                const list<ExtendedExpression*> & suggestions
+                );
+
+
 
 #endif
 

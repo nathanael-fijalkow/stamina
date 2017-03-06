@@ -33,7 +33,9 @@ public:
 	static vector<int> final_states;
 
 	//Converts a given ExtendedExpression into the corresponding Matrix
-	const MultiCounterMatrix * ExtendedExpression2Matrix(const ExtendedExpression * expr, const MultiCounterAut & automata);
+	const MultiCounterMatrix * ExtendedExpression2Matrix(
+                                                         const ExtendedExpression * expr,
+                                                         const MultiCounterAut & automata);
 
 protected:
 	pair <Matrix *, bool> addMatrix(const Matrix * mat);

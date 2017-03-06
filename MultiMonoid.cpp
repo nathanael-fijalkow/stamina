@@ -112,7 +112,10 @@ ostream& operator<<(ostream& st, const UnstableMultiMonoid & monoid)
 	return st;
 }
 
-const MultiCounterMatrix * UnstableMultiMonoid::ExtendedExpression2Matrix(const ExtendedExpression * expr,const MultiCounterAut & automata)
+const MultiCounterMatrix * UnstableMultiMonoid::ExtendedExpression2Matrix(
+                                            const ExtendedExpression * expr,
+                                            const MultiCounterAut & automata
+                                                                          )
 {
 	const LetterExpr * lexpr = isLetterExpr(expr);
 	const ConcatExpr * cexpr = isConcatExpr(expr);

@@ -116,13 +116,24 @@ int main(int argc, char **argv)
         }
         if(toOut) {
             ofstream ofs(outputFilename + ".dot");
-            
             ofs << Dot::toDot(expa,&m, -1);
         }
     }
     else if (expa->type==CLASSICAL)
     {
-        computeStarHeight(*expa, true, true);
+        
+        ClassicAut aut(*expa);
+        if(!aut.isdet()) {
+            cout << "Only deterministic automata are handled" << endl;
+            return 0;
+        }
+        UnstableMultiMonoid * monoid = NULL;
+        const ExtendedExpression * witness = NULL;
+        computeStarHeight(aut, monoid, witness, true, true);
+        if(toOut) {
+            ofstream ofs(outputFilename + ".dot");
+            ofs << Dot::toDot(expa,monoid, -1);
+        }
     }
     return 0;
 }
