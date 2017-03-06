@@ -4,6 +4,21 @@
 
 using namespace std;
 
+
+void printset(uint orig){
+		cout<<"{";
+        uint k=0;
+        while(orig!=0){
+            if (orig & 1) {
+                cout<<k;
+                if(orig>1) cout<<",";
+            }
+            k++;
+            orig=orig>>1;
+        }
+        cout <<"}";
+ }
+
 //Classical Automata
 void ClassicAut::init(char Nletters,uint Nstates){
     NbLetters=Nletters;
@@ -388,18 +403,9 @@ ClassicEpsAut* SubPrune(ClassicEpsAut *aut){
     for(uint i=0;i<nb_pruned;i++){
         PruneAut->finalstate[i]=aut->finalstate[original[i]];
 #if VERBOSE_AUTOMATA_COMPUTATION
-        cout<<i<<": {";
+        cout<<i<<": ";
         uint orig=original[i];
-        uint k=0;
-        while(orig!=0){
-            if (orig & 1) {
-                cout<<k;
-                if(orig>1) cout<<",";
-            }
-            k++;
-            orig=orig>>1;
-        }
-        cout <<"}";
+        printset(orig);
         if (PruneAut->initialstate[i]) cout<<" initial";
         if (PruneAut->finalstate[i]) cout<<" final";
         cout<<endl;
@@ -532,18 +538,9 @@ ClassicEpsAut* SubPruneSink(ClassicEpsAut *aut){
     for(uint i=0;i<nb_pruned;i++){
         PruneAut->finalstate[i]=aut->finalstate[original[i]];
 #if VERBOSE_AUTOMATA_COMPUTATION
-        cout<<i<<": {";
+        cout<<i<<": ";
         uint orig=original[i];
-        uint k=0;
-        while(orig!=0){
-            if (orig & 1) {
-                cout<<k;
-                if(orig>1) cout<<",";
-            }
-            k++;
-            orig=orig>>1;
-        }
-        cout <<"}";
+        printset(orig);
         if (PruneAut->initialstate[i]) cout<<" initial";
         if (PruneAut->finalstate[i]) cout<<" final";
         cout<<endl;
@@ -599,30 +596,34 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
     
     //cout<<"minimisation"<<endl;
     while(search){
+        cout <<"Iteration"<<endl;
         vector<vector<bool>> new_pre(N);
         //initialisation
         search=false;
         for(uint i=0;i<N;i++){
             new_pre[i].resize(N,false);
             for(uint j=0;j<N;j++){
-                if (! preorder[i][j]) break;
+                if (! preorder[i][j]) continue; //already separated
                 unsigned char a;
                 for(a=0;a<nl;a++){
                     //cout<<"transdet"<<endl;
                     uint p=aut->transdet[a][i];
                     uint q=aut->transdet[a][j];
-                    if (!preorder[p][q]) {search=true;break;}
+                    if (!preorder[p][q]) {search=true;break;} //new separation
                 }
                 if (a<nl) continue;
                 uint k;
                 for(k=0;k<N;k++){
                     //cout<<"accessing names and orig"<<endl;
-                    uint p=aut->names[aut->orig[i]|aut->orig[k]];
-                    uint q=aut->names[aut->orig[j]|aut->orig[k]];
-                    if (!preorder[p][q]) {search=true;break;}
+                    /*uint p=aut->names[aut->orig[i]|aut->orig[k]];
+                    uint q=aut->names[aut->orig[j]|aut->orig[k]];*/
+                    uint p=i|k;
+                    uint q=j|k;
+                    if (!preorder[p][q]) {search=true;break;} //new separation                 
                 }
                 if(k<N) continue;
-                new_pre[i][j]=true;
+                new_pre[i][j]=true; //stay related
+                printset(i);cout<<" <= ";printset(j);cout<<endl;
             }
         }
         preorder=new_pre;
@@ -636,27 +637,32 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
     vector<uint> prev; //previous names
     uint nb=0;
     for(uint i=0;i<N;i++){
+
         bool found=false;
         for(int j=0;j<i;j++){
             if(preorder[i][j] && preorder[j][i]){
                 //equivalent element found
                 repr[i]=repr[j];
+                cout<<"merging ";printset(i);cout<<" and ";printset(j);cout<<endl;
                 found=true;
                 break;
             }
         }
         if(!found) {
             repr[i]=nb;
-            prev.push_back(nb);
+            printset(i);cout <<" affected to "<<nb<<endl;
+            prev.push_back(i);
             nb++;
         }
     }
+    
     
     
     ClassicEpsAut *MinAut=new ClassicEpsAut(nl,nb);
     cout<<"minAut created"<<endl;
     //initial and final states
     MinAut->initial=repr[aut->initial];
+    MinAut->initialstate[MinAut->initial]=true;
     
     for(uint i=0;i<nb;i++){
         MinAut->finalstate[i]=aut->finalstate[prev[i]];
@@ -669,14 +675,25 @@ ClassicEpsAut* SubMinPre(ClassicEpsAut *aut){
         }
     }
     
-    //epsilon transitions
-    for(uint i=0;i<nb;i++){
-        for(uint j=0;j<nb;j++){
-            MinAut->trans_eps[i][j]=preorder[prev[i]][prev[j]];
+    //epsilon transitions : it is enough that a couple of predecessors are in relation
+    for(uint i=0;i<N;i++){
+        for(uint j=0;j<N;j++){
+        	if (preorder[i][j])
+           		 MinAut->trans_eps[repr[i]][repr[j]]=true;
         }
     }
 #if VERBOSE_AUTOMATA_COMPUTATION
-    MinAut->print();
+	for(uint i=0;i<nb;i++){
+        cout<<i<<": ";
+        uint orig=prev[i];
+        printset(orig);
+        if (MinAut->initialstate[i]) cout<<" initial";
+        if (MinAut->finalstate[i]) cout<<" final";
+        cout<<endl;
+      }
+      MinAut->print();
+      cout<<endl<<endl;
+      
 #endif
     return MinAut;
 }
