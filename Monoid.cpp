@@ -541,6 +541,9 @@ const ExtendedExpression * UnstableMonoid::ComputeMonoid()
 	return NULL;
 }
 
+int Monoid::MAX_EXPR_TO_PROCESS = MAX_EXPR_TO_PROCESS_DEFAULT;
+int Monoid::MAX_MONOID_SIZE = MAX_MONOID_SIZE_DEFAULT;
+
 Monoid::Monoid()
 {
 	bool res = singleton.try_lock();

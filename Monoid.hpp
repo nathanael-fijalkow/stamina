@@ -19,7 +19,9 @@
 
 using namespace std;
 
-#define MAX_MONOID_SIZE 1000000
+
+#define MAX_EXPR_TO_PROCESS_DEFAULT 1000000000;
+#define MAX_MONOID_SIZE_DEFAULT 1000000;
 
 /* CLASS DEFINITIONS */
 // This class describes a Markov Monoid
@@ -51,6 +53,9 @@ public:
 	//the state names, default names if empty vector
 	vector<string> state_names;
 
+    static int MAX_EXPR_TO_PROCESS;
+    static int MAX_MONOID_SIZE;
+    
 protected:
 
 	// Constructor
@@ -133,7 +138,7 @@ protected:
 	unordered_set<const Matrix *> idempotent;
 	unordered_set<const Matrix *> notidempotent;
 
-	int cnt;
+    int cnt;
 	void check_size(int i)
 	{
 
@@ -141,10 +146,9 @@ protected:
 		cout << "and " << rewriteRules.size() << " rules and " 
         << Matrix::vectors.size() + int_vectors.size()
 		     << " vectors and " << i << " expressions to process." << endl;
-		cnt = MAX_MONOID_SIZE / 10;
-
-		if (new_elements.size() > MAX_MONOID_SIZE)
-				throw std::runtime_error("Monoid too large");
+        cnt = MAX_MONOID_SIZE / 10;
+		if (i > MAX_EXPR_TO_PROCESS)
+				throw std::runtime_error("Too many expressions to process");
 	}
 
 	int _sharp_height;
