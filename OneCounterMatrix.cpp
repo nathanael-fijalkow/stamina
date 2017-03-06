@@ -281,8 +281,11 @@ Matrix * OneCounterSmallMatrix::prod(const Matrix * pmat1) const
 }
 
 //works only on idempotents
-Matrix * OneCounterLargeMatrix::stab() const
+Matrix * OneCounterLargeMatrix::stab(bool isIdempotentForSure) const
 {
+    if(!isIdempotentForSure)
+        throw runtime_error("Stab of non idempotent matrice sunimplemented yet");
+
 	uint n = Vector::GetStateNb();
 	OneCounterLargeMatrix * result = new OneCounterLargeMatrix();
 
@@ -347,8 +350,11 @@ Matrix * OneCounterLargeMatrix::stab() const
 }
 
 //works only on idempotents
-Matrix * OneCounterSmallMatrix::stab() const
+Matrix * OneCounterSmallMatrix::stab(bool isIdempotentForSure) const
 {
+    if(!isIdempotentForSure)
+        throw runtime_error("Stab of non idempotent matrice sunimplemented yet");
+
 	uint n = Vector::GetStateNb();
 	OneCounterSmallMatrix * result = new OneCounterSmallMatrix();
 

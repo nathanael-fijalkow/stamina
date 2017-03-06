@@ -108,7 +108,7 @@ public:
 
 	// compute stabilisation
     //The caller is in charge of deleting the returned object
-	const MultiCounterMatrix * stab() const;
+	const MultiCounterMatrix * stab(bool isIdempotentForSure = false) const;
 
 	// Function checking whether a matrix is idempotent
     bool isIdempotent() const { return (*this) == * ((*this) * (*this)); }

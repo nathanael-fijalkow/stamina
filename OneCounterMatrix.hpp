@@ -54,7 +54,7 @@ public:
 
 	// compute stabilisation
 	//The caller is in charge of deleting the returned object
-	Matrix * stab() const;
+	Matrix * stab(bool isIdempotentForSure = false) const;
 
 	void update_hash()
 	{
@@ -105,7 +105,7 @@ public:
 
 	// compute stabilisation
 	//The caller is in charge of deleting the returned object
-	Matrix * stab() const;
+	Matrix * stab(bool isIdempotentForSure = false) const;
 
 	// Function checking whether a matrix is idempotent
 	bool isIdempotent() const;

@@ -35,7 +35,7 @@ public:
 
 	// compute stabilisation
 	//The caller is in charge of deleting the returned object
-	const Matrix * stab() const;
+	const Matrix * stab(bool isIdempotentForSure) const;
 
 	// computes the list of recurrent states.
 	const Vector * recurrent_states() const;

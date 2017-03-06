@@ -149,7 +149,7 @@ MultiCounterMatrix::MultiCounterMatrix(const ExplicitMatrix & explMatrix)
 
 MultiCounterMatrix::MultiCounterMatrix(unsigned char diag, unsigned char nondiag)
 {
-
+    
     init();
     auto stnb = VectorInt::GetStateNb();
     
@@ -236,20 +236,20 @@ void MultiCounterMatrix::print(std::ostream & os, vector<string> state_names) co
     }
 #if USE_REDUNDANCE_HEURISTIC
     /*
-    cout << "red_row: ";
-    for(int i = 0; i < stnb; i++) {
-        cout << row_red[i] <<  " ";
-        if(row_red[i] > stnb + 1)
-            cout << "oups";
-    }
-    cout << endl;
-    cout << "red_col: ";
-    for(int i = 0; i < stnb; i++) {
-        cout <<  col_red[i] << " ";
-        if(col_red[i] > stnb + 1)
-            cout << "oups";
-    }
-    cout << endl;
+     cout << "red_row: ";
+     for(int i = 0; i < stnb; i++) {
+     cout << row_red[i] <<  " ";
+     if(row_red[i] > stnb + 1)
+     cout << "oups";
+     }
+     cout << endl;
+     cout << "red_col: ";
+     for(int i = 0; i < stnb; i++) {
+     cout <<  col_red[i] << " ";
+     if(col_red[i] > stnb + 1)
+     cout << "oups";
+     }
+     cout << endl;
      */
 #endif
 }
@@ -314,7 +314,7 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
 {
     //memset(new_vec, 0, (VectorInt::GetStateNb() * sizeof(char)));
     auto stnb = VectorInt::GetStateNb();
-
+    
 #if CACHE_VECTOR_PRODUCTS_HEUR
     long long v =  ((long long) vec) << 32;
 #endif
@@ -348,7 +348,7 @@ const VectorInt * MultiCounterMatrix::sub_prod_int(
                     auto a = act_prod[ *ab++ ][ *bb++ ];
                     if(a < min_curr) min_curr = a;
 #if USE_MIN_HEURISTIC
-                        if(min_curr == m) break;
+                    if(min_curr == m) break;
 #else
                     if(min_curr == 0) break;
 #endif
@@ -444,24 +444,31 @@ bool MultiCounterMatrix::isUnlimitedWitness(const vector<int> & initial_states, 
     return found;
 }
 
-const MultiCounterMatrix * MultiCounterMatrix::stab() const
+const MultiCounterMatrix * MultiCounterMatrix::stab(bool isIdempotentForSure) const
 {
     //start by reaching idempotent power.
 #if TIME_BENCHMARKS
     auto start = std::chrono::high_resolution_clock::now();
 #endif
     
-    const MultiCounterMatrix * emat = new MultiCounterMatrix(*this);
-    while(true){
-        auto new_emat = (*emat) * (*emat);
-        if(*new_emat == *emat)
-        {
-            delete new_emat; new_emat = NULL;
-            break;
+    
+     MultiCounterMatrix const * emat = NULL;
+    
+    if(isIdempotentForSure) {
+        emat = this;
+    } else {
+        emat = new MultiCounterMatrix(*this);
+        while(true){
+            auto new_emat = (*emat) * (*emat);
+            if(*new_emat == *emat)
+            {
+                delete new_emat; new_emat = NULL;
+                break;
+            }
+            auto to_delete = emat;
+            emat = new_emat;
+            delete to_delete; to_delete = NULL;
         }
-        auto to_delete = emat;
-        emat = new_emat;
-        delete to_delete; to_delete = NULL;
     }
     
     uint n = VectorInt::GetStateNb();
@@ -539,7 +546,11 @@ const MultiCounterMatrix * MultiCounterMatrix::stab() const
     free(new_col);
     free(diags);
     new_row = new_col = diags = NULL;
-    delete(emat); emat = NULL;
+
+    if(!isIdempotentForSure) {
+        delete(emat); emat = NULL;
+    }
+    
     result->update_hash();
     
 #if TIME_BENCHMARKS

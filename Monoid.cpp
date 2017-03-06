@@ -437,7 +437,7 @@ const ExtendedExpression * UnstableMonoid::sharpify_expression(const ExtendedExp
 
 	if (is_idempotent(mat_e)){
         
-		auto mat = mat_e->stab();
+		auto mat = mat_e->stab(true);
 		auto result = addMatrix(mat);
         delete mat; mat = NULL;
         auto nmat = result.first;

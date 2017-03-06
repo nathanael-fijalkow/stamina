@@ -73,7 +73,7 @@ public:
 
 	// compute stabilisation
 	//The caller is in charge of deleting the returned object
-	virtual const Matrix * stab() const = 0;
+	virtual const Matrix * stab(bool isIdempotentForSure) const = 0;
 
 	// Function returning the hash
 	HashMat hash() const { return _hash; };

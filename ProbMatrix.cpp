@@ -276,8 +276,11 @@ bool ProbMatrix::recurrent(int j) const{
 }
 
 // Function computing the stabilization. mat is assumed to be idempotent
-const Matrix * ProbMatrix::stab() const
+const Matrix * ProbMatrix::stab(bool isIdempotentForSure) const
 {
+    if(!isIdempotentForSure)
+        throw runtime_error("Stab of non idempotent matrice sunimplemented yet");
+    
 	const Vector * recs = recurrent_states();
 	uint n = Vector::GetStateNb();
 	ProbMatrix * result = new ProbMatrix(n);
