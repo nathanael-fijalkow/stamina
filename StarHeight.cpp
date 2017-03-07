@@ -236,7 +236,8 @@ MultiCounterAut * toNestedBaut(
                                char k,
                                bool debug,
                                bool output_file,
-                               string filepref
+                               string filepref,
+                               bool use_minimization
                                ){
     
     uint ns=Subsetaut->NbStates;
@@ -352,7 +353,9 @@ int computeStarHeight( ClassicAut & aut,
                       int & LC,
                       bool filelogs,
                       bool verbose,
-                      string filepref
+                      string filepref,
+                      bool use_loop_heuristic,
+                      bool use_minimization
                       )
 {
     if(! aut.iscomplete()){
@@ -407,9 +410,11 @@ int computeStarHeight( ClassicAut & aut,
     
     if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
 
-    Subsetaut=SubMinPre(Subsetaut); //optional for now, to test later
-    Subsetaut=SubPrune(Subsetaut);
-    
+    if(use_minimization) {
+        Subsetaut=SubMinPre(Subsetaut); //optional for now, to test later
+        Subsetaut=SubPrune(Subsetaut);
+    }
+        
     ns=Subsetaut->NbStates;
     nl=Subsetaut->NbLetters;
     
@@ -435,7 +440,7 @@ int computeStarHeight( ClassicAut & aut,
         if(verbose)
             cout << "Second step: checking whether the Loop Complexity suggestions are unlimitedness witnesses." << endl;
         //if(h <= 1)
-        if(false)
+        if(use_loop_heuristic)
         {
             witness = checkLoopComplexitySuggestions(monoid, *Baut, sharplist);
             if(witness != NULL) {

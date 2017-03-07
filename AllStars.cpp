@@ -62,7 +62,7 @@ bool inc_mat_and_states() {
 }
 
 void random_automaton(int stnb) {
-    delete expa;    
+    delete expa;
     expa = new ExplicitAutomaton(stnb,letters_nb);
     expa->initialState = 0;
     expa->finalStates.push_back(stnb - 1);
@@ -77,13 +77,28 @@ void random_automaton(int stnb) {
 
 void pusage(char* s)
 {
-    cout << "Usage: " << s << "[-v] [-f] [-a automaton_id] [-r] [-m max_state_nb]" << endl;
+    cout << "Usage: " << s << "[-v] [-f] [-a automaton_id] [-b automaton_id] [-r] [-m max_state_nb] [-l] [-i] [-z] [-y exp_number]" << endl;
     cout << "\t-v verbose on [default off]" << endl;
     cout << "\t-f file output on [default off]" << endl;
     cout << "\t-a automaton_id compute for a specific automaton id# " << endl;
+    cout << "\t-b automaton_id compute for automata with >= id# " << endl;
     cout << "\t-r random choice of automaton [default off]" << endl;
     cout << "\t-m max_state_nb specifies max number of states [default 15]" << endl;
+    cout << "\t-l do not use loop heuristic [default yes]" << endl;
+    cout << "\t-i do not use minimization [default yes]" << endl;
+    cout << "\t-z try all combinations of heuristics [default no]" << endl;
+    cout << "\t-y number_of_experiments [default 100]" << endl;
     exit(0);
+}
+
+bool use_loop_heuristic = true;
+bool use_minimization = true;
+
+string filename() {
+    stringstream filename;
+    filename << "starheight_" << (random_mode ? "random" : "enumerative") << "_";
+    filename << "_loopheur_" << (use_loop_heuristic ? "on" : "off") << "_minim_heur" << (use_minimization ? "on" : "off");
+    return filename.str();
 }
 
 int main(int argc, char **argv)
@@ -95,10 +110,13 @@ int main(int argc, char **argv)
     int opt;
     bool verbose = false;
     bool out_file = false;
+    bool compare_heuristics = false;
+    int experiments_nb = 100;
+    bool just_one_id = true;
     int aut_id = -1;
     
     
-    while((opt = getopt(argc,argv, "vhfra:m:")) != -1)
+    while((opt = getopt(argc,argv, "vhfrliza:m:y:")) != -1)
     {
         switch(opt)
         {
@@ -119,32 +137,76 @@ int main(int argc, char **argv)
             case 'a':
                 aut_id = atoi(optarg);
                 cout << "Automaton id #" << aut_id<< endl;
+                just_one_id = true;
+                break;
+            case 'b':
+                aut_id = atoi(optarg);
+                cout << "Automaton id #" << aut_id<< endl;
+                just_one_id = false;
                 break;
             case 'm':
                 max_state_nb = atoi(optarg);
                 if(max_state_nb <= 0) max_state_nb = 1;
-                cout << "Automaton id #" << aut_id<< endl;
+                cout << "Max states #" << max_state_nb<< endl;
+                break;
+            case 'y':
+                experiments_nb = atoi(optarg);
+                if(experiments_nb <= 0) experiments_nb = 1;
+                break;
+            case 'z':
+                compare_heuristics = true;
+                cout << "Comparing heuristics" << endl;
+                break;
+            case 'l':
+                use_loop_heuristic = false;
+                if(!compare_heuristics) cout << "Disabling loop heuristic" << endl;
+                break;
+            case 'i':
+                use_minimization = false;
+                if(!compare_heuristics) cout << "Disabling minimization" << endl;
                 break;
             default:
                 pusage(argv[0]);
         }
     }
     
+    cout << "Experiments nb" << experiments_nb<< endl;
+    
     if(aut_id>=0) random_mode = false;
     
-
     
-    stringstream filename;
-    filename << "starheight_" << (random_mode ? "random" : "enumerative");
+    if(compare_heuristics) {
+        use_loop_heuristic= false;
+        use_minimization = false;
+    }
     
-    ofstream file(filename.str() + ".csv", ofstream::app);
-    file << "#;StarHeight;LoopComplexity;AutomatonSize;MonoidDim;MonoidSize;RewriteRulesNb;VectorsNb;ComputationTime(ms)" << endl;
-    file.close();
+    if(!compare_heuristics) {
+        ofstream file(filename() + ".csv", ofstream::app);
+        file << "#;StarHeight;LoopComplexity;AutomatonSize;MonoidDim;";
+        file << "MonoidSize;RewriteRulesNb;VectorsNb;ComputationTime(ms);";
+        file << "LoopHeur;MinHeur";
+        file << endl;
+        file.close();
+    } else {
+        for(int loop = 0; loop<=1; loop++) {
+            for(int mini = 0; mini <= 1; mini++) {
+                use_loop_heuristic = loop;
+                use_minimization = mini;
+                ofstream file(filename() + ".csv", ofstream::app);
+                file << "#;StarHeight;LoopComplexity;AutomatonSize;MonoidDim;";
+                file << "MonoidSize;RewriteRulesNb;VectorsNb;ComputationTime(ms);";
+                file << "LoopHeur;MinHeur";
+                file << endl;
+                file.close();
+            }
+        }
+    }
     
-    uint nb = 0;
-
+    uint cur_aut_id = 1;
+    uint exp_nb = 0;
     auto base = std::chrono::high_resolution_clock::now();
-
+    
+    
     
     for(int stnb = 1 ; stnb < max_state_nb; stnb++) {
         
@@ -153,13 +215,11 @@ int main(int argc, char **argv)
         expa->finalStates.push_back(stnb -1);
         
         while(true) {
-            nb++;
-            if(aut_id < 0 || nb == aut_id) {
-                
+            if(aut_id < 0 || cur_aut_id >= aut_id) {
                 auto start = std::chrono::high_resolution_clock::now();
                 unsigned int seed
-                    = chrono::duration_cast<chrono::microseconds>(start - base).count();
-
+                = chrono::duration_cast<chrono::microseconds>(start - base).count();
+                
                 if(random_mode)
                 {
                     cout << "Random seed " << seed << endl;
@@ -168,17 +228,20 @@ int main(int argc, char **argv)
                     cout << "New random automaton with " << stnb << " states and seed " << seed << endl;
                     random_automaton(stnb);
                 }
-
+                
                 ClassicAut aut(*expa);
                 if(!aut.iscomplete()) {
-                    // cout << "Automaton #" << nb << " not complete" << endl;
+                    // cout << "Automaton #" << cur_aut_id << " not complete" << endl;
                 } else if (!aut.isdet()){
-                    //cout << "Automaton #" << nb << " not deterministic" << endl;
+                    //cout << "Automaton #" << cur_aut_id << " not deterministic" << endl;
                 } else {
                     if(!random_mode) {
-                        cout << "Automaton #" << nb << " complete and deterministic" << endl;
+                        cout << "Automaton #" << cur_aut_id << " complete and deterministic" << endl;
                     }
+                    if(!compare_heuristics || (!use_minimization && !use_loop_heuristic))
+                        exp_nb++;
 
+                    
                     UnstableMultiMonoid * monoid = NULL;
                     const ExtendedExpression * witness = NULL;
                     int loopComplexity;
@@ -187,41 +250,65 @@ int main(int argc, char **argv)
                                                monoid,
                                                witness,
                                                loopComplexity,
-                                               verbose,
                                                out_file,
-                                               "AllStars");
+                                               verbose,
+                                               "AllStars",
+                                               use_loop_heuristic,
+                                               use_minimization
+                                               );
                     
                     auto end = std::chrono::high_resolution_clock::now();
                     auto ctime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-                    
+                    cout << "Computation time " << ctime << endl;
                     if(monoid != NULL) {
                         cout << "StarHeight " << h << endl;
-                        ofstream file(filename.str() + ".csv", ofstream::app);
-                        file << (random_mode ? nb : seed) << ";" << h << ";" << loopComplexity << ";";
+                        ofstream file(filename() + ".csv", ofstream::app);
+                        file << (random_mode ? seed : cur_aut_id) << ";" << h << ";" << loopComplexity << ";";
                         file << stnb  << ";" << VectorInt::GetStateNb() << ";";
                         file << monoid->expr_to_mat.size();
                         file << ";" << monoid->rewriteRules.size() << ";" << int_vectors.size();
-                        file << ";" <<  ctime << endl;
+                        file << ";" <<  ctime;
+                        file << ";" << (int) use_loop_heuristic;
+                        file << ";" << (int) use_minimization;
+                        file << endl;
                         file.close();
                         delete monoid; monoid = NULL;
                     } else  {
                         cout << "StarHeight " << h << endl;
-                        ofstream file(filename.str() + ".csv", ofstream::app);
-                        file << (random_mode ? nb : seed) << ";" << h << ";" << loopComplexity << ";";
+                        ofstream file(filename() + ".csv", ofstream::app);
+                        file << (random_mode ? seed : cur_aut_id) << ";" << h << ";" << loopComplexity << ";";
                         file << stnb << ";" << VectorInt::GetStateNb()<< ";" << 0;
                         file << ";" << 0 << ";" << 0;
-                        file << ";" << ctime << endl;
+                        file << ";" <<  ctime;
+                        file << ";" << (int) use_loop_heuristic;
+                        file << ";" << (int) use_minimization;
+                        file << endl;
                         file.close();
                     }
                 }
             }
-            if(!random_mode && !inc_mat_and_states())
-                break;
+            if(compare_heuristics && !use_loop_heuristic && !use_minimization)
+            { use_minimization = true; }
+            else if(compare_heuristics && !use_loop_heuristic && use_minimization)
+            { use_loop_heuristic =true; use_minimization = false;}
+            else if(compare_heuristics && use_loop_heuristic && !use_minimization)
+            { use_minimization = true;}
+            else if(!random_mode){
+                if(compare_heuristics) {
+                    use_loop_heuristic = false;
+                    use_minimization = false;
+                }
+                
+                if(just_one_id && aut_id >= 0 && cur_aut_id >= aut_id) break;
+                cur_aut_id++;
+                if(exp_nb > experiments_nb) break;
+                bool ret = inc_mat_and_states();
+                if(!ret) break;
+            }
         }
         delete expa;
-        if(nb >= aut_id) break;
+        if(just_one_id && aut_id >= 0 && cur_aut_id >= aut_id) break;
     }
-    
     cout << "Experiment over " << endl;
     
 }
