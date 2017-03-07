@@ -86,6 +86,7 @@ void pusage(char* s)
     cout << "\t-m max_state_nb specifies max number of states [default 15]" << endl;
     cout << "\t-l do not use loop heuristic [default yes]" << endl;
     cout << "\t-i do not use minimization [default yes]" << endl;
+    cout << "\t-p do not use pruning [default yes]" << endl;
     cout << "\t-z try all combinations of heuristics [default no]" << endl;
     cout << "\t-y number_of_experiments [default 100]" << endl;
     exit(0);
@@ -93,11 +94,12 @@ void pusage(char* s)
 
 bool use_loop_heuristic = true;
 bool use_minimization = true;
+bool use_prune = true;
 
 string filename() {
     stringstream filename;
     filename << "starheight_" << (random_mode ? "random" : "enumerative") << "_";
-    filename << "_loopheur_" << (use_loop_heuristic ? "on" : "off") << "_minim_heur" << (use_minimization ? "on" : "off");
+    filename << "_loopheur_" << (use_loop_heuristic ? "on" : "off") << "_minim_heur" << (use_minimization ? "on" : "off") << "_prune_heur" << (use_prune ? "on" : "off");
     return filename.str();
 }
 
@@ -164,6 +166,10 @@ int main(int argc, char **argv)
             case 'i':
                 use_minimization = false;
                 if(!compare_heuristics) cout << "Disabling minimization" << endl;
+                break;
+            case 'p':
+                use_prune = false;
+                cout << "Disabling pruning" << endl;
                 break;
             default:
                 pusage(argv[0]);
@@ -254,7 +260,8 @@ int main(int argc, char **argv)
                                                verbose,
                                                "AllStars",
                                                use_loop_heuristic,
-                                               use_minimization
+                                               use_minimization,
+                                               use_prune
                                                );
                     
                     auto end = std::chrono::high_resolution_clock::now();
@@ -270,6 +277,7 @@ int main(int argc, char **argv)
                         file << ";" <<  ctime;
                         file << ";" << (int) use_loop_heuristic;
                         file << ";" << (int) use_minimization;
+                        file << ";" << (int) use_prune;
                         file << endl;
                         file.close();
                         delete monoid; monoid = NULL;
@@ -282,6 +290,7 @@ int main(int argc, char **argv)
                         file << ";" <<  ctime;
                         file << ";" << (int) use_loop_heuristic;
                         file << ";" << (int) use_minimization;
+                        file << ";" << (int) use_prune;
                         file << endl;
                         file.close();
                     }

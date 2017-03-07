@@ -236,8 +236,9 @@ MultiCounterAut * toNestedBaut(
                                char k,
                                bool debug,
                                bool output_file,
-                               string filepref,
-                               bool use_minimization
+                               string filepref
+                               //bool use_minimization,
+                              // bool use_prune
                                ){
     
     uint ns=Subsetaut->NbStates;
@@ -355,7 +356,8 @@ int computeStarHeight( ClassicAut & aut,
                       bool verbose,
                       string filepref,
                       bool use_loop_heuristic,
-                      bool use_minimization
+                      bool use_minimization,
+                      bool use_prune
                       )
 {
     if(! aut.iscomplete()){
@@ -410,10 +412,10 @@ int computeStarHeight( ClassicAut & aut,
     
     if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
 
-    if(use_minimization) {
-        Subsetaut=SubMinPre(Subsetaut); //optional for now, to test later
+    if(use_minimization) 
+        Subsetaut=SubMinPre(Subsetaut); 
+    if(use_prune)
         Subsetaut=SubPrune(Subsetaut);
-    }
         
     ns=Subsetaut->NbStates;
     nl=Subsetaut->NbLetters;

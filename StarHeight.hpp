@@ -36,8 +36,8 @@ MultiCounterAut* toNestedBaut(
                               char k,
                               bool debug = true,
                               bool output_file = true,
-                              string filepref = "",
-                              bool use_minimization = true
+                              string filepref = ""
+                             // bool use_minimization = true
 );
 
 
@@ -50,7 +50,8 @@ int computeStarHeight(ClassicAut & aut,
                       bool verbose,
                       string filepref = "",
                       bool use_loop_heuristic = true,
-                    bool use_minimization = true
+                    bool use_minimization = true,
+                    bool use_prune = true
 );
 
 ExtendedExpression *
