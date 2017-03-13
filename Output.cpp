@@ -68,9 +68,9 @@ string Dot::giveStyles ()
 string Dot::toDot(const ExplicitAutomaton & a)
 {
 	string ret=start;
-	if(SH == -1)
-		ret += "label=\"Automaton\"\n";
-	else
+	if(SH != -1)
+//		ret += "label=\"Automaton\"\n";
+//	else
 		ret += "label=\"Monoid for SH=" + std::to_string(SH) +"\"\n";
 	ret += giveStyles();
 	for(int i=0;i<a.alphabet.length();i++)

@@ -136,11 +136,12 @@ int main(int argc, char **argv)
             cout << endl;
             monoid->print();
             cout << endl;
-            
+            /*
             string filename(argv[2]);
             ofstream ofs(filename + ".monoid.dot");
             ofs << Dot::toDot(expa,monoid,h);
             ofs.close();
+             */
         }
         
         

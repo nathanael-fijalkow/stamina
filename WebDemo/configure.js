@@ -38,7 +38,7 @@
     fill_random();
 
     setInterval(showOutput, 2000);
-    setInterval(showAutomaton, 2000);
+    setInterval(updateAutomaton, 2000);
 
     function generate()
     {
@@ -72,7 +72,7 @@
       /* Generate initial and fnal  selector */
       $('.initial').empty();
       $('.final').empty();
-      for(i=1; i <= maxstatesnb; i++)
+      for(i=0; i < maxstatesnb; i++)
 	{
 	  $('.initial').append('<div  id="i'+i+'">'+i+'<input class="c" type="checkbox"></input></div>');
 	  $('.final').append('<div  id="f'+i+'">'+i+'<input class="c" type="checkbox"></input></div>');
@@ -97,7 +97,7 @@
 	  var dmat = $('#detmats').find('#Mat'+i);
 	  pmat.append('<br/>');
 	  cmat.append('<br/>');
-	  for(j=1; j<= maxstatesnb; j++)
+	  for(j=0; j< maxstatesnb; j++)
 	    {
 	      var lab = 'l'+i+'_'+j;
 	     dmat.append('<div style="float:top;" id="'+lab+'"></div>');
@@ -109,7 +109,7 @@
 
 	      var pline =pmat.find('#'+lab);
 	      var cline =cmat.find('#'+lab);
-	      for(k=1; k<= maxstatesnb; k++)
+	      for(k=0; k< maxstatesnb; k++)
 		{
 		  pline.append('<input selected="" class="c" type="checkbox" id="c'+i+'_'+j+'_'+k+'"/>');
 		  cline.append('<select selected=""  id="c'+i+'_'+j+'_'+k+'"/>');
@@ -127,7 +127,7 @@
       var ccoeff = counters_list();
 
       /* random choice of final states */
-      for(j=1; j<= statesnb; j++)		 
+      for(j=0; j< statesnb; j++)		 
 	{
 	  var yes = Math.random() < density;
 	  $('#f'+j).find("input").prop('checked',yes);
@@ -135,12 +135,12 @@
 	}
 
       /* random choice of one initial state */
-      var randinit = 1 + Math.floor( Math.random() * statesnb() );
+      var randinit = Math.floor( Math.random() * statesnb() );
       $('#i'+randinit).find("input").prop('checked',true);
       //at least one final state or parsing wont work
       if(!ok)
 	{
-	  randinit = 1 + Math.floor( Math.random() * statesnb() );
+	  randinit = Math.floor( Math.random() * statesnb() );
 	  $('#f'+randinit).find("input").prop('checked',true);
 	}
 
@@ -150,11 +150,11 @@
       var dmat = $('#detmats');
       for(i=1; i <= maxlettersnb; i++)
 	{
-	  for(j=1; j<= maxstatesnb; j++)
+	  for(j=0; j< maxstatesnb; j++)
 	    {
 
 		  var dcell = dmat.find('#c'+i+'_'+j+'_');
-		  dcell.val( 1 + Math.floor(Math.random()* statesnb()) );
+		  dcell.val( Math.floor(Math.random()* statesnb()) );
 
 	      for(k=1; k<= maxstatesnb; k++)
 		{
@@ -185,9 +185,9 @@
 
     function update()
     {
-      for(i=1; i <= maxstatesnb; i++)
+      for(i=0; i < maxstatesnb; i++)
 	{
-	  if(i <= statesnb())
+	  if(i < statesnb())
 	    {
 	      $('#i'+i).show();
 	      $('#f'+i).show();
@@ -245,7 +245,7 @@ switch(problem()) {
 
       var dselect = '';
       for(var i = 0 ; i < statesnb(); i++)
-		dselect += '<option value='+(i+1)+'>'+(i+1)+'</option>';
+		dselect += '<option value='+i+'>'+i+'</option>';
       
       for(i=1; i <= maxlettersnb; i++)
 	{
@@ -258,7 +258,7 @@ switch(problem()) {
 	      else if(auttype() == "counter") {  pmat.hide(); cmat.show(); dmat.hide(); }
 	      else if(auttype() == "det") {  pmat.hide(); cmat.hide(); dmat.show();}
 
-	      for(j=1; j<= maxstatesnb; j++)
+	      for(j=0; j< maxstatesnb; j++)
 		{
 		  var pline = pmat.find('#l'+i+'_'+j);
 		  var cline = cmat.find('#l'+i+'_'+j);
@@ -273,14 +273,14 @@ switch(problem()) {
 		      dcell.append(dselect);
 		      dcell.val(old);
 		      if(dcell.val() == "")
-			    dcell.val("1");
+			    dcell.val("0");
 			  if(j > statesnb()) {
 		      lab= '#l'+i+'_'+j;
 		      	dline = dmat.find(lab);
 			     dline.hide();
 			    }
 			
-		  for(k=1; k<= maxstatesnb; k++)
+		  for(k=0; k< maxstatesnb; k++)
 		    {
 		      var lab= '#c'+i+'_'+j+'_'+k;
 		      var ccell = cmat.find(lab);
@@ -326,12 +326,15 @@ switch(problem()) {
 	  });
     }
 
-function showAutomaton()
+function showAutomaton(data)
 {
-	
+	if(data) {
+		$('#automate').empty();
+		$('#automate').append( Viz(data));
+	}
 }
 
-function getAutomaton(mtime)
+function updateAutomaton()
 {
 	$.ajax({
 	method: "POST",
@@ -342,38 +345,9 @@ function getAutomaton(mtime)
 	.done(function( msg ) {
 		if(msg != "") {
 		var filename = msg;
-		jQuery.get('filename', showAutomaton, 'text');
-
-			var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", filename, false);
-    rawFile.onreadystatechange = function ()
-    {
-        if(rawFile.readyState === 4)
-        		  $('#automate').append( Viz(rawFile));
-    }
-	});
-}
-
-var automaton_mtime = "";
-
-
-    function checkAutomaton()
-    {
-      $.ajax({
-	method: "POST",
-	    url: "",
-	    async:false,
-	    data: { "action": "aut_mtime"}
-	})
-	.done(function( msg ) {
-			if(automaton_mtime != msg) {
-				getAutomaton(msg);			
-				automaton_file = msg;
-			}
-	  });
-    }
-
-
+		jQuery.get(filename, showAutomaton, 'text');
+	}});
+	}
 
     $( ".matchanger" ).change(function() {
 	update();
@@ -387,19 +361,19 @@ var automaton_mtime = "";
 	var mats = [];
 	var initial = '';
 	var final = '';
-	for(i=1; i <= statesnb(); i++)
+	for(i=0; i < statesnb(); i++)
 	  {
 	    var obj = $('#f'+i);
-	    if($('#f'+i).find("input").prop('checked')) final += (i-1) + " ";
-	    if($('#i'+i).find("input").prop('checked')) initial += (i-1) + " ";
+	    if($('#f'+i).find("input").prop('checked')) final += i + " ";
+	    if($('#i'+i).find("input").prop('checked')) initial += i + " ";
 	  }
 
 	for(i=1; i <= lettersnb(); i++)
 	  {	 
 	    var st = '';
-	    for(j=1; j <= statesnb(); j++)
+	    for(j=0; j < statesnb(); j++)
 	      {
-		for(k=1; k <= statesnb(); k++)
+		for(k=0; k < statesnb(); k++)
 		  {
 			
 		    if(auttype() == "proba")

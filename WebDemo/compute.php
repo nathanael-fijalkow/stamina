@@ -3,11 +3,10 @@ $iid = session_id();
 		
 $dir = $iid."@".$_SERVER['REMOTE_ADDR'];
 
-$finput="automaton.".$dir.".acme";
-$foutput="computation.".$dir.".log";
-$input=$finput;
-$output=$foutput;
-$automaton = "automaton.".$dir.".acme.dot";
+$input="automaton.".$dir.".acme";
+$output="computation.".$dir.".log";
+$automaton = "automaton.".$dir.".acme.auto.dot";
+$monoid = "automaton.".$dir.".acme.monoid.dot";
 
 $bin = realpath("WebDemo");
     $action = $_POST['action'];
@@ -17,13 +16,15 @@ $bin = realpath("WebDemo");
     switch($action)
       {
       case 'solve':
-
+	$aut=$_POST['automaton'];
+if(file_exists($output))
 	unlink($output);
+if(file_exists($automaton	))
 	unlink($automaton);
 
 	$f = fopen($input,"w+");
-	
 	$o = fopen($output,"w+");
+	
 	if(!file_exists($bin) || !is_file($bin)) {
 	    $msg = "Binary not found"; fwrite($o,$msg); echo $msg; break;
 	} else if(!is_executable($bin))  {
@@ -54,40 +55,33 @@ $bin = realpath("WebDemo");
 		fwrite($f,$aut["mats"][$i]);
 	      }
 	    fclose($f);
-	    fwrite($o,'The <a href="'.$input.'"> automaton file</a> and '); 
+	    fwrite($o,'The <a href="'.$input.'"> automaton stamina file</a> and '); 
 	    fwrite($o,'the <a href="'.$output.'"> log file</a>'."\n"); 
 	    fclose($o);
 	    echo "Computation started";	
-	    exec("nice ".$bin." ".$problem." ".$finput." >> ".$foutput. " 2>/dev/null  &");
+	    exec("nice ".$bin." ".$problem." ".$input." >> ".$output. " 2>/dev/null  &");
 	  }
 	break;
-	case 'aut_mtime':
-		if(file_exists($automaton)) {
-			$fp = fopen($automaton, "r");
-			$fstat = fstat($fp);
-			fclose($fp);
-			return $fstat['mtime'];
-		} else {
-			return "";
-		}
-		break;
 	case 'aut_file':
-		if(file_exists($automaton)) {
-			return $automaton;
-		} else {
-			return "";
-		}
+		if(file_exists($automaton))
+			echo $automaton;
 		break;		
+	case 'monoid_file':
+		if(file_exists($monoid))
+			echo $monoid;
+		break;		
+		
       case 'progress':
+      	if(!file_exists($output))
+      	return;
+      	
 	$size = filesize($output);
 	$max = 10000;
 
 	//retourne le contenu du fichier de sortie
 	$f =fopen($output,"r");
-	if($f ===false)
-	  {
-	    echo "No output yet";
-	    break;
+	if($f ===false)  {
+	    echo "No output yet";  break;
 	  } 
 	$out = "";
 
@@ -111,7 +105,7 @@ $bin = realpath("WebDemo");
 
 	    echo "<br/>*************************************************<br/>";
 	    echo "<br/>The computation is long, output is truncated...";
-	    echo "Here is <a href=\"".$foutput."\">the complete log.</a><br/>";
+	    echo "Here is <a href=\"".$output."\">the complete log.</a><br/>";
 	    echo "<br/>*************************************************<br/>";
 
 	    fseek($f, $size - $max);
