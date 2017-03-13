@@ -70,13 +70,14 @@
 	} 
 
       /* Generate initial and fnal  selector */
-      $('.initial').empty();
       $('.final').empty();
-      for(i=0; i < maxstatesnb; i++)
+	  $('#initial').empty();
+	 for(i=0; i < maxstatesnb; i++)
 	{
-	  $('.initial').append('<div  id="i'+i+'">'+i+'<input class="c" type="checkbox"></input></div>');
+		  $('#initial').append('<option id="i'+i+'">'+i+'</option>');
 	  $('.final').append('<div  id="f'+i+'">'+i+'<input class="c" type="checkbox"></input></div>');
 	}
+	$('.initial').val(0);
 
       /* Generate matrix editor */
       $('#probamats').empty();
@@ -126,6 +127,10 @@
       var density = $('#density').val() / 100.0;
       var ccoeff = counters_list();
 
+
+      /* random choice of one initial state */
+      $('#initial').val( Math.floor( Math.random() * statesnb() ));
+
       /* random choice of final states */
       for(j=0; j< statesnb; j++)		 
 	{
@@ -134,9 +139,6 @@
 	  ok |= yes;
 	}
 
-      /* random choice of one initial state */
-      var randinit = Math.floor( Math.random() * statesnb() );
-      $('#i'+randinit).find("input").prop('checked',true);
       //at least one final state or parsing wont work
       if(!ok)
 	{
@@ -185,19 +187,17 @@
 
     function update()
     {
-      for(i=0; i < maxstatesnb; i++)
+    for(i=0; i < maxstatesnb; i++)
 	{
 	  if(i < statesnb())
-	    {
-	      $('#i'+i).show();
 	      $('#f'+i).show();
-	    }
-	  else
-	    {
-	      $('#i'+i).hide();
+	  else 
 	      $('#f'+i).hide();
-	    }		
 	}
+		  $('#initial').empty();	
+	 for(i=0; i < statesnb(); i++)
+		  $('#initial').append('<option id="i'+i+'">'+i+'</option>');
+	$('.initial').val(0);
 
 switch(problem()) {
 	case "sh": $('#solve').val("Compute the StarHeight of this Deterministic Automaton"); break;
@@ -365,7 +365,8 @@ function updateAutomaton()
 	  {
 	    var obj = $('#f'+i);
 	    if($('#f'+i).find("input").prop('checked')) final += i + " ";
-	    if($('#i'+i).find("input").prop('checked')) initial += i + " ";
+	    initial = $('#initial').val() + " ";
+//	    if($('#i'+i).find("input").prop('checked')) initial += i + " ";
 	  }
 
 	for(i=1; i <= lettersnb(); i++)
