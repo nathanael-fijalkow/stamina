@@ -171,7 +171,7 @@
 		}
 		
 		if(!ok)	{
-		  finit = Math.floor( Math.random() * statesnb() );
+		  var finit = Math.floor( Math.random() * statesnb() );
 		  pmat.find('#c' + i + '_' + j + '_' + finit).prop('checked',true);
 		}
 }
