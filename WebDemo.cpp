@@ -121,11 +121,17 @@ int main(int argc, char **argv)
 
         cout << endl << endl << "RESULT: the star height is " << h << "." << endl;
         
-        cout << endl << endl;
-        if(witness) witness->print();
+        if(witness) {
+            cout << endl << "Witness expression: ";
+            witness->print();
+            cout << endl;
+        }
 
-        cout << endl << endl;
-        if(monoid) monoid->print();
+        if(monoid) {
+            cout << endl;
+            monoid->print();
+            cout << endl;
+        }
         
         string filename(argv[2]);
         ofstream ofs(filename + ".dot");
