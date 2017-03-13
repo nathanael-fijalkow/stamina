@@ -1,0 +1,128 @@
+/* andreas01 - an open source xhtml/css website layout by Andreas Viklund (http://andreasviklund.com). Made for OSWD.org, free to use as-is for any purpose as long as the proper credits are given for the original design work. For design assistance and support, contact me through my website or through http://oswd.org/email.phtml?user=Andreas
+
+Version: 1.0
+(July 25, 2005)
+
+Screen layout: */
+
+/* changed by Hugo Gimbert http://www.labri.fr/~gimbert */
+
+body {
+margin: 0px 10px 20px 10px;
+padding: 0;
+font: 76% Verdana,Tahoma,Arial,sans-serif;
+
+}
+
+
+.header {
+clear: both;
+margin: 0;
+padding: 3% 0 5% 0;
+}
+
+.header h1 {
+text-align: center;
+font-size : 2em;
+color:#800000;
+}
+
+.avmenu {
+position:fixed;
+float: left;
+width: 10%;
+margin: 10px 0 0 10px;
+padding: 0;
+font-size: 0.9em;
+}
+
+.avmenu ul {	
+list-style: none;
+margin: 0 0 0 0;
+padding: 0;
+font-size: 1.1em;
+}	
+
+.avmenu li {
+margin: 0 0 8px 0;
+padding: 0;
+}
+
+.avmenu li a {
+font-weight: bold;
+text-decoration: none;
+color: #505050;
+display: block;
+padding: 6px 0 6px 10px;
+background: #f4f4f4;
+border-left: 4px solid #cccccc;
+}	
+	
+.avmenu li a:hover {
+background: #eaeaea;
+/*color: #286ea0;*/
+color:#800000;
+border-left: 4px solid #286ea0;
+/*border-left: 4px solid #800000;*/
+}
+
+
+.containeur{ 
+margin: 0 0 10px 0;
+width:80%;
+float:right;}
+
+.contenu{ 
+margin: 0;
+ }
+
+.contenu li{ 
+padding : 3px 0 3px 0;
+ }
+.blockid{
+float:left; 
+text-decoration: bold;
+ }
+
+.blockid ul{ 
+list-style: none;
+}
+.blockid li{ 
+padding: 0px 0 10px 0;
+ }
+
+.photoid {
+margin: 10px 0px 0px 0px;
+float: left;
+width: 25%;
+}
+.cnrsid {
+margin: 20px 20px 20px 20px;
+float: left;
+width: 12%;
+}
+
+
+h2 {
+color:#800000;
+font-size:1.3em;
+}
+
+a {
+text-decoration: none;
+color: #286ea0;
+}
+
+a:hover {
+text-decoration: underline;
+/*color: #286ea0;*/
+color: #800000;
+
+}
+
+.hide{ 
+display:none; }
+
+
+
+
