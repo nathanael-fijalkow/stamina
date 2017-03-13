@@ -60,6 +60,8 @@ int main(int argc, char **argv)
         cout << " [compute-monoid,has-value1,is-unbounded] [input file] [ (opt) timeout in sec]" << endl;
         exit(0);
     }
+
+    
 #ifdef UNIX
     int timeout = 3 * 60;
     if(argc >= 4)
@@ -155,46 +157,25 @@ int main(int argc, char **argv)
     }
     else if (expa->type==CLASSICAL)
     {
-        /*
-         int height = 0;
-         ClassicAut* aut = fromExplicitToClassic(expa);
-         
-         pair<char,list<uint>> res = LoopComplexity(aut);
-         int lc = (int) res.first;
-         list<uint> order = res.second;
-         const RegExp* regexpr = Aut2RegExp(aut,order);
-         if(!regexpr) {
-         cout << "This automaton does not accept any words." << endl;
-         cout << "This automaton has star-height: 0" << endl;
-         exit(0);
-         }
-         
-         const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
-         cout << "Automaton with regexp: ";
-         regexpr->print();
-         cout << endl;
-         cout << "And loop complexity: " << lc << endl;
-         while(height < lc) {
-         cout << "Checking for height: " << height << endl;
-         MultiCounterAut* baut = toNestedBaut(aut, height);
-         UnstableMultiMonoid monoid(*baut);
-         const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr, *baut);
-         if(!monoid.IsUnlimitedWitness(mat) &&
-         !monoid.containsUnlimitedWitness())
-         break;
-         if(monoid.IsUnlimitedWitness(mat))
-         cout << "We guessed an unlimited witness" << endl;
-         else
-         cout << "The guess was not good, but we found an unlimited witness" << endl;
-         if(verbose)
-         monoid.print();
-         delete baut;
-         height++;
-         }
-         cout << "This automaton has star-height: " << height << endl;
-         if(height == lc)
-         cout << "And it is optimal (loop complexity is equal to the star height)" << endl;
-         */
+        ClassicAut aut(*expa);
+        if(!aut.isdet()) {
+            cout << "Only deterministic automata are handled" << endl;
+            return 0;
+        }
+        
+        //outputs
+        UnstableMultiMonoid * monoid = NULL;
+        const ExtendedExpression * witness = NULL;
+        int loopComplexity = 0;
+        auto h = computeStarHeight(aut, monoid, witness, loopComplexity, false, true);
+        cout << "RESULT: the star height is " << h << "." << endl;
+        
+        string filename(argv[2]);
+        ofstream ofs(filename + ".dot");
+        ofs << Dot::toDot(expa,monoid, -1);
+        
+        delete expa; expa = NULL;
+        delete monoid; monoid = NULL;
     }
     else if (expa->type > 0)
     {
