@@ -215,7 +215,8 @@ int main(int argc, char **argv)
     
     
     for(int stnb = 1 ; stnb < max_state_nb; stnb++) {
-        
+
+        delete expa;
         expa = new ExplicitAutomaton(stnb,letters_nb);
         expa->initialState = 0;
         expa->finalStates.push_back(stnb -1);
@@ -308,15 +309,23 @@ int main(int argc, char **argv)
                     use_minimization = false;
                 }
                 
-                if(just_one_id && aut_id >= 0 && cur_aut_id >= aut_id) break;
+                if(just_one_id && aut_id >= 0 && cur_aut_id >= aut_id) {
+                    cout << "Performed single experiment on id " << aut_id << "." << endl;
+                    break;
+                }
                 cur_aut_id++;
-                if(exp_nb > experiments_nb) break;
+                if(exp_nb > experiments_nb){
+                    cout << "Max experiments number attained." << endl;
+                    break;
+                }
                 bool ret = inc_mat_and_states();
                 if(!ret) break;
             }
         }
-        delete expa;
-        if(just_one_id && aut_id >= 0 && cur_aut_id >= aut_id) break;
+        if(just_one_id && aut_id >= 0 && cur_aut_id >= aut_id) {
+            cout << "Performed single experiment on id " << aut_id << "." << endl;
+            break;
+        }
     }
     cout << "Experiment over " << endl;
     
