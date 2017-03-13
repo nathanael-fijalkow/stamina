@@ -7,6 +7,8 @@ $finput="automaton.".$dir.".acme";
 $foutput="computation.".$dir.".log";
 $input=$finput;
 $output=$foutput;
+$automaton = "automaton.".$dir.".acme.dot";
+
 $bin = realpath("WebDemo");
     $action = $_POST['action'];
     $problem = $_POST['problem'];
@@ -15,9 +17,12 @@ $bin = realpath("WebDemo");
     switch($action)
       {
       case 'solve':
-	$aut=$_POST['automaton'];
+
+	unlink($output);
+	unlink($automaton);
 
 	$f = fopen($input,"w+");
+	
 	$o = fopen($output,"w+");
 	if(!file_exists($bin) || !is_file($bin)) {
 	    $msg = "Binary not found"; fwrite($o,$msg); echo $msg; break;
@@ -56,6 +61,23 @@ $bin = realpath("WebDemo");
 	    exec("nice ".$bin." ".$problem." ".$finput." >> ".$foutput. " 2>/dev/null  &");
 	  }
 	break;
+	case 'aut_mtime':
+		if(file_exists($automaton)) {
+			$fp = fopen($automaton, "r");
+			$fstat = fstat($fp);
+			fclose($fp);
+			return $fstat['mtime'];
+		} else {
+			return "";
+		}
+		break;
+	case 'aut_file':
+		if(file_exists($automaton)) {
+			return $automaton;
+		} else {
+			return "";
+		}
+		break;		
       case 'progress':
 	$size = filesize($output);
 	$max = 10000;

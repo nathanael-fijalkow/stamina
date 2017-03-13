@@ -1,3 +1,5 @@
+    
+
 	  var maxstatesnb = 10;
     var maxlettersnb = 4;
     var maxcountersnb = 5;
@@ -35,7 +37,8 @@
     update();
     fill_random();
 
-    setInterval(showProgress, 1000);
+    setInterval(showOutput, 2000);
+    setInterval(showAutomaton, 2000);
 
     function generate()
     {
@@ -310,7 +313,7 @@ switch(problem()) {
       $('.log').append(data);
     }
 
-    function showProgress()
+    function showOutput()
     {
       $.ajax({
 	method: "POST",
@@ -320,6 +323,53 @@ switch(problem()) {
 	})
 	.done(function( msg ) {
 	    output(msg );
+	  });
+    }
+
+function showAutomaton()
+{
+	
+}
+
+function getAutomaton(mtime)
+{
+	$.ajax({
+	method: "POST",
+	    url: "",
+	    async:false,
+	    data: { "action": "aut_file"}
+	})
+	.done(function( msg ) {
+		if(msg != "") {
+		var filename = msg;
+		jQuery.get('filename', showAutomaton, 'text');
+
+			var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", filename, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        		  $('#automate').append( Viz(rawFile));
+    }
+	});
+}
+
+var automaton_mtime = "";
+
+
+    function checkAutomaton()
+    {
+      $.ajax({
+	method: "POST",
+	    url: "",
+	    async:false,
+	    data: { "action": "aut_mtime"}
+	})
+	.done(function( msg ) {
+			if(automaton_mtime != msg) {
+				getAutomaton(msg);			
+				automaton_file = msg;
+			}
 	  });
     }
 

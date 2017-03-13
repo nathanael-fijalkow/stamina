@@ -179,11 +179,13 @@ string Dot::toDot(Monoid* m)
 string Dot::toDot(const ExplicitAutomaton* a, Monoid* m, int sh)
 {
 	string ret;
-	size = a->size;
-	initialState = a->initialState;
-	finalStates = a->finalStates;
-	SH = sh;
-	ret += toDot(*a);
+    if(a) {
+        size = a->size;
+        initialState = a->initialState;
+        finalStates = a->finalStates;
+        SH = sh;
+        ret += toDot(*a);
+    }
 	ret += toDot(m);
 	return ret;
 }

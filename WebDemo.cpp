@@ -100,9 +100,14 @@ int main(int argc, char **argv)
     {
         cout << "Failed to parse automaton " << endl;
         exit(0);
+    } else {
+        string filename(argv[2]);
+        ofstream ofs(filename + ".auto.dot");
+        ofs << Dot::toDot(expa,NULL, -1);
+        ofs.close();
     }
     
-//    cout << "Performin action '" << action << "'" << endl;
+    //    cout << "Performin action '" << action << "'" << endl;
     
     
     if(action == "starheight" || action == "sh") {
@@ -118,7 +123,7 @@ int main(int argc, char **argv)
         const ExtendedExpression * witness = NULL;
         int loopComplexity = 0;
         auto h = computeStarHeight(aut, monoid, witness, loopComplexity, false, true);
-
+        
         cout << endl << endl << "RESULT: the star height is " << h << "." << endl;
         
         if(witness) {
@@ -126,16 +131,18 @@ int main(int argc, char **argv)
             witness->print();
             cout << endl;
         }
-
+        
         if(monoid) {
             cout << endl;
             monoid->print();
             cout << endl;
+            
+            string filename(argv[2]);
+            ofstream ofs(filename + ".monoid.dot");
+            ofs << Dot::toDot(expa,monoid,h);
+            ofs.close();
         }
         
-        string filename(argv[2]);
-        ofstream ofs(filename + ".dot");
-        ofs << Dot::toDot(expa,monoid, -1);
         
         delete expa; expa = NULL;
         delete monoid; monoid = NULL;
