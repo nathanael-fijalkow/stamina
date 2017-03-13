@@ -1,0 +1,125 @@
+
+
+The input automaton is a classical automaton. Stamina will compute its star height.
+It first finds an upper bound using the Loop Complexity heuristics, and then proceeds with the star height computation.
+
+************LOOP COMPLEXITY******************
+
+According to the Loop Complexity heuristics, the star-height is at most 2.
+A regular expression for the language (omitting epsilon) is:  ((bb*c+aa*(c+bb*c))+((c+bb*c)+aa*(c+bb*c))(((c+bb*c)+aa*(c+bb*c)))*((c+bb*c)+aa*(c+bb*c)))
+The Loop Complexity suggests the following unboundedness witness:   bb#c(bb#c)^#bb#c
+
+************STAR HEIGHT COMPUTATION**********
+
+******************************
+Testing star height 0
+******************************
+
+******************************
+Testing star height 1
+******************************
+Processing product: 2258 elements and 2874 rules and 5723 vectors and 4721406 expressions to process.
+Processing product: 2668 elements and 4069 rules and 5726 vectors and 6566732 expressions to process.
+Processing product: 2781 elements and 4155 rules and 5726 vectors and 7056542 expressions to process.
+Processing product: 2829 elements and 4386 rules and 5726 vectors and 7212839 expressions to process.
+Processing product: 2911 elements and 4390 rules and 5726 vectors and 7558583 expressions to process.
+Processing product: 2911 elements and 4398 rules and 5726 vectors and 7458583 expressions to process.
+Processing product: 2911 elements and 4398 rules and 5726 vectors and 7358583 expressions to process.
+Processing product: 2993 elements and 4398 rules and 5726 vectors and 7708940 expressions to process.
+Processing product: 3075 elements and 4509 rules and 5726 vectors and 8070602 expressions to process.
+Processing product: 3075 elements and 4533 rules and 5726 vectors and 7970602 expressions to process.
+Processing product: 3075 elements and 4538 rules and 5726 vectors and 7870602 expressions to process.
+Processing product: 3111 elements and 4553 rules and 5726 vectors and 7974128 expressions to process.
+Processing product: 3113 elements and 4566 rules and 5726 vectors and 7885407 expressions to process.
+Processing product: 3174 elements and 4580 rules and 5726 vectors and 8050287 expressions to process.
+Processing product: 3174 elements and 4581 rules and 5726 vectors and 8030939 expressions to process.
+Processing product: 3213 elements and 4604 rules and 5726 vectors and 8153988 expressions to process.
+Processing product: 3213 elements and 4608 rules and 5726 vectors and 8053988 expressions to process.
+Processing product: 3274 elements and 4620 rules and 5726 vectors and 8304464 expressions to process.
+Processing product: 3274 elements and 4620 rules and 5726 vectors and 8204464 expressions to process.
+Processing product: 3274 elements and 4620 rules and 5726 vectors and 8104464 expressions to process.
+Processing product: 3274 elements and 4620 rules and 5726 vectors and 8004464 expressions to process.
+Processing product: 3310 elements and 4620 rules and 5726 vectors and 8110654 expressions to process.
+Processing product: 3310 elements and 4620 rules and 5726 vectors and 8010654 expressions to process.
+Processing product: 3315 elements and 4727 rules and 5726 vectors and 7939149 expressions to process.
+Processing product: 3315 elements and 4727 rules and 5726 vectors and 7839149 expressions to process.
+Processing product: 3315 elements and 4727 rules and 5726 vectors and 7739149 expressions to process.
+Processing product: 3315 elements and 4743 rules and 5726 vectors and 7639149 expressions to process.
+Processing product: 3315 elements and 4743 rules and 5726 vectors and 7539149 expressions to process.
+Processing product: 3315 elements and 4789 rules and 5726 vectors and 7439149 expressions to process.
+Processing product: 3315 elements and 4798 rules and 5726 vectors and 7339149 expressions to process.
+Processing product: 3315 elements and 4798 rules and 5726 vectors and 7239149 expressions to process.
+Processing product: 3315 elements and 4814 rules and 5726 vectors and 7139149 expressions to process.
+Processing product: 3315 elements and 4814 rules and 5726 vectors and 7039149 expressions to process.
+Processing product: 3315 elements and 4814 rules and 5726 vectors and 6939149 expressions to process.
+Processing product: 3315 elements and 4854 rules and 5726 vectors and 6839149 expressions to process.
+Processing product: 3315 elements and 4860 rules and 5726 vectors and 6739149 expressions to process.
+Processing product: 3315 elements and 4870 rules and 5726 vectors and 6639149 expressions to process.
+Processing product: 3315 elements and 4870 rules and 5726 vectors and 6539149 expressions to process.
+Processing product: 3315 elements and 4895 rules and 5726 vectors and 6439149 expressions to process.
+Processing product: 3315 elements and 4904 rules and 5726 vectors and 6339149 expressions to process.
+Processing product: 3315 elements and 4904 rules and 5726 vectors and 6239149 expressions to process.
+Processing product: 3315 elements and 4912 rules and 5726 vectors and 6139149 expressions to process.
+Processing product: 3315 elements and 4917 rules and 5726 vectors and 6039149 expressions to process.
+Processing product: 3315 elements and 4917 rules and 5726 vectors and 5939149 expressions to process.
+Processing product: 3315 elements and 4917 rules and 5726 vectors and 5839149 expressions to process.
+Processing product: 3315 elements and 4926 rules and 5726 vectors and 5739149 expressions to process.
+Processing product: 3315 elements and 4926 rules and 5726 vectors and 5639149 expressions to process.
+Processing product: 3315 elements and 4950 rules and 5726 vectors and 5539149 expressions to process.
+Processing product: 3315 elements and 4965 rules and 5726 vectors and 5439149 expressions to process.
+Processing product: 3315 elements and 4979 rules and 5726 vectors and 5339149 expressions to process.
+Processing product: 3315 elements and 4979 rules and 5726 vectors and 5239149 expressions to process.
+Processing product: 3315 elements and 4984 rules and 5726 vectors and 5139149 expressions to process.
+Processing product: 3315 elements and 4998 rules and 5726 vectors and 5039149 expressions to process.
+Processing product: 3315 elements and 4998 rules and 5726 vectors and 4939149 expressions to process.
+Processing product: 3315 elements and 4998 rules and 5726 vectors and 4839149 expressions to process.
+Processing product: 3315 elements and 4998 rules and 5726 vectors and 4739149 expressions to process.
+Processing product: 3315 elements and 5014 rules and 5726 vectors and 4639149 expressions to process.
+Processing product: 3315 elements and 5014 rules and 5726 vectors and 4539149 expressions to process.
+Processing product: 3315 elements and 5014 rules and 5726 vectors and 4439149 expressions to process.
+Processing product: 3315 elements and 5014 rules and 5726 vectors and 4339149 expressions to process.
+Processing product: 3315 elements and 5014 rules and 5726 vectors and 4239149 expressions to process.
+Processing product: 3315 elements and 5014 rules and 5726 vectors and 4139149 expressions to process.
+Processing product: 3315 elements and 5014 rules and 5726 vectors and 4039149 expressions to process.
+Processing product: 3315 elements and 5014 rules and 5726 vectors and 3939149 expressions to process.
+Processing product: 3315 elements and 5023 rules and 5726 vectors and 3839149 expressions to process.
+Processing product: 3315 elements and 5028 rules and 5726 vectors and 3739149 expressions to process.
+Processing product: 3315 elements and 5042 rules and 5726 vectors and 3639149 expressions to process.
+Processing product: 3315 elements and 5042 rules and 5726 vectors and 3539149 expressions to process.
+Processing product: 3315 elements and 5042 rules and 5726 vectors and 3439149 expressions to process.
+Processing product: 3315 elements and 5060 rules and 5726 vectors and 3339149 expressions to process.
+Processing product: 3315 elements and 5061 rules and 5726 vectors and 3239149 expressions to process.
+Processing product: 3315 elements and 5061 rules and 5726 vectors and 3139149 expressions to process.
+Processing product: 3315 elements and 5066 rules and 5726 vectors and 3039149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 2939149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 2839149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 2739149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 2639149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 2539149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 2439149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 2339149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 2239149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 2139149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 2039149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 1939149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 1839149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 1739149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 1639149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 1539149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 1439149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 1339149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 1239149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 1139149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 1039149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 939149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 839149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 739149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 639149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 539149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 439149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 339149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 239149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 139149 expressions to process.
+Processing product: 3315 elements and 5080 rules and 5726 vectors and 39149 expressions to process.
+
+RESULTS: the star height is 2, as predicted by the Loop Complexity heuristics, and a regular expression witnessing it is ((bb*c+aa*(c+bb*c))+((c+bb*c)+aa*(c+bb*c))(((c+bb*c)+aa*(c+bb*c)))*((c+bb*c)+aa*(c+bb*c))).

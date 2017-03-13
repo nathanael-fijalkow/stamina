@@ -1,0 +1,22 @@
+
+
+The input automaton is a classical automaton. Stamina will compute its star height.
+It first finds an upper bound using the Loop Complexity heuristics, and then proceeds with the star height computation.
+
+************LOOP COMPLEXITY******************
+
+According to the Loop Complexity heuristics, the star-height is at most 2.
+A regular expression for the language (omitting epsilon) is:  (ab*a+(b+ab*a)((b+ab*a))*(b+ab*a))
+The Loop Complexity suggests the following unboundedness witness:   ab#a(ab#a)^#ab#a
+
+************STAR HEIGHT COMPUTATION**********
+
+******************************
+Testing star height 0
+******************************
+
+******************************
+Testing star height 1
+******************************
+
+RESULTS: the star height is 2, as predicted by the Loop Complexity heuristics, and a regular expression witnessing it is (ab*a+(b+ab*a)((b+ab*a))*(b+ab*a)).
