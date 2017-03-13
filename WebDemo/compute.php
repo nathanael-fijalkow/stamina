@@ -81,7 +81,7 @@ $bin = realpath("WebDemo");
 	  }
 	else
 	  {
-	    for($i = 0; $i < 50; $i++)
+	    for($i = 0; $i < 150; $i++)
 	      {
 	    $chunk  = fgets($f);
 	    echo str_replace(array("\n","E ","O "),array("<br/>","&epsilon;","&omega;"),$chunk);	    
