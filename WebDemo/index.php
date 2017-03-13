@@ -434,29 +434,33 @@ and the value 1 problems for probabilistic automata.
       $('#probamats').empty();
       $('#countermats').empty();
       $('#detmats').empty();
+      $('#detmats').append("<div><b>Transitions</b></div>");
+      
       for(i=1; i <= maxlettersnb; i++)
 	{
-	  var smat = '<div style="float:left;margin-right:30px" id="Mat'+i+'"><b>Mat '
-	    +String.fromCharCode(97 + i - 1)+'</b></div>';
+				var l = String.fromCharCode(97 + i - 1);
+	  var smat = '<div style="float:left;margin-right:30px" id="Mat'+i+'"><b>Mat '+l+'</b></div>';
 	  $('#probamats').append(smat);
 	  $('#countermats').append(smat);
+      smat = '<div style="float:left;margin-right:30px" id="Mat'+i+'"></div>';
 	  $('#detmats').append(smat);
 	  var pmat = $('#probamats').find('#Mat'+i);
 	  var cmat = $('#countermats').find('#Mat'+i);
 	  var dmat = $('#detmats').find('#Mat'+i);
 	  pmat.append('<br/>');
 	  cmat.append('<br/>');
-	  dmat.append('<br/>');
 	  for(j=1; j<= maxstatesnb; j++)
 	    {
 	      var lab = 'l'+i+'_'+j;
+	     dmat.append('<div style="float:top;" id="'+lab+'"></div>');
 	      pmat.append('<div id="'+lab+'">'+j+'</div>');
 	      cmat.append('<div id="'+lab+'">'+j+'</div>');
-	      dmat.append('<div id="'+lab+'">'+j+'</div>');
+
+	      var dline =dmat.find('#'+lab);
+		  dline.append('<b> '+j + ',' +l+' &#8614; </b> <select selected=""  id="c'+i+'_'+j+'_"/>');
+
 	      var pline =pmat.find('#'+lab);
 	      var cline =cmat.find('#'+lab);
-	      var dline =dmat.find('#'+lab);
-		  dline.append('<select selected=""  id="c'+i+'_'+j+'_"/>');
 	      for(k=1; k<= maxstatesnb; k++)
 		{
 		  pline.append('<input selected="" class="c" type="checkbox" id="c'+i+'_'+j+'_'+k+'"/>');
@@ -622,6 +626,11 @@ switch(problem()) {
 		      dcell.val(old);
 		      if(dcell.val() == "")
 			    dcell.val("1");
+			  if(j > statesnb()) {
+		      lab= '#l'+i+'_'+j;
+		      	dline = dmat.find(lab);
+			     dline.hide();
+			    }
 			
 		  for(k=1; k<= maxstatesnb; k++)
 		    {
