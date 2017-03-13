@@ -359,10 +359,10 @@ int computeStarHeight( ClassicAut & aut,
                       )
 {
     if(! aut.iscomplete()){
-    	//cout<<" adding sink"<<endl;
+        //cout<<" adding sink"<<endl;
         aut.addsink();
-      }
-        
+    }
+    
     
     if(verbose) cout << "************LOOP COMPLEXITY******************" << endl << endl;
     
@@ -370,18 +370,18 @@ int computeStarHeight( ClassicAut & aut,
     LC = (int)res.first ;
     list<uint> order = res.second;
     RegExp * regexpr = Aut2RegExp( &aut , order );
-
+    
     list<ExtendedExpression *> sharplist = Reg2Sharps(regexpr);
-
+    
     if(regexpr == NULL || sharplist.size()==0)// empty language
     {
         if(verbose) cout <<"The language is empty, the star height is 0."<<endl;
         monoid = NULL; witness = NULL;
         return 0;
     }
-
+    
     if(regexpr->starheight<LC) LC=regexpr->starheight;
-
+    
     if(verbose) {
         cout << "According to the Loop Complexity heuristics,";
         cout << "the star-height is at most " << LC << "." << endl;
@@ -392,118 +392,118 @@ int computeStarHeight( ClassicAut & aut,
     }
     int h=LC;
     if (LC>1){
-    if(verbose) cout << endl << "************STAR HEIGHT COMPUTATION**********" << endl;
-    if(verbose) cout << "Computing the Subset Automaton..." << endl;
-    
-    //We start by computing the subset automaton of aut
-    //It has deterministic letters
-    ClassicEpsAut * Subsetaut = toSubsetAut(&aut);
-    
-    uint ns=Subsetaut->NbStates;
-    char nl=Subsetaut->NbLetters;
-    
-    if(verbose){
-        printf("Subset Automaton Built, %d states\n\n",ns);
-        ofstream file(filepref + "subset_aut.txt");
-        Subsetaut->print(file);
-    }
-    
-    if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
-
-    if(use_minimization) {
-        Subsetaut=SubMinPre(Subsetaut); //optional for now, to test later
-        Subsetaut=SubPrune(Subsetaut);
-    }
+        if(verbose) cout << endl << "************STAR HEIGHT COMPUTATION**********" << endl;
+        if(verbose) cout << "Computing the Subset Automaton..." << endl;
         
-    ns=Subsetaut->NbStates;
-    nl=Subsetaut->NbLetters;
-    
-    if(verbose) printf("Pruned Subset Automaton Built, %d states\n\n",ns);
-    if(filelogs) {
-        ofstream file(filepref + "subset_aut_pruned.txt");
-        Subsetaut->print(file);
-    }
-    
-    h = 1;
-    
-    while (h<LC){
-        if(verbose) {
-        cout << endl << "******************************" << endl;
-        cout << "Testing star height " << h << endl;
-        cout << "******************************" << endl;
-            cout << "First step: computing the automaton with counters." << endl << endl;
+        //We start by computing the subset automaton of aut
+        //It has deterministic letters
+        ClassicEpsAut * Subsetaut = toSubsetAut(&aut);
+        
+        uint ns=Subsetaut->NbStates;
+        char nl=Subsetaut->NbLetters;
+        
+        if(verbose){
+            printf("Subset Automaton Built, %d states\n\n",ns);
+            ofstream file(filepref + "subset_aut.txt");
+            Subsetaut->print(file);
         }
         
-        MultiCounterAut * Baut = toNestedBaut(Subsetaut, h, verbose, filelogs, "AllStars_");
-        monoid = new UnstableMultiMonoid(*Baut);
+        if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
         
-        if(verbose)
-            cout << "Second step: checking whether the Loop Complexity suggestions are unlimitedness witnesses." << endl;
-        //if(h <= 1)
-        if(use_loop_heuristic)
-        {
-            witness = checkLoopComplexitySuggestions(monoid, *Baut, sharplist);
-            if(witness != NULL) {
-                if(verbose)
-                    cout << "--> The heuristic found a witness, star height is > than " << h << endl;
-                if(filelogs) {
-                    ofstream f(filepref + "unlimited_witness_sh_" +  to_string(h) + ".txt");
-                    f << *witness;
+        if(use_minimization) {
+            Subsetaut=SubMinPre(Subsetaut); //optional for now, to test later
+            Subsetaut=SubPrune(Subsetaut);
+        }
+        
+        ns=Subsetaut->NbStates;
+        nl=Subsetaut->NbLetters;
+        
+        if(verbose) printf("Pruned Subset Automaton Built, %d states\n\n",ns);
+        if(filelogs) {
+            ofstream file(filepref + "subset_aut_pruned.txt");
+            Subsetaut->print(file);
+        }
+        
+        h = 1;
+        
+        while (h<LC){
+            if(verbose) {
+                cout << endl << "******************************" << endl;
+                cout << "Testing star height " << h << endl;
+                cout << "******************************" << endl;
+                cout << "First step: computing the automaton with counters." << endl << endl;
+            }
+            
+            MultiCounterAut * Baut = toNestedBaut(Subsetaut, h, verbose, filelogs, "AllStars_");
+            monoid = new UnstableMultiMonoid(*Baut);
+            
+            if(verbose)
+                cout << "Second step: checking whether the Loop Complexity suggestions are unlimitedness witnesses." << endl;
+            //if(h <= 1)
+            if(use_loop_heuristic)
+            {
+                witness = checkLoopComplexitySuggestions(monoid, *Baut, sharplist);
+                if(witness != NULL) {
+                    if(verbose)
+                        cout << "--> The heuristic found a witness, star height is > than " << h << endl;
+                    if(filelogs) {
+                        ofstream f(filepref + "unlimited_witness_sh_" +  to_string(h) + ".txt");
+                        f << *witness;
+                    }
+                } else if(verbose) {
+                    cout << "-->Heuristic found no witness." << endl << endl;
                 }
-            } else if(verbose) {
-                cout << "-->Heuristic found no witness." << endl << endl;
-            }
-        }
-        //no need anymore for Baut;
-        delete Baut;
-        Baut = NULL;
-
-        
-        if(!witness){
-            if(verbose){
-                cout << "Third step: computing the monoid, and checking for the existence of an unlimitedness witness on the fly." << endl << endl;
-            }
-            
-            try {
-                witness = monoid->containsUnlimitedWitness();
-            } catch(const runtime_error & exc) {
-                cout << "Starheight >= "  << h << " but exact computation failed with " << endl;
-                cout << string(exc.what()) << endl;
-                return -h;
-            }
-
-            
-            if(filelogs) {
-                monoid->print_summary();
-                ofstream f(filepref + "monoid_sh_" + to_string(h) + ".txt");
-                f << *monoid;
-            }
-            
-            if(!witness) {
-                if(verbose)
-                    cout << "The monoid for sh=" << h << " is limited." << endl;
-                return h;
             } else {
-                if(verbose){
-                    cout << "An unlimited witness is ";
-                    witness->print();
-                    cout << endl;
-                }
-                if(filelogs) {
-                    ofstream f(filepref + "unlimited_witness_sh_" +   to_string(h) + ".txt");
-                    f << *witness;
-                }
-		if (h+1 < LC) {
-		  delete monoid;
-		  monoid = NULL;
-		}
+                witness = NULL;
             }
-        } else if (h+1 < LC) {
-            delete monoid;
-            monoid = NULL;
+            //no need anymore for Baut;
+            delete Baut;
+            Baut = NULL;
+            
+            
+            if(!witness){
+                if(verbose){
+                    cout << "Third step: computing the monoid, and checking for the existence of an unlimitedness witness on the fly." << endl << endl;
+                }
+                
+                try {
+                    witness = monoid->containsUnlimitedWitness();
+                } catch(const runtime_error & exc) {
+                    cout << "Starheight >= "  << h << " but exact computation failed with " << endl;
+                    cout << string(exc.what()) << endl;
+                    return -h;
+                }
+                
+                
+                if(filelogs) {
+                    monoid->print_summary();
+                    ofstream f(filepref + "monoid_sh_" + to_string(h) + ".txt");
+                    f << *monoid;
+                }
+                
+                if(!witness) {
+                    if(verbose)
+                        cout << "The monoid for sh=" << h << " is limited." << endl;
+                    return h;
+                } else {
+                    if(verbose){
+                        cout << "An unlimited witness is ";
+                        witness->print();
+                        cout << endl;
+                    }
+                    if(filelogs) {
+                        ofstream f(filepref + "unlimited_witness_sh_" +   to_string(h) + ".txt");
+                        f << *witness;
+                    }
+                    if (h+1 < LC) {
+                        delete monoid; monoid = NULL;
+                    }
+                }
+            } else if (h+1 < LC) {
+                delete monoid; monoid = NULL;
+            }
+            h++;
         }
-        h++;
-    }
     }
     if(h==LC && verbose){
         cout << endl << "RESULTS: the star height is " << LC << ", matching the Loop Complexity, and a regular expression witnessing it is ";
