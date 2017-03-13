@@ -57,9 +57,15 @@ int main(int argc, char **argv)
     if(argc <= 2)
     {
         cout << "Usage " << string(argv[0]);
-        cout << " [compute-monoid,has-value1,is-unbounded] [input file] [ (opt) timeout in sec]" << endl;
+        cout << " $action [input file] [ (opt) timeout in sec]" << endl;
+        cout << " with $action" << endl;
+        cout << "\t starheight / sh: compute starheight of a classical automaton" << endl;
+        cout << "\t value1 / vo: check whether a probabilistic automaton has value 1" << endl;
+        cout << "\t monoid / mon: compute monoid of the automaton" << endl;
         exit(0);
     }
+    
+    
 #ifdef UNIX
     int timeout = 3 * 60;
     if(argc >= 4)
@@ -77,7 +83,6 @@ int main(int argc, char **argv)
 #endif
     
     string action(argv[1]);
-    bool find_witness = (action != "compute-monoid");
     
     ExplicitAutomaton* expa = NULL;
     {
@@ -97,134 +102,122 @@ int main(int argc, char **argv)
         exit(0);
     }
     
-    if(expa->type==PROB)
-    {
-        UnstableMarkovMonoid m(*expa);
-        
-        if(find_witness)
-        {
-            cout << "Looking for a value 1 witness in the Markov monoid..." << endl;
-            m.setWitnessTest(&UnstableMarkovMonoid::value1Test);
-        }
-        else
-        {
-            cout << "Computing the Markov monoid..." << endl;
-        }
-        auto expr = m.ComputeMonoid();
-        
-        if(expr == NULL)
-            cout << "The monoid has exactly " << m.expr_to_mat.size() << " elements" << endl;
-        else
-        {
-            cout << "The monoid has at least " << m.expr_to_mat.size() << " elements,<br/>";
-            cout << "the computation stopped because a value 1 witness was found." << endl;
+//    cout << "Performin action '" << action << "'" << endl;
+    
+    
+    if(action == "starheight" || action == "sh") {
+        cout << "Computing starheight" << endl;
+        ClassicAut aut(*expa);
+        if(!aut.isdet()) {
+            cout << "Only deterministic automata are handled" << endl;
+            return 0;
         }
         
-        pair<int, const ExtendedExpression*> r = m.maxLeakNb();
-        auto lnb = r.first;
-        if(lnb == 0)
-        {
-            cout << "This automaton is leaktight" << endl;
-        }
-        else
-        {
-            cout << "This automaton is NOT leaktight, it has " << lnb << " leak, for example" << endl;
-            cout << *expr << endl;
-            cout << "is a leak" << endl;
-        }
-        if(!find_witness)
-            expr = m.hasValue1();
-        if (expr)
-        {
-            cout << "The automaton has value 1.\nA value 1 witness is " << endl;
-            cout << *expr << endl << endl;
-        }
-        else if(r.first == 0)
-        {
-            cout << "The automaton does not have value 1, because it is leaktight and there is no value 1 witness." << endl;
-        }
-        else
-        {
-            cout << "Since the automaton is not leaktight, and since there is no value1 witness,";
-            cout << "the algorithm could not determine whether the automaton has value 1 or not." << endl;
-        }
-        m.print();
-        //      if(toOut)
-        //ofs << Dot::toDot(expa,m);
+        //outputs
+        UnstableMultiMonoid * monoid = NULL;
+        const ExtendedExpression * witness = NULL;
+        int loopComplexity = 0;
+        auto h = computeStarHeight(aut, monoid, witness, loopComplexity, false, true);
+
+        cout << endl << endl << "RESULT: the star height is " << h << "." << endl;
         
-    }
-    else if (expa->type==CLASSICAL)
-    {
-        /*
-         int height = 0;
-         ClassicAut* aut = fromExplicitToClassic(expa);
-         
-         pair<char,list<uint>> res = LoopComplexity(aut);
-         int lc = (int) res.first;
-         list<uint> order = res.second;
-         const RegExp* regexpr = Aut2RegExp(aut,order);
-         if(!regexpr) {
-         cout << "This automaton does not accept any words." << endl;
-         cout << "This automaton has star-height: 0" << endl;
-         exit(0);
-         }
-         
-         const ExtendedExpression* sharp_expr = Reg2Sharp(regexpr);
-         cout << "Automaton with regexp: ";
-         regexpr->print();
-         cout << endl;
-         cout << "And loop complexity: " << lc << endl;
-         while(height < lc) {
-         cout << "Checking for height: " << height << endl;
-         MultiCounterAut* baut = toNestedBaut(aut, height);
-         UnstableMultiMonoid monoid(*baut);
-         const Matrix* mat = monoid.ExtendedExpression2Matrix(sharp_expr, *baut);
-         if(!monoid.IsUnlimitedWitness(mat) &&
-         !monoid.containsUnlimitedWitness())
-         break;
-         if(monoid.IsUnlimitedWitness(mat))
-         cout << "We guessed an unlimited witness" << endl;
-         else
-         cout << "The guess was not good, but we found an unlimited witness" << endl;
-         if(verbose)
-         monoid.print();
-         delete baut;
-         height++;
-         }
-         cout << "This automaton has star-height: " << height << endl;
-         if(height == lc)
-         cout << "And it is optimal (loop complexity is equal to the star height)" << endl;
-         */
-    }
-    else if (expa->type > 0)
-    {
-        UnstableMultiMonoid m(* expa);
-        const ExtendedExpression * expr =
-            find_witness ?
-            m.containsUnlimitedWitness() :
-            m.ComputeMonoid();
+        string filename(argv[2]);
+        ofstream ofs(filename + ".dot");
+        ofs << Dot::toDot(expa,monoid, -1);
         
-        if(expr == NULL)
-            cout << "The monoid has exactly " << m.expr_to_mat.size() << " elements" << endl;
-        else
-        {
-            cout << "The monoid has at least " << m.expr_to_mat.size() << " elements,<br/>";
-            cout << "the computation stopped because an unlimited witness was found." << endl;
-        }
+        delete expa; expa = NULL;
+        delete monoid; monoid = NULL;
+    } else {
         
-        if(find_witness)
+        bool find_witness = (action != "monoid" && action != "mon");
+        
+        
+        if(expa->type==PROB)
         {
-            if(expr == NULL)
+            UnstableMarkovMonoid m(*expa);
+            
+            if(find_witness)
             {
-                cout << "This automaton is bounded, its monoid contains no unlimited witness." << endl;
+                cout << "Looking for a value 1 witness in the Markov monoid..." << endl;
+                m.setWitnessTest(&UnstableMarkovMonoid::value1Test);
             }
             else
             {
-                cout << "This automaton is NOT bounded, its monoid contains the following unlimited witness:" << endl;
-                cout << *expr << endl;
+                cout << "Computing the Markov monoid..." << endl;
             }
+            auto expr = m.ComputeMonoid();
+            
+            if(expr == NULL)
+                cout << "The monoid has exactly " << m.expr_to_mat.size() << " elements" << endl;
+            else
+            {
+                cout << "The monoid has at least " << m.expr_to_mat.size() << " elements,<br/>";
+                cout << "the computation stopped because a value 1 witness was found." << endl;
+            }
+            
+            pair<int, const ExtendedExpression*> r = m.maxLeakNb();
+            auto lnb = r.first;
+            if(lnb == 0)
+            {
+                cout << endl << endl << "This automaton is LEAKTIGHT " << endl;
+            }
+            else
+            {
+                cout << endl << endl << "This automaton is NOT LEAKTIGHT, it has " << lnb << " LEAK, for example" << endl;
+                cout << *(r.second) << endl;
+                cout << "is a leak" << endl;
+            }
+            if(!find_witness)
+                expr = m.hasValue1();
+            if (expr)
+            {
+                cout << "The automaton HAS VALUE=1.\nA value 1 witness is " << endl;
+                cout << *expr << endl << endl;
+            }
+            else if(r.first == 0)
+            {
+                cout << "The automaton DOES NOT HAVE VALUE=1, because it is leaktight and there is no value 1 witness." << endl << endl;
+            }
+            else
+            {
+                cout << "Since the automaton is not leaktight, and since there is no value1 witness,";
+                cout << "the algorithm could not determine whether the automaton has value 1 or not." << endl;
+            }
+            m.print();
+            //      if(toOut)
+            //ofs << Dot::toDot(expa,m);
+            
         }
-        m.print();
+        else if (expa->type > 0)
+        {
+            UnstableMultiMonoid m(* expa);
+            const ExtendedExpression * expr =
+            find_witness ?
+            m.containsUnlimitedWitness() :
+            m.ComputeMonoid();
+            
+            if(expr == NULL)
+                cout << "The monoid has exactly " << m.expr_to_mat.size() << " elements" << endl;
+            else
+            {
+                cout << "The monoid has at least " << m.expr_to_mat.size() << " elements,<br/>";
+                cout << "the computation stopped because an unlimited witness was found." << endl;
+            }
+            
+            if(find_witness)
+            {
+                if(expr == NULL)
+                {
+                    cout << endl << endl << "RESULT: This automaton is LIMITED, its monoid contains No UNLIMITED WITNESS." << endl << endl;
+                }
+                else
+                {
+                    cout << endl << endl << "RESULT: This automaton is NOT LIMITED, its monoid contains the following UNLIMITED WITNESS:" << endl;
+                    cout << *expr << endl;
+                }
+            }
+            m.print();
+        }
+        cout << "Computation over " << endl;
     }
-    cout << "Computation over " << endl;
 }
