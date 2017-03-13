@@ -194,10 +194,13 @@
 	  else 
 	      $('#f'+i).hide();
 	}
+	var befin =  $('#initial').val();
+	if(befin == "") befin = 0;
+	
 		  $('#initial').empty();	
 	 for(i=0; i < statesnb(); i++)
 		  $('#initial').append('<option id="i'+i+'">'+i+'</option>');
-	$('.initial').val(0);
+	$('#initial').val(befin);
 
 switch(problem()) {
 	case "sh": $('#solve').val("Compute the StarHeight of this Deterministic Automaton"); break;

@@ -153,6 +153,15 @@ and the value 1 problems for probabilistic automata.
 				     </td></tr>
 				     <tr><td>
 					     	  <input type="button" id="random" value="Random automaton" ></input>
+				     <span class="density"><b>Density</b><select id="density" /></span>
+				     <?php
+				     for($i=10;$i <=40; $i+=10)
+				       echo '<option value="'.$i.'">'.$i.'%</option>';
+    echo '<option selected="selected" value="30">30%</option>';
+    for($i=60;$i <=90; $i+=10)
+      echo '<option value="'.$i.'">'.$i.'%</option>';
+    ?>
+      </select>
 
 				     <table><tr>
 				     <td style="vertical-align:top">
@@ -171,19 +180,6 @@ and the value 1 problems for probabilistic automata.
 				     </td>
 				     </tr>
 				     </table></td></tr>
-				     <tr>
-				     <td class="density" >Density
-				     <select id="density" />
-				     <?php
-				     for($i=10;$i <=40; $i+=10)
-				       echo '<option value="'.$i.'">'.$i.'%</option>';
-    echo '<option selected="selected" value="50">50%</option>';
-    for($i=60;$i <=90; $i+=10)
-      echo '<option value="'.$i.'">'.$i.'%</option>';
-    ?>
-      </select>
-	  </td>
-	  </tr>
 
 	  </table>
 	  <div id="buttons">
@@ -202,7 +198,7 @@ and the value 1 problems for probabilistic automata.
 	  </div>
 	        <script src="configure.js" type="text/javascript"></script>
 <br/>
-	<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+	<br/><br/><br/>
 
 <hr/>
 <h2 id="Installation">Installation</h2> 
