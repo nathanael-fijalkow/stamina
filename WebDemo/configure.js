@@ -132,7 +132,7 @@
       $('#initial').val( Math.floor( Math.random() * statesnb() ));
 
       /* random choice of final states */
-      for(j=0; j< statesnb; j++)		 
+      for(j=0; j< statesnb(); j++)		 
 	{
 	  var yes = (Math.random() < density) ? true : false;
 	  $('#f'+j).find("input").prop('checked',yes);
@@ -142,7 +142,7 @@
       //at least one final state or parsing wont work
       if(!ok)
 	{
-	  randinit = Math.floor( Math.random() * statesnb() );
+	  var randinit = Math.floor( Math.random() * statesnb() );
 	  $('#f'+randinit).find("input").prop('checked',true);
 	}
 
