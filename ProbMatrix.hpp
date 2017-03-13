@@ -8,6 +8,9 @@
 class ProbMatrix : public Matrix
 {
 public:
+    //Empty matrix
+    ProbMatrix();
+    
 	// Constructor from explicit representation
 	ProbMatrix(const ExplicitMatrix &);
     

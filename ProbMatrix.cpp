@@ -39,6 +39,11 @@ const Vector *const *const ProbMatrix::getRowPluses() const
   return row_pluses();
 }
 
+ProbMatrix::ProbMatrix()
+{
+    allocate();
+}
+
 // Convert an explicit matrix into a matrix
 ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix)
 {
@@ -258,7 +263,7 @@ const Matrix * ProbMatrix::prod(const Matrix * pmat1) const
 	const ProbMatrix & mat1 = *this;
 	const ProbMatrix & mat2 = *(ProbMatrix *)pmat1;
 	uint n = Vector::GetStateNb();
-	ProbMatrix * result = new ProbMatrix(n);
+	ProbMatrix * result = new ProbMatrix();
 
 	for (uint i = 0; i < n; i++)
 	{
@@ -289,7 +294,7 @@ const Matrix * ProbMatrix::stab(bool isIdempotentForSure) const
     
 	const Vector * recs = recurrent_states();
 	uint n = Vector::GetStateNb();
-	ProbMatrix * result = new ProbMatrix(n);
+	ProbMatrix * result = new ProbMatrix();
 
 	for (uint i = 0; i < n; i++)
 	{
