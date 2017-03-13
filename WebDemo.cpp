@@ -196,7 +196,7 @@ int main(int argc, char **argv)
             }
             else if(r.first == 0)
             {
-                cout << "The automaton DOES NOT HAVE VALUE=1, because it is leaktight and there is no value 1 witness." << endl << endl;
+                cout << "The automaton HAS NOT VALUE=1, because it is leaktight and there is no value 1 witness." << endl << endl;
             }
             else
             {

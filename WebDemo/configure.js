@@ -361,6 +361,8 @@ function updateAutomaton()
 	var mats = [];
 	var initial = '';
 	var final = '';
+	$('#automate').empty();
+	$('#output').empty();
 	for(i=0; i < statesnb(); i++)
 	  {
 	    var obj = $('#f'+i);
