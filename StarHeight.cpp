@@ -236,9 +236,10 @@ MultiCounterAut * toNestedBaut(
                                char k,
                                bool debug,
                                bool output_file,
-                               string filepref,
-                               bool use_minimization
-                               ){
+                               string filepref
+//bool use_minimization,
+// bool use_prune
+){
     
     uint ns=Subsetaut->NbStates;
     char nl=Subsetaut->NbLetters;
@@ -355,7 +356,8 @@ int computeStarHeight( ClassicAut & aut,
                       bool verbose,
                       string filepref,
                       bool use_loop_heuristic,
-                      bool use_minimization
+                      bool use_minimization,
+                      bool use_prune
                       )
 {
     if(! aut.iscomplete()){
@@ -392,6 +394,7 @@ int computeStarHeight( ClassicAut & aut,
     }
     int h=LC;
     if (LC>1){
+        
         if(verbose) cout << endl << "************STAR HEIGHT COMPUTATION**********" << endl;
         if(verbose) cout << "Computing the Subset Automaton..." << endl;
         
@@ -408,17 +411,21 @@ int computeStarHeight( ClassicAut & aut,
             Subsetaut->print(file);
         }
         
-        if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
         
         if(use_minimization) {
-            Subsetaut=SubMinPre(Subsetaut); //optional for now, to test later
+            if (verbose) cout <<"Minimizing the Subset Automaton..."<<endl;
+            Subsetaut=SubMinPre(Subsetaut);
+        }
+        if(use_prune) {
+            if (verbose) cout <<"Pruning the Subset Automaton..."<<endl;
+            
             Subsetaut=SubPrune(Subsetaut);
         }
         
         ns=Subsetaut->NbStates;
         nl=Subsetaut->NbLetters;
         
-        if(verbose) printf("Pruned Subset Automaton Built, %d states\n\n",ns);
+        if(verbose) printf("Subset Automaton Built, %d states\n\n",ns);
         if(filelogs) {
             ofstream file(filepref + "subset_aut_pruned.txt");
             Subsetaut->print(file);
@@ -487,9 +494,7 @@ int computeStarHeight( ClassicAut & aut,
                     return h;
                 } else {
                     if(verbose){
-                        cout << "An unlimited witness is ";
-                        witness->print();
-                        cout << endl;
+                        cout << "An unlimited witness is "; witness->print(); cout << endl;
                     }
                     if(filelogs) {
                         ofstream f(filepref + "unlimited_witness_sh_" +   to_string(h) + ".txt");
