@@ -45,7 +45,6 @@ public:
     static bool value1Test(const Matrix * m);
     static int initialState;
     static vector<bool> finalStates;
-    static int autsize;
     
 protected:
 	pair <Matrix *, bool> addMatrix(const Matrix * mat);

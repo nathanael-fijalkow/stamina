@@ -137,7 +137,7 @@ bool UnstableMarkovMonoid::value1Test(const Matrix * pm)
      cout << i << ": " << finalStates[i] << " " << ones->contains(i) << endl;
      */
     
-    for (int i = 0; i < UnstableMarkovMonoid::autsize; i++)
+    for (int i = 0; i < Vector::GetStateNb(); i++)
         if( !UnstableMarkovMonoid::finalStates[i]  && ones->contains(i))
             return false;
     return true;
@@ -145,6 +145,5 @@ bool UnstableMarkovMonoid::value1Test(const Matrix * pm)
 
 int UnstableMarkovMonoid::initialState = 0;
 vector<bool> UnstableMarkovMonoid::finalStates;
-int UnstableMarkovMonoid::autsize = 0;
 
 
