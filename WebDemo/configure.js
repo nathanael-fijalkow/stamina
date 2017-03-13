@@ -327,7 +327,7 @@ switch(problem()) {
       $.ajax({
 	method: "POST",
 	    url: "",
-	    async:false,
+	    async:true,
 	    data: { "action": "progress"}
 	})
 	.done(function( msg ) {
@@ -339,6 +339,7 @@ function showAutomaton(data)
 {
 	if(data) {
 		$('#automate').empty();
+		//output(data);
 		$('#automate').append( Viz(data));
 	}
 }
@@ -348,7 +349,7 @@ function updateAutomaton()
 	$.ajax({
 	method: "POST",
 	    url: "",
-	    async:false,
+	    async:true,
 	    data: { "action": "aut_file"}
 	})
 	.done(function( msg ) {
@@ -420,6 +421,7 @@ function updateAutomaton()
 	$.ajax({
 	  method: "POST",
 	      url: "",
+	      async:true,
 	      data: { "action": this.id, "automaton" : aut, "problem" : problem() }
 	  })
 	  .done(function( msg ) {

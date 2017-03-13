@@ -19,7 +19,7 @@ $bin = realpath("WebDemo");
 	$aut=$_POST['automaton'];
 if(file_exists($output))
 	unlink($output);
-if(file_exists($automaton	))
+if(file_exists($automaton))
 	unlink($automaton);
 
 	$f = fopen($input,"w+");
@@ -65,10 +65,6 @@ if(file_exists($automaton	))
 	case 'aut_file':
 		if(file_exists($automaton))
 			echo $automaton;
-		break;		
-	case 'monoid_file':
-		if(file_exists($monoid))
-			echo $monoid;
 		break;		
 		
       case 'progress':
