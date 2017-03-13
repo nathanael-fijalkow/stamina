@@ -156,7 +156,7 @@
 		  var dcell = dmat.find('#c'+i+'_'+j+'_');
 		  dcell.val( Math.floor(Math.random()* statesnb()) );
 
-	      for(k=1; k<= maxstatesnb; k++)
+	      for(k=0; k< maxstatesnb; k++)
 		{
 		  var pcell = pmat.find('#c'+i+'_'+j+'_'+k);
 		  pcell.prop('checked', (Math.random() < density));
@@ -263,7 +263,7 @@ switch(problem()) {
 		  var pline = pmat.find('#l'+i+'_'+j);
 		  var cline = cmat.find('#l'+i+'_'+j);
 		  var dline = dmat.find('#l'+i+'_'+j);
-		  if(j > statesnb())  {  pline.hide(); cline.hide(); dline.hide(); }
+		  if(j >= statesnb())  {  pline.hide(); cline.hide(); dline.hide(); }
 		  else { pline.show();  cline.show(); dline.show(); }
 
 		      var lab= '#c'+i+'_'+j+'_';
@@ -274,7 +274,7 @@ switch(problem()) {
 		      dcell.val(old);
 		      if(dcell.val() == "")
 			    dcell.val("0");
-			  if(j > statesnb()) {
+			  if(j >= statesnb()) {
 		      lab= '#l'+i+'_'+j;
 		      	dline = dmat.find(lab);
 			     dline.hide();
@@ -295,7 +295,7 @@ switch(problem()) {
 			  if(ccell.val() == "")
 			    ccell.val(cselect[0][0]);
 			
-		      if(k <= statesnb()) { ccell.show(); pcell.show(); }
+		      if(k < statesnb()) { ccell.show(); pcell.show(); }
 		      else { pcell.hide(); ccell.hide(); }
 		    }
 		}
