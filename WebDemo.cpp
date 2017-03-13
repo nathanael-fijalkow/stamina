@@ -121,7 +121,10 @@ int main(int argc, char **argv)
 
         cout << endl << endl << "RESULT: the star height is " << h << "." << endl;
         
+        cout << endl << endl;
         if(witness) witness->print();
+
+        cout << endl << endl;
         if(monoid) monoid->print();
         
         string filename(argv[2]);
