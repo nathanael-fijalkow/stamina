@@ -87,7 +87,6 @@ $bin = realpath("WebDemo");
 	    echo str_replace(array("\n","E ","O "),array("<br/>","&epsilon;","&omega;"),$chunk);	    
 	      }
 
-
 	    echo "<br/>*************************************************<br/>";
 	    echo "<br/>The computation is long, output is truncated...";
 	    echo "Here is <a href=\"".$foutput."\">the complete log.</a><br/>";

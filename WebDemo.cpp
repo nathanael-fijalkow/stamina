@@ -102,6 +102,9 @@ int main(int argc, char **argv)
         exit(0);
     }
     
+//    cout << "Performin action '" << action << "'" << endl;
+    
+    
     if(action == "starheight" || action == "sh") {
         cout << "Computing starheight" << endl;
         ClassicAut aut(*expa);
@@ -115,7 +118,8 @@ int main(int argc, char **argv)
         const ExtendedExpression * witness = NULL;
         int loopComplexity = 0;
         auto h = computeStarHeight(aut, monoid, witness, loopComplexity, false, true);
-        cout << "RESULT: the star height is " << h << "." << endl;
+
+        cout << endl << endl << "RESULT: the star height is " << h << "." << endl;
         
         string filename(argv[2]);
         ofstream ofs(filename + ".dot");
@@ -125,7 +129,7 @@ int main(int argc, char **argv)
         delete monoid; monoid = NULL;
     } else {
         
-        bool find_witness = (action == "monoid" || action == "mon");
+        bool find_witness = (action != "monoid" && action != "mon");
         
         
         if(expa->type==PROB)
@@ -155,24 +159,24 @@ int main(int argc, char **argv)
             auto lnb = r.first;
             if(lnb == 0)
             {
-                cout << "This automaton is leaktight" << endl;
+                cout << endl << endl << "This automaton is LEAKTIGHT " << endl;
             }
             else
             {
-                cout << "This automaton is NOT leaktight, it has " << lnb << " leak, for example" << endl;
-                cout << *expr << endl;
+                cout << endl << endl << "This automaton is NOT LEAKTIGHT, it has " << lnb << " LEAK, for example" << endl;
+                cout << *(r.second) << endl;
                 cout << "is a leak" << endl;
             }
             if(!find_witness)
                 expr = m.hasValue1();
             if (expr)
             {
-                cout << "The automaton has value 1.\nA value 1 witness is " << endl;
+                cout << "The automaton HAS VALUE=1.\nA value 1 witness is " << endl;
                 cout << *expr << endl << endl;
             }
             else if(r.first == 0)
             {
-                cout << "The automaton does not have value 1, because it is leaktight and there is no value 1 witness." << endl;
+                cout << "The automaton DOES NOT HAVE VALUE=1, because it is leaktight and there is no value 1 witness." << endl << endl;
             }
             else
             {
@@ -204,11 +208,11 @@ int main(int argc, char **argv)
             {
                 if(expr == NULL)
                 {
-                    cout << "This automaton is bounded, its monoid contains no unlimited witness." << endl;
+                    cout << endl << endl << "RESULT: This automaton is LIMITED, its monoid contains No UNLIMITED WITNESS." << endl << endl;
                 }
                 else
                 {
-                    cout << "This automaton is NOT bounded, its monoid contains the following unlimited witness:" << endl;
+                    cout << endl << endl << "RESULT: This automaton is NOT LIMITED, its monoid contains the following UNLIMITED WITNESS:" << endl;
                     cout << *expr << endl;
                 }
             }
