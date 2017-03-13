@@ -3,6 +3,12 @@ project (Stamina)
 
 option(COMPILE_SAGE_MODULES "Compiles SAGE modules (requires BOOST >= 1.45.0)" OFF)
 
+option(COMPILE_32 "force 32 bit compilation " OFF)
+if(COMPILE_32) 
+  set(CMAKE_CXX_FLAGS "-m32")
+  set(CMAKE_C_FLAGS "-m32")
+endif()
+
 option(MSVC "Compile for Visual Studio" OFF)
 if(MSVC)
 	add_definitions(-D_USE_MATH_DEFINES)
