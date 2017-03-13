@@ -51,16 +51,22 @@ ProbMatrix::ProbMatrix(const ExplicitMatrix & explMatrix)
 		vector<bool> c_pluses(Vector::GetStateNb());
 		vector<bool> c_ones(Vector::GetStateNb());
 
+        bool ok = false;
+        
 		for (uint j = 0; j < Vector::GetStateNb(); j++)
 		{
 			char c1 = explMatrix.coefficients[i][j];
 			r_pluses[j] = (c1 >= 1);
 			r_ones[j] = (c1 >= 2);
+            ok |= r_ones[j];
 
 			char c2 = explMatrix.coefficients[j][i];
 			c_pluses[j] = (c2 >= 1);
 			c_ones[j] = (c2 == 2);
 		}
+        
+        if(!ok)
+            throw runtime_error("Cannot create ProbMatrix: every row should have at least one '1' entry");
 
 		unordered_set<Vector>::iterator it = vectors.emplace(r_ones).first;
 		row_ones()[i] = &(*it);

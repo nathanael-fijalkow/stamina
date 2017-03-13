@@ -54,6 +54,8 @@ void signal_callback_handler(int signum)
 
 int main(int argc, char **argv)
 {
+    try
+    {
     if(argc <= 2)
     {
         cout << "Usage " << string(argv[0]);
@@ -239,5 +241,9 @@ int main(int argc, char **argv)
             m.print();
         }
         cout << "Computation over " << endl;
+    }
+    } catch(runtime_error & exc)
+    {
+        cout << "Computation failed: " << exc.what() << endl;
     }
 }

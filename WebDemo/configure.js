@@ -134,7 +134,7 @@
       /* random choice of final states */
       for(j=0; j< statesnb; j++)		 
 	{
-	  var yes = Math.random() < density;
+	  var yes = (Math.random() < density) ? true : false;
 	  $('#f'+j).find("input").prop('checked',yes);
 	  ok |= yes;
 	}
@@ -158,19 +158,25 @@
 		  var dcell = dmat.find('#c'+i+'_'+j+'_');
 		  dcell.val( Math.floor(Math.random()* statesnb()) );
 
+	ok = false;
+	
 	      for(k=0; k< maxstatesnb; k++)
 		{
+		  var pok = (Math.random() < density);
+		  ok |= pok;
 		  var pcell = pmat.find('#c'+i+'_'+j+'_'+k);
-		  pcell.prop('checked', (Math.random() < density));
+		  pcell.prop('checked', pok);
 		  var ccell = cmat.find('#c'+i+'_'+j+'_'+k);
 		  ccell.val( ccoeff[Math.floor(Math.random()*ccoeff.length)] );
 		}
-	      var cell = pmat.find('#c'+i+'_'+j+'_'+(1 + Math.floor(Math.random()*statesnb)));
-	      cell.prop('checked',true);
-	    }
-	}
-    }
-
+		
+		if(!ok)	{
+		  finit = Math.floor( Math.random() * statesnb() );
+		  pmat.find('#c' + i + '_' + j + '_' + finit).prop('checked',true);
+		}
+}
+}
+}
 
     function counters_list()
     {

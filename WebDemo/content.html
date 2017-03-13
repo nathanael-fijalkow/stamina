@@ -153,7 +153,8 @@ and the value 1 problems for probabilistic automata.
 				     </td></tr>
 				     <tr><td>
 					     	  <input type="button" id="random" value="Random automaton" ></input>
-				     <span class="density"><b>Density</b><select id="density" /></span>
+				     <span class="density"><b>Density</b>
+				     <select id="density" />
 				     <?php
 				     for($i=10;$i <=40; $i+=10)
 				       echo '<option value="'.$i.'">'.$i.'%</option>';
@@ -162,6 +163,7 @@ and the value 1 problems for probabilistic automata.
       echo '<option value="'.$i.'">'.$i.'%</option>';
     ?>
       </select>
+      </span>
 
 				     <table><tr>
 				     <td style="vertical-align:top">
