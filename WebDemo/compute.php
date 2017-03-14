@@ -3,10 +3,14 @@ $iid = session_id();
 		
 $dir = $iid."@".$_SERVER['REMOTE_ADDR'];
 
-$input="automaton.".$dir.".acme";
-$output="computation.".$dir.".log";
-$automaton = "automaton.".$dir.".acme.auto.dot";
-$monoid = "automaton.".$dir.".acme.monoid.dot";
+if (!file_exists('temp')) {
+    mkdir('temp', 0777, true);
+}
+
+$input="temp/automaton.".$dir.".acme";
+$output="temp/computation.".$dir.".log";
+$automaton = "temp/automaton.".$dir.".acme.auto.dot";
+$monoid = "temp/automaton.".$dir.".acme.monoid.dot";
 
 $bin = realpath("WebDemo");
     $action = $_POST['action'];

@@ -407,6 +407,8 @@ int computeStarHeight( ClassicAut & aut,
         
         if(verbose){
             printf("Subset Automaton Built, %d states\n\n",ns);
+        }
+        if(filelogs) {
             ofstream file(filepref + "subset_aut.txt");
             Subsetaut->print(file);
         }
