@@ -163,7 +163,7 @@
 	      for(k=0; k< maxstatesnb; k++)
 		{
 		  var pok = (Math.random() < density);
-		  ok |= pok;
+		  ok |= (pok && k < statesnb());
 		  var pcell = pmat.find('#c'+i+'_'+j+'_'+k);
 		  pcell.prop('checked', pok);
 		  var ccell = cmat.find('#c'+i+'_'+j+'_'+k);
@@ -335,14 +335,6 @@ switch(problem()) {
 	  });
     }
 
-function showAutomaton(data)
-{
-	if(data) {
-		$('#automate').empty();
-		//output(data);
-		$('#automate').append( Viz(data));
-	}
-}
 
 function updateAutomaton()
 {
@@ -350,14 +342,16 @@ function updateAutomaton()
 	method: "POST",
 	    url: "",
 	    async:true,
-	    data: { "action": "aut_file"}
+	    data: { "action": "automaton"}
 	})
-	.done(function( msg ) {
-		if(msg != "") {
-		var filename = msg;
-		jQuery.get(filename, showAutomaton, 'text');
-	}});
+	.done(function( data ) {
+	if(data) {
+		$('#automate').empty();
+		//output(data);
+		$('#automate').append( Viz(data));
 	}
+	});
+}
 
     $( ".matchanger" ).change(function() {
 	update();

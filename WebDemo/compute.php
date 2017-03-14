@@ -62,11 +62,11 @@ if(file_exists($automaton))
 	    exec("nice ".$bin." ".$problem." ".$input." >> ".$output. " 2>/dev/null  &");
 	  }
 	break;
-	case 'aut_file':
-		if(file_exists($automaton))
-			echo $automaton;
-		break;		
-		
+	case 'automaton':
+		$ret =  file_get_contents($automaton);
+		if($ret !== FALSE) 
+			echo $ret;
+		break;				
       case 'progress':
       	if(!file_exists($output))
       	return;
@@ -76,9 +76,7 @@ if(file_exists($automaton))
 
 	//retourne le contenu du fichier de sortie
 	$f =fopen($output,"r");
-	if($f ===false)  {
-	    echo "No output yet";  break;
-	  } 
+	if($f ===false)  { echo "No output yet";  break; } 
 	$out = "";
 
 	if($size <= $max)
