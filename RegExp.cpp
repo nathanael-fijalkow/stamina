@@ -153,7 +153,7 @@ LetterRegExp::LetterRegExp(char a)
 	flat = string(1,'a' + a);
 }
 
-ConcatRegExp::ConcatRegExp(RegExp *e1, RegExp *e2)
+ConcatRegExp::ConcatRegExp(const RegExp *e1, const RegExp *e2)
 {
 	left = e1;
 	right = e2;
@@ -179,7 +179,7 @@ UnionRegExp::~UnionRegExp()
     delete right; right = NULL;
 }
 
-StarRegExp::StarRegExp(RegExp *e1)
+StarRegExp::StarRegExp(const RegExp *e1)
 {
 	base = e1;
 	starheight=1+e1->starheight;
@@ -382,11 +382,11 @@ RegExp *Aut2RegExp(ClassicAut *in, list<state> order)
 //we do it here because we'll only use it locally
 struct UnionListRegExp : RegExp
 {
-	list<RegExp *> sons;
-	UnionListRegExp(list<RegExp *> elist){
+    list<const RegExp *> sons;
+	UnionListRegExp(const list<const RegExp *> elist){
 		sons=elist;
 		int m=0;
-		for(RegExp *e:sons){
+		for(const RegExp *e:sons){
 			max(m,e->starheight);
 		}
 		starheight=m;
@@ -399,7 +399,7 @@ struct UnionListRegExp : RegExp
 	virtual void print() const {
 		bool f=true;
 		cout<<"(";
-		for(RegExp *e : sons){
+		for(const RegExp *e : sons){
 			if (f) f=false; else cout<<"+";
 			e->print();
 			}
@@ -419,49 +419,49 @@ const UnionListRegExp * isUnionList(const RegExp *expr){ return dynamic_cast<con
 
 
 //return the list of summand terms in an expression (singleton if not sum)
-list<RegExp *> RegTerms(RegExp *reg){
+list<const RegExp *> RegTerms(const RegExp *reg){
 	const UnionRegExp *uexp=isUnion(reg);
 	if (uexp!=NULL){ 
 		//binary union;		
-		list<RegExp *> list1=RegTerms(uexp->left);
-		list<RegExp *> list2=RegTerms(uexp->right);
+		list<const RegExp *> list1=RegTerms(uexp->left);
+		list<const RegExp *> list2=RegTerms(uexp->right);
 		list1.insert(list1.end(),list2.begin(),list2.end());
 		return list1;
 	}
 	const UnionListRegExp *lexp=isUnionList(reg);
 	if (lexp!=NULL){ 
 		//union list
-		list<RegExp *> reslist;
-		for(RegExp *e: lexp->sons){
-			list<RegExp *> el=RegTerms(e);
+		list<const RegExp *> reslist;
+		for(const RegExp *e: lexp->sons){
+			list<const RegExp *> el=RegTerms(e);
 			reslist.insert(reslist.end(),el.begin(),el.end());
 		}
 		return reslist;
 	}
 	//not a union, return the singleton expression
-	list<RegExp *> reslist;
+	list<const RegExp *> reslist;
 	reslist.push_back(reg);
 	return reslist;
 }
 
 //expand subexpressions: a(b+c)->ab+ac, no binary union or nested sums in the result.
-RegExp *ExpandReg(RegExp *reg){
+const RegExp *ExpandReg(const RegExp *reg){
 	const LetterRegExp *lexp=isLetter(reg);
 	if (lexp!=NULL) {
 		return reg;
 		}
 	const UnionRegExp *uexp=isUnion(reg);
 	if (uexp!=NULL){
-		list<RegExp *> l1=RegTerms(ExpandReg(uexp->left));
-		list<RegExp *> l2=RegTerms(ExpandReg(uexp->right));		
+		list<const RegExp *> l1=RegTerms(ExpandReg(uexp->left));
+		list<const RegExp *> l2=RegTerms(ExpandReg(uexp->right));
 		l1.insert(l1.end(),l2.begin(),l2.end());
 		UnionListRegExp *res=new UnionListRegExp(l1);
 		return res;
 	}
 	const UnionListRegExp *listexp=isUnionList(reg);
 	if (listexp!=NULL){
-		list <RegExp*> newsons;
-		for(RegExp *e: listexp->sons){
+		list <const RegExp*> newsons;
+		for(const RegExp *e: listexp->sons){
 			newsons.push_back(ExpandReg(e));
 		}
 		UnionListRegExp *res=new UnionListRegExp(newsons);
@@ -469,13 +469,13 @@ RegExp *ExpandReg(RegExp *reg){
 	}
 	const ConcatRegExp *cexp=isConcat(reg);	
 	if (cexp!=NULL){				
-		list<RegExp *> list1=RegTerms(ExpandReg(cexp->left));
-		list<RegExp *> list2=RegTerms(ExpandReg(cexp->right));
-		list<RegExp *> sonlist;
+		list<const RegExp *> list1=RegTerms(ExpandReg(cexp->left));
+		list<const RegExp *> list2=RegTerms(ExpandReg(cexp->right));
+		list<const RegExp *> sonlist;
 		//expand the product of two lists
-		for(RegExp *e : list1){
-				for(RegExp *f : list2){
-						ConcatRegExp *ef=new ConcatRegExp(e,f);	
+		for(const RegExp *e : list1){
+				for(const RegExp *f : list2){
+						const ConcatRegExp *ef=new ConcatRegExp(e,f);
 						sonlist.push_back(ef);
 				}
 			}
@@ -527,7 +527,7 @@ ExtendedExpression *Reg2Sharp(const RegExp *reg, bool balance){
 		int i=0;
 		bool all_equal=true;
 		int maxsh=-1;
-		for(RegExp *e : ulexp->sons){
+		for(const RegExp *e : ulexp->sons){
 			ExtendedExpression *exp=Reg2Sharp(e,balance);
 			res->sons[i]=new SharpedExpr(exp); //we just # everything for the non-balanced version
 			i++;
@@ -546,7 +546,7 @@ ExtendedExpression *Reg2Sharp(const RegExp *reg, bool balance){
 		//not used for now, but may be improved and used in the future
 		// for now it is not clear which is better, they seem to work in the same cases
 		i=0;
-		for(RegExp *e : ulexp->sons){
+		for(const RegExp *e : ulexp->sons){
 			ExtendedExpression *exp=Reg2Sharp(e,balance);
 			if (exp->sharp_height==maxsh) res->sons[i]=exp; //remove the sharp from maximal factors
 			i++;
@@ -574,10 +574,10 @@ ExtendedExpression *Reg2Sharp(const RegExp *reg, bool balance){
 }
 
 //apply Reg2Sharp to a sum of normal forms expressions and return the list of results.
-list<ExtendedExpression *> Reg2Sharps(RegExp *reg){
-	list<RegExp *> elist=RegTerms(ExpandReg(reg));
+list<ExtendedExpression *> Reg2Sharps(const RegExp *reg){
+	list<const RegExp *> elist=RegTerms(ExpandReg(reg));
 	list<ExtendedExpression *> res;
-	for(RegExp *e: elist){
+	for(const RegExp *e: elist){
 		//only unbalanced heuristic for now, but not clear which is better
 		res.push_back(Reg2Sharp(e,false));
 	}

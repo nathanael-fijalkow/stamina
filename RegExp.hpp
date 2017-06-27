@@ -35,10 +35,10 @@ struct LetterRegExp :RegExp
 
 struct ConcatRegExp : RegExp
 {
-	ConcatRegExp(RegExp *e1, RegExp *e2);
+	ConcatRegExp(const RegExp *e1, const RegExp *e2);
 	~ConcatRegExp();
-	RegExp *left;
-	RegExp *right;
+	const RegExp *left;
+	const RegExp *right;
 	virtual void print() const;
 	virtual RegExp* clone() const;
 };
@@ -55,9 +55,9 @@ struct UnionRegExp : RegExp
 
 struct StarRegExp : RegExp
 {
-	StarRegExp(RegExp *e1);
+	StarRegExp(const RegExp *e1);
 	~StarRegExp();
-	RegExp *base;
+	const RegExp *base;
 	virtual void print() const;
 	virtual RegExp* clone() const;
 };
@@ -71,6 +71,6 @@ const StarRegExp * isStar(const RegExp *expr);
 
 RegExp* Aut2RegExp(ClassicAut *Aut, list<uint> order);
 
-list<ExtendedExpression*> Reg2Sharps(RegExp *reg);
+list<ExtendedExpression*> Reg2Sharps(const RegExp *reg);
 
 #endif
