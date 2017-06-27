@@ -36,7 +36,7 @@ void pusage(char* s)
 int main(int argc, char **argv)
 {
     
-    int opt,verbose=1,toOut=0;
+    int opt,verbose=0,toOut=0;
     ifstream ifs;
     string outputFilename;
 #ifndef WIN32
