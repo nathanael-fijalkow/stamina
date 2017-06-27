@@ -51,7 +51,8 @@ string Dot::giveStyles ()
     
 	if(both < 0)
 		ret += initialStyle + std::to_string(initialState) + ";\n";
-	if(finalStatesNb>1 || (finalStatesNb==1 && both>=0))
+	if(finalStatesNb>1 || (finalStatesNb==1 && both<0))
+
 	{
 		ret+=finalStyle;
         for(auto fs : finalStates) {
