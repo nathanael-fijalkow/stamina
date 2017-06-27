@@ -80,6 +80,7 @@ int main(int argc, char **argv)
         cout << endl << endl << "The input automaton is a probabilistic automaton. Stamina will construct the Markov Monoid to check whether it has value 1." << endl << endl ;
         
         UnstableMarkovMonoid m(*expa);
+        m.setWitnessTest(&(m.value1Test));
         auto expr = m.ComputeMonoid();
         
         cout << "***************************************" << endl;
