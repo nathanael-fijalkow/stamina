@@ -736,7 +736,7 @@ MultiCounterAut::~MultiCounterAut()
 
 char MultiCounterAut::coef_to_char(string coef, int NbCounters)
 {
-    if(coef == "") return 2 * NbCounters + 2;
+    if(coef == "" || coef=="_") return 2 * NbCounters + 2;
     if(coef == "B") return 2 * NbCounters + 2;
     if(coef == "O") return 2 * NbCounters + 1;
     if(coef == "E") return NbCounters;

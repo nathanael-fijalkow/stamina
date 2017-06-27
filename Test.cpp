@@ -143,5 +143,33 @@ int main(int argc, char **argv)
         delete expa; expa = NULL;
         delete monoid; monoid = NULL;
     }
+    else if (expa->type > 0)
+        {
+            UnstableMultiMonoid m(* expa);
+            const ExtendedExpression * expr = m.ComputeMonoid();
+            
+                if(expr == NULL)
+                {
+                    cout << endl << endl << "RESULT: This automaton is LIMITED, its monoid contains No UNLIMITED WITNESS." << endl << endl;
+                }
+                else
+                {
+                    cout << endl << endl << "RESULT: This automaton is NOT LIMITED, its monoid contains the following UNLIMITED WITNESS:" << endl;
+                    cout << *expr << endl;
+                }
+
+           if(verbose){
+            cout << "***************************************" << endl;
+            cout << "***********VERBOSE MODE****************" << endl;
+            cout << "***************************************" << endl << endl;
+            
+            m.print();
+            cout << endl;
+        }
+        if(toOut) {
+            ofstream ofs(outputFilename + ".dot");
+            ofs << Dot::toDot(expa,&m, -1);
+        }
+    }
     return 0;
 }

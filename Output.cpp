@@ -68,18 +68,39 @@ string Dot::giveStyles ()
 string Dot::toDot(const ExplicitAutomaton & a)
 {
 	string ret=start;
-	if(SH != -1)
-//		ret += "label=\"Automaton\"\n";
+	//if(SH != -1)
+		ret += "label=\"Automaton\"\n";
 //	else
-		ret += "label=\"Monoid for SH=" + std::to_string(SH) +"\"\n";
+	//	ret += "label=\"Monoid for SH=" + std::to_string(SH) +"\"\n";
 	ret += giveStyles();
-	for(int i=0;i<a.alphabet.length();i++)
+	if(a.type<=0){//Proba or classical
+		for(int i=0;i<a.alphabet.length();i++)
 		for(int j=0;j<size;j++)
 			for(int k=0;k<size;k++)
-				if( a.matrices[i].coefficients[j][k] == 2 )
+				if(a.matrices[i].coefficients[j][k] == 2 )
 					ret+=std::to_string(j) + " -> " + std::to_string(k) + " [label = \""
-                        +a.alphabet[i]+"\"];\n";
-	ret+="}\n";
+                       			 +a.alphabet[i]+"\"];\n";
+		ret+="}\n";
+	}
+	else{//MultiCounteraut
+		int n=a.type;//number of cuunters
+		for(int i=0;i<a.alphabet.length();i++)
+		for(int j=0;j<size;j++)
+			for(int k=0;k<size;k++){
+			int elem=a.matrices[i].coefficients[j][k];
+			if(elem < 2 * n + 2){ // do not display bottom
+			ret += std::to_string(j) + " -> " + std::to_string(k)+ " [label = \""
+                       			 +a.alphabet[i] +":";
+			if (elem == 2 * n + 1) ret += "O";
+			else if (elem == n) ret += "E";
+			else if (elem < n) ret += "r" + to_string(elem);
+			else ret += "i" + to_string(elem - n - 1);
+			ret += "\"];\n";
+			}
+			}
+		ret+="}\n";
+	
+	}
 	return ret;
 }
 
