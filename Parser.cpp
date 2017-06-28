@@ -42,7 +42,7 @@ ExplicitAutomaton* Parser::parseFile(std::istream &file)
     int size = stoi(line);
     
     int type;
-    getline(file,line);
+    getfline(file,line);
     if(!line.compare("p"))
         type=PROB;
     else {
