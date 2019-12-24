@@ -1,25 +1,24 @@
-Stamina: STabilisation Monoids IN Automata theory
+# Stamina: STabilisation Monoids IN Automata theory
 
 Stamina is a tool implementing algebraic techniques to solve decision problems from automata theory.
 More specifically, it uses stabilisation monoids as an algorithmic back-end to solve two problems: the value 1 problem for probabilistic automata
 and that boundedness problem for automata with counters.
 Most importantly, it is, to the best of our knowledge, the very first implementation of an algorithm solving the star-height problem.
 
-It has been written in C++, by Nathanael Fijalkow, Hugo Gimbert, Edon Kelmendi and Denis Kuperberg.
+It has been written in C++ by [Nathanaël Fijalkow](nathanael-fijalkow.github.io/), [Hugo Gimbert](https://www.labri.fr/perso/gimbert/), [Edon Kelmendi](https://www.cs.ox.ac.uk/people/edon.kelmendi/) and [Denis Kuperberg](https://perso.ens-lyon.fr/denis.kuperberg/).
 
-Stamina is the successor of ACME, which also implements the transformation of an automaton into a stabilisation monoid. 
+Stamina is the successor of [ACME](https://github.com/nathanael-fijalkow/acme), which also implements the transformation of an automaton into a stabilisation monoid. 
 The point of Stamina is that it is much much faster, and does a lot of space optimisations.
 This allows to handle much bigger automata, which is required to solve the star-height problem.
 
-*************
-Installation
-*************
+See the [tool paper presentation at CIAA'2017](https://github.com/nathanael-fijalkow/stamina/blob/master/CIAA_2017_Stamina.pdf).
+
+### Installation
 
 To compile, open a terminal, go to the Stamina directory, type
 
 cmake .
 make
-
 
 The command
 ./StaminaTest file.txt -o out.dot
@@ -37,9 +36,7 @@ For cost automata, the coefficients of the matrix are I1, I2,... for increments 
 
 Careful: if the input is a classical automaton for star-height computation, it has to be deterministic. In future versions, we might accept instead the dual (accepting states reversed) of a non-deterministic automaton for the complement language.
 
-************
-Sage Library
-************
+### Sage Library 
 
 After compiling Stamina, copy the files stamina.py and libacme.so to sage/stamina-0.1/src/. 
 To create a Sage package:
