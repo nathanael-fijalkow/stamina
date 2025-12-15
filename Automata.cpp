@@ -1,6 +1,7 @@
 
 #include "Automata.hpp"
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 
